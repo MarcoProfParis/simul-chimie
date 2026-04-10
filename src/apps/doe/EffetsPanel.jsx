@@ -437,7 +437,8 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
             left: popupPos.x,
             top: popupPos.y,
             zIndex: 300,
-            width: 340,
+            width: 480,
+            maxWidth: "95vw",
             background: "var(--bg, #fff)",
             border: "1.5px solid #6366f1",
             borderRadius: 12,
@@ -465,59 +466,171 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
             </button>
           </div>
 
-          {/* Contenu compact */}
-          <div style={{ padding: "12px 14px", fontSize: 12 }}>
+          {/* Contenu scrollable */}
+          <div style={{ padding: "12px 14px", fontSize: 11, overflowY: "auto", maxHeight: "80vh" }}>
 
-            {/* Résultat principal */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10,
-              padding: "8px 12px", background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
-              <span style={{ fontFamily: "monospace", color: "#374151" }}>b = </span>
-              <span style={{ fontFamily: "monospace", fontWeight: 700, fontSize: 16,
-                color: effet > 0 ? "#15803d" : effet < 0 ? "#dc2626" : "#6b7280" }}>
-                {effet > 0 ? "+" : ""}{(+effet).toFixed(3)}
-              </span>
-              {activeResp?.unit && (
-                <span style={{ fontSize: 10, color: "#9ca3af" }}>{activeResp.unit}</span>
-              )}
+            {/* ── Étape 2 — Moyennes par niveau ── */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                letterSpacing: 1, color: "#6b7280", marginBottom: 8 }}>
+                Étape 2 — Moyennes par niveau
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+
+                {/* Moy(+1) */}
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0",
+                  borderRadius: 8, padding: "8px 10px" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                    color: "#15803d", marginBottom: 6 }}>
+                    Moy(+1)
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
+                    {plusRows.map((r, i) => {
+                      const ri = validRows.indexOf(r);
+                      return (
+                        <span key={i} style={{ fontFamily: "monospace", fontSize: 10,
+                          background: "#bbf7d0", color: "#166534", borderRadius: 4,
+                          padding: "1px 5px" }}>
+                          E{ri + 1} = {(+r.responses[yKey]).toFixed(2)}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontFamily: "monospace", fontSize: 10, color: "#15803d", marginBottom: 4 }}>
+                    = ({plusRows.map(r => (+r.responses[yKey]).toFixed(2)).join(" + ")}) / {plusRows.length}
+                  </div>
+                  <div style={{ fontFamily: "monospace", fontWeight: 700, fontSize: 15,
+                    color: "#15803d" }}>
+                    = {(+moyPlus).toFixed(2)}
+                  </div>
+                </div>
+
+                {/* Moy(-1) */}
+                <div style={{ background: "#fef2f2", border: "1px solid #fecaca",
+                  borderRadius: 8, padding: "8px 10px" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                    color: "#dc2626", marginBottom: 6 }}>
+                    Moy(−1)
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
+                    {minusRows.map((r, i) => {
+                      const ri = validRows.indexOf(r);
+                      return (
+                        <span key={i} style={{ fontFamily: "monospace", fontSize: 10,
+                          background: "#fecaca", color: "#991b1b", borderRadius: 4,
+                          padding: "1px 5px" }}>
+                          E{ri + 1} = {(+r.responses[yKey]).toFixed(2)}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontFamily: "monospace", fontSize: 10, color: "#dc2626", marginBottom: 4 }}>
+                    = ({minusRows.map(r => (+r.responses[yKey]).toFixed(2)).join(" + ")}) / {minusRows.length}
+                  </div>
+                  <div style={{ fontFamily: "monospace", fontWeight: 700, fontSize: 15,
+                    color: "#dc2626" }}>
+                    = {(+moyMinus).toFixed(2)}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Formule */}
-            <div style={{ fontFamily: "monospace", fontSize: 11, color: "#374151", marginBottom: 8 }}>
-              <div style={{ marginBottom: 4, color: "#6b7280", fontSize: 10, textTransform: "uppercase", letterSpacing: 1 }}>
-                Formule
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <span>b =</span>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <span style={{ borderBottom: "1px solid #9ca3af", paddingBottom: 1, color: "#15803d" }}>
-                    {(+moyPlus).toFixed(2)} − {(+moyMinus).toFixed(2)}
-                  </span>
-                  <span style={{ color: "#6b7280", paddingTop: 1 }}>2</span>
-                </div>
-                <span>=</span>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <span style={{ borderBottom: "1px solid #9ca3af", paddingBottom: 1 }}>
-                    {(+(moyPlus - moyMinus)).toFixed(2)}
-                  </span>
-                  <span style={{ color: "#6b7280", paddingTop: 1 }}>2</span>
-                </div>
-                <span>=</span>
-                <span style={{ fontWeight: 700, color: effet > 0 ? "#15803d" : "#dc2626" }}>
-                  {(+effet).toFixed(3)}
-                </span>
-              </div>
-            </div>
+            {/* Séparateur */}
+            <div style={{ borderTop: "1px solid #e5e7eb", marginBottom: 12 }} />
 
-            {/* Interprétation courte */}
-            <div style={{ fontSize: 11, color: "#374151", padding: "6px 10px",
-              background: Math.abs(effet) < 0.3 ? "#f9fafb" : effet > 0 ? "#eff6ff" : "#fef2f2",
-              borderRadius: 6, borderLeft: `3px solid ${Math.abs(effet) < 0.3 ? "#d1d5db" : effet > 0 ? "#6366f1" : "#ef4444"}` }}>
-              {Math.abs(effet) < 0.3
-                ? `Effet faible → ${termFactors.map(f => f.name).join(" × ")} peu influent.`
-                : effet > 0
-                ? `Effet positif → augmenter ${isInteraction ? "l'interaction" : termFactors[0]?.name} augmente ${activeResp?.name || "Y"}.`
-                : `Effet négatif → augmenter ${isInteraction ? "l'interaction" : termFactors[0]?.name} diminue ${activeResp?.name || "Y"}.`
-              }
+            {/* ── Étape 3 — Calcul de l'effet ── */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                letterSpacing: 1, color: "#6b7280", marginBottom: 8 }}>
+                Étape 3 — Calcul de l'effet = coefficient b
+              </div>
+
+              {/* Formule avec fraction */}
+              <div style={{ fontFamily: "monospace", marginBottom: 10,
+                padding: "8px 10px", background: "#f8fafc", borderRadius: 6,
+                border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  <span style={{ color: "#374151" }}>b =</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <span style={{ borderBottom: "1px solid #9ca3af", paddingBottom: 1,
+                      fontSize: 11, color: "#374151" }}>
+                      <span style={{ color: "#15803d" }}>Moy(+1)</span>
+                      {" − "}
+                      <span style={{ color: "#dc2626" }}>Moy(−1)</span>
+                    </span>
+                    <span style={{ color: "#6b7280", paddingTop: 1, fontSize: 11 }}>2</span>
+                  </div>
+                  <span style={{ color: "#6b7280" }}>=</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <span style={{ borderBottom: "1px solid #9ca3af", paddingBottom: 1, fontSize: 11 }}>
+                      <span style={{ color: "#15803d" }}>{(+moyPlus).toFixed(2)}</span>
+                      {" − "}
+                      <span style={{ color: "#dc2626" }}>{(+moyMinus).toFixed(2)}</span>
+                    </span>
+                    <span style={{ color: "#6b7280", paddingTop: 1, fontSize: 11 }}>2</span>
+                  </div>
+                  <span style={{ color: "#6b7280" }}>=</span>
+                  <span style={{ fontWeight: 700, fontSize: 14,
+                    color: effet > 0 ? "#15803d" : effet < 0 ? "#dc2626" : "#6b7280" }}>
+                    {effet > 0 ? "+" : ""}{(+effet).toFixed(3)}
+                  </span>
+                  {activeResp?.unit && (
+                    <span style={{ fontSize: 10, color: "#9ca3af" }}>{activeResp.unit}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Interprétation */}
+              <div style={{
+                padding: "8px 10px",
+                borderRadius: 6,
+                borderLeft: `3px solid ${Math.abs(effet) < 0.3 ? "#d1d5db" : effet > 0 ? "#6366f1" : "#ef4444"}`,
+                background: Math.abs(effet) < 0.3 ? "#f9fafb" : effet > 0 ? "#eff6ff" : "#fef2f2",
+                color: Math.abs(effet) < 0.3 ? "#6b7280" : effet > 0 ? "#3730a3" : "#991b1b",
+                fontSize: 11,
+                lineHeight: 1.5,
+                marginBottom: 8,
+              }}>
+                {Math.abs(effet) < 0.3 ? (
+                  <span>Effet très faible ({(+effet).toFixed(3)}) → {termFactors.map(f => f.name).join(" × ")} a peu d'influence sur {activeResp?.name || "la réponse"}.</span>
+                ) : effet > 0 ? (
+                  <span>
+                    Effet positif (+{(+effet).toFixed(3)}) → {isInteraction
+                      ? `l'interaction ${termFactors.map(f => f.name).join(" × ")} a un effet synergique.`
+                      : `augmenter ${termFactors[0].name} augmente ${activeResp?.name || "la réponse"} de ${Math.abs(effet * 2).toFixed(2)} ${activeResp?.unit || ""} entre les deux niveaux.`}
+                  </span>
+                ) : (
+                  <span>
+                    Effet négatif ({(+effet).toFixed(3)}) → {isInteraction
+                      ? `l'interaction ${termFactors.map(f => f.name).join(" × ")} a un effet antagoniste.`
+                      : `augmenter ${termFactors[0].name} diminue ${activeResp?.name || "la réponse"} de ${Math.abs(effet * 2).toFixed(2)} ${activeResp?.unit || ""} entre les deux niveaux.`}
+                  </span>
+                )}
+                {isInteraction && (
+                  <div style={{ marginTop: 4, opacity: 0.8, fontSize: 10 }}>
+                    L'interaction signifie que l'effet de {termFactors[0].name} n'est pas le même selon le niveau de {termFactors[1].name}.
+                  </div>
+                )}
+              </div>
+
+              {/* Vérification moindres carrés */}
+              {fit && (() => {
+                const termIdx = model.terms.indexOf(term);
+                if (termIdx < 0) return null;
+                const bFromFit = fit.coeffs[termIdx + 1];
+                const diff = Math.abs(bFromFit - effet);
+                return (
+                  <div style={{ padding: "6px 10px", borderRadius: 6,
+                    background: "#fffbeb", border: "1px solid #fde68a",
+                    color: "#92400e", fontSize: 10 }}>
+                    <span style={{ fontWeight: 700 }}>Vérification :</span>{" "}
+                    coefficient moindres carrés = {bFromFit.toFixed(3)}.
+                    {diff < 0.01
+                      ? " ✓ Identique (plan orthogonal)."
+                      : ` Différence de ${diff.toFixed(3)} — plan non orthogonal (points centraux).`}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
