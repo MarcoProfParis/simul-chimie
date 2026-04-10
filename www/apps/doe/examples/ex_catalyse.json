@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "id": "ex_reaction_catalytique",
+    "title": "Optimisation d'une réaction catalytique",
+    "context": "3 facteurs · Rendement (%)",
+    "tags": ["modèle synergie", "3 facteurs", "plan factoriel complet 2³"],
+    "difficulty": "intermédiaire",
+    "real_data": false,
+    "source": ""
+  },
+
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low":  { "real": 80, "coded": -1 },
+      "high": { "real": 120, "coded":  1 }
+    },
+    {
+      "id": "X2",
+      "name": "Pression",
+      "unit": "bar",
+      "continuous": true,
+      "low":  { "real": 1, "coded": -1 },
+      "high": { "real": 3, "coded":  1 }
+    },
+    {
+      "id": "X3",
+      "name": "Temps",
+      "unit": "h",
+      "continuous": true,
+      "low":  { "real": 1, "coded": -1 },
+      "high": { "real": 3, "coded":  1 }
+    }
+  ],
+
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Rendement",
+      "unit": "%"
+    }
+  ],
+
+  "center_point": {
+    "present": false,
+    "replicates": 2
+  },
+
+  "model_default": ["X1", "X2", "X3", "X1X2", "X1X3", "X2X3"],
+
+  "runs": [
+    {
+      "id": 1,
+      "coded": { "X1": -1, "X2": -1, "X3": -1 },
+      "real":  { "X1": 80, "X2": 1, "X3": 1 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 64.45 },
+        { "rep": 2, "Y1": 65.683 }
+      ]
+    },
+    {
+      "id": 2,
+      "coded": { "X1": -1, "X2": -1, "X3": 1 },
+      "real":  { "X1": 80, "X2": 1, "X3": 3 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 59.537 },
+        { "rep": 2, "Y1": 58.799 }
+      ]
+    },
+    {
+      "id": 3,
+      "coded": { "X1": -1, "X2": 1, "X3": -1 },
+      "real":  { "X1": 80, "X2": 3, "X3": 1 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 74.705 },
+        { "rep": 2, "Y1": 71.322 }
+      ]
+    },
+    {
+      "id": 4,
+      "coded": { "X1": -1, "X2": 1, "X3": 1 },
+      "real":  { "X1": 80, "X2": 3, "X3": 3 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 70.469 },
+        { "rep": 2, "Y1": 62.881 }
+      ]
+    },
+    {
+      "id": 5,
+      "coded": { "X1": 1, "X2": -1, "X3": -1 },
+      "real":  { "X1": 120, "X2": 1, "X3": 1 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 85.054 },
+        { "rep": 2, "Y1": 75.174 }
+      ]
+    },
+    {
+      "id": 6,
+      "coded": { "X1": 1, "X2": -1, "X3": 1 },
+      "real":  { "X1": 120, "X2": 1, "X3": 3 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 75.505 },
+        { "rep": 2, "Y1": 73.593 }
+      ]
+    },
+    {
+      "id": 7,
+      "coded": { "X1": 1, "X2": 1, "X3": -1 },
+      "real":  { "X1": 120, "X2": 3, "X3": 1 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 102.709 },
+        { "rep": 2, "Y1": 104.559 }
+      ]
+    },
+    {
+      "id": 8,
+      "coded": { "X1": 1, "X2": 1, "X3": 1 },
+      "real":  { "X1": 120, "X2": 3, "X3": 3 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 90.854 },
+        { "rep": 2, "Y1": 89.344 }
+      ]
+    }
+  ]
+}

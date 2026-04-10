@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "id": "ex_extraction",
+    "title": "Extraction d'un principe actif",
+    "context": "Optimisation du rendement d'extraction d'un principe actif végétal par solvant",
+    "tags": ["effets principaux", "interactions", "3 facteurs"],
+    "difficulty": "débutant",
+    "real_data": false,
+    "source": "Adapté du cours BTS Métiers de la Chimie 2024"
+  },
+
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low":  { "real": 40,  "coded": -1 },
+      "high": { "real": 70,  "coded":  1 }
+    },
+    {
+      "id": "X2",
+      "name": "Durée d'extraction",
+      "unit": "min",
+      "continuous": true,
+      "low":  { "real": 15,  "coded": -1 },
+      "high": { "real": 45,  "coded":  1 }
+    },
+    {
+      "id": "X3",
+      "name": "Solvant",
+      "unit": null,
+      "continuous": false,
+      "low":  { "label": "Éthanol 50%", "coded": -1 },
+      "high": { "label": "Éthanol 70%", "coded":  1 }
+    }
+  ],
+
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Rendement d'extraction",
+      "unit": "%"
+    },
+    {
+      "id": "Y2",
+      "name": "Pureté",
+      "unit": "%"
+    }
+  ],
+
+  "center_point": {
+    "present": true,
+    "replicates": 3
+  },
+
+  "model_default": ["X1", "X2", "X3", "X1X2", "X1X3"],
+
+  "runs": [
+    {
+      "id": 1,
+      "coded":  { "X1": -1, "X2": -1, "X3": -1 },
+      "real":   { "X1": 40, "X2": 15, "X3": "Éthanol 50%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 52.3, "Y2": 88.1 }
+      ]
+    },
+    {
+      "id": 2,
+      "coded":  { "X1":  1, "X2": -1, "X3": -1 },
+      "real":   { "X1": 70, "X2": 15, "X3": "Éthanol 50%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 63.7, "Y2": 85.4 }
+      ]
+    },
+    {
+      "id": 3,
+      "coded":  { "X1": -1, "X2":  1, "X3": -1 },
+      "real":   { "X1": 40, "X2": 45, "X3": "Éthanol 50%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 58.9, "Y2": 90.2 }
+      ]
+    },
+    {
+      "id": 4,
+      "coded":  { "X1":  1, "X2":  1, "X3": -1 },
+      "real":   { "X1": 70, "X2": 45, "X3": "Éthanol 50%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 74.2, "Y2": 83.7 }
+      ]
+    },
+    {
+      "id": 5,
+      "coded":  { "X1": -1, "X2": -1, "X3":  1 },
+      "real":   { "X1": 40, "X2": 15, "X3": "Éthanol 70%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 61.5, "Y2": 91.8 }
+      ]
+    },
+    {
+      "id": 6,
+      "coded":  { "X1":  1, "X2": -1, "X3":  1 },
+      "real":   { "X1": 70, "X2": 15, "X3": "Éthanol 70%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 76.3, "Y2": 87.5 }
+      ]
+    },
+    {
+      "id": 7,
+      "coded":  { "X1": -1, "X2":  1, "X3":  1 },
+      "real":   { "X1": 40, "X2": 45, "X3": "Éthanol 70%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 68.4, "Y2": 93.1 }
+      ]
+    },
+    {
+      "id": 8,
+      "coded":  { "X1":  1, "X2":  1, "X3":  1 },
+      "real":   { "X1": 70, "X2": 45, "X3": "Éthanol 70%" },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 82.7, "Y2": 86.3 }
+      ]
+    },
+    {
+      "id": 9,
+      "coded":  { "X1": 0, "X2": 0, "X3": null },
+      "real":   { "X1": 55, "X2": 30, "X3": null },
+      "center": true,
+      "replicates": [
+        { "rep": 1, "Y1": 70.1, "Y2": 89.4 },
+        { "rep": 2, "Y1": 69.8, "Y2": 90.0 },
+        { "rep": 3, "Y1": 70.5, "Y2": 89.7 }
+      ]
+    }
+  ]
+}

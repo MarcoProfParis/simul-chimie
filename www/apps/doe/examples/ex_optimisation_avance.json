@@ -1,0 +1,420 @@
+{
+  "meta": {
+    "id": "ex_optimisation_avance",
+    "title": "Optimisation d'une réaction enzymatique",
+    "context": "2 facteurs · CCF augmenté 20 essais · Modèle quadratique · Maximum très marqué",
+    "difficulty": "avancé",
+    "real_data": false,
+    "source": "Exemple pédagogique BTS Métiers de la Chimie — optimisation enzymatique"
+  },
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low": {
+        "real": 50.0,
+        "coded": -1
+      },
+      "high": {
+        "real": 90.0,
+        "coded": 1
+      }
+    },
+    {
+      "id": "X2",
+      "name": "pH",
+      "unit": "",
+      "continuous": true,
+      "low": {
+        "real": 5.5,
+        "coded": -1
+      },
+      "high": {
+        "real": 8.5,
+        "coded": 1
+      }
+    }
+  ],
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Activité enzymatique",
+      "unit": "%"
+    }
+  ],
+  "center_point": {
+    "present": true,
+    "replicates": 8
+  },
+  "model_default": [
+    "X1",
+    "X2",
+    "X1X2",
+    "X12",
+    "X22"
+  ],
+  "runs": [
+    {
+      "id": 1,
+      "coded": {
+        "X1": -1,
+        "X2": -1
+      },
+      "real": {
+        "X1": 50,
+        "X2": 5.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 37.56
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "coded": {
+        "X1": -1,
+        "X2": -1
+      },
+      "real": {
+        "X1": 50,
+        "X2": 5.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 38.3
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "coded": {
+        "X1": 1,
+        "X2": -1
+      },
+      "real": {
+        "X1": 90,
+        "X2": 5.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 52.26
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "coded": {
+        "X1": 1,
+        "X2": -1
+      },
+      "real": {
+        "X1": 90,
+        "X2": 5.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 52.55
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "coded": {
+        "X1": -1,
+        "X2": 1
+      },
+      "real": {
+        "X1": 50,
+        "X2": 8.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 48.04
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "coded": {
+        "X1": -1,
+        "X2": 1
+      },
+      "real": {
+        "X1": 50,
+        "X2": 8.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 47.39
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "coded": {
+        "X1": 1,
+        "X2": 1
+      },
+      "real": {
+        "X1": 90,
+        "X2": 8.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 69.1
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "coded": {
+        "X1": 1,
+        "X2": 1
+      },
+      "real": {
+        "X1": 90,
+        "X2": 8.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 70.81
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "coded": {
+        "X1": -1,
+        "X2": 0
+      },
+      "real": {
+        "X1": 50,
+        "X2": 7.0
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 56.17
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "coded": {
+        "X1": 1,
+        "X2": 0
+      },
+      "real": {
+        "X1": 90,
+        "X2": 7.0
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 75.55
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "coded": {
+        "X1": 0,
+        "X2": -1
+      },
+      "real": {
+        "X1": 70,
+        "X2": 5.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 62.16
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "coded": {
+        "X1": 0,
+        "X2": 1
+      },
+      "real": {
+        "X1": 70,
+        "X2": 8.5
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 77.06
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 84.58
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 84.63
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 85.63
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 84.55
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 84.08
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 85.78
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 85.68
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 70,
+        "X2": 7.0
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 85.96
+        }
+      ]
+    }
+  ]
+}

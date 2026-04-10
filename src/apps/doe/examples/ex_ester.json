@@ -1,0 +1,88 @@
+{
+  "meta": {
+    "id": "ex_esterification",
+    "title": "Synthèse d'un ester",
+    "context": "2 facteurs · Taux de conversion (%)",
+    "tags": ["modèle synergie", "2 facteurs", "plan factoriel complet 2²"],
+    "difficulty": "intermédiaire",
+    "real_data": false,
+    "source": ""
+  },
+
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low":  { "real": 60, "coded": -1 },
+      "high": { "real": 80, "coded":  1 }
+    },
+    {
+      "id": "X2",
+      "name": "Rapport molaire",
+      "unit": "",
+      "continuous": true,
+      "low":  { "real": 1, "coded": -1 },
+      "high": { "real": 2, "coded":  1 }
+    }
+  ],
+
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Taux de conversion",
+      "unit": "%"
+    }
+  ],
+
+  "center_point": {
+    "present": false,
+    "replicates": 1
+  },
+
+  "model_default": ["X1", "X2", "X1X2"],
+
+  "runs": [
+    {
+      "id": 1,
+      "coded": { "X1": -1, "X2": -1 },
+      "real":  { "X1": 60, "X2": 1 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 40.603 },
+        { "rep": 2, "Y1": 38.692 }
+      ]
+    },
+    {
+      "id": 2,
+      "coded": { "X1": -1, "X2": 1 },
+      "real":  { "X1": 60, "X2": 2 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 65.489 },
+        { "rep": 2, "Y1": 55.315 }
+      ]
+    },
+    {
+      "id": 3,
+      "coded": { "X1": 1, "X2": -1 },
+      "real":  { "X1": 80, "X2": 1 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 73.611 },
+        { "rep": 2, "Y1": 73.253 }
+      ]
+    },
+    {
+      "id": 4,
+      "coded": { "X1": 1, "X2": 1 },
+      "real":  { "X1": 80, "X2": 2 },
+      "center": false,
+      "replicates": [
+        { "rep": 1, "Y1": 79.608 },
+        { "rep": 2, "Y1": 79.161 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "id": "ex_saponification_table",
+    "title": "Optimisation NaOH — rendement",
+    "context": "4 facteurs · Rendement (%)",
+    "tags": ["modèle synergie", "4 facteurs", "plan factoriel complet 2⁴"],
+    "difficulty": "intermédiaire",
+    "real_data": true,
+    "source": "tableau fourni"
+  },
+
+  "factors": [
+    {
+      "id": "X1",
+      "name": "NaOH",
+      "unit": "% en poids",
+      "continuous": true,
+      "low":  { "real": 1, "coded": -1 },
+      "high": { "real": 5, "coded": 1 }
+    },
+    {
+      "id": "X2",
+      "name": "Temps d’addition",
+      "unit": "min",
+      "continuous": true,
+      "low":  { "real": 10, "coded": -1 },
+      "high": { "real": 20, "coded": 1 }
+    },
+    {
+      "id": "X3",
+      "name": "Temps de maintien",
+      "unit": "min",
+      "continuous": true,
+      "low":  { "real": 15, "coded": -1 },
+      "high": { "real": 30, "coded": 1 }
+    },
+    {
+      "id": "X4",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low":  { "real": 20, "coded": -1 },
+      "high": { "real": 40, "coded": 1 }
+    }
+  ],
+
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Rendement",
+      "unit": "%"
+    }
+  ],
+
+  "center_point": {
+    "present": false,
+    "replicates": 1
+  },
+
+  "model_default": ["X1", "X2", "X3", "X4", "X1X2", "X1X3", "X1X4"],
+
+  "runs": [
+    { "id": 1,  "coded": {"X1":-1,"X2":-1,"X3":-1,"X4":-1}, "real":{"X1":1,"X2":10,"X3":15,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":51.7}] },
+    { "id": 2,  "coded": {"X1": 1,"X2":-1,"X3":-1,"X4":-1}, "real":{"X1":5,"X2":10,"X3":15,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":60.0}] },
+    { "id": 3,  "coded": {"X1":-1,"X2": 1,"X3":-1,"X4":-1}, "real":{"X1":1,"X2":20,"X3":15,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":47.0}] },
+    { "id": 4,  "coded": {"X1": 1,"X2": 1,"X3":-1,"X4":-1}, "real":{"X1":5,"X2":20,"X3":15,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":57.8}] },
+
+    { "id": 5,  "coded": {"X1":-1,"X2":-1,"X3": 1,"X4":-1}, "real":{"X1":1,"X2":10,"X3":30,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":58.7}] },
+    { "id": 6,  "coded": {"X1": 1,"X2":-1,"X3": 1,"X4":-1}, "real":{"X1":5,"X2":10,"X3":30,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":61.3}] },
+    { "id": 7,  "coded": {"X1":-1,"X2": 1,"X3": 1,"X4":-1}, "real":{"X1":1,"X2":20,"X3":30,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":56.3}] },
+    { "id": 8,  "coded": {"X1": 1,"X2": 1,"X3": 1,"X4":-1}, "real":{"X1":5,"X2":20,"X3":30,"X4":20}, "center":false, "replicates":[{"rep":1,"Y1":59.9}] },
+
+    { "id": 9,  "coded": {"X1":-1,"X2":-1,"X3":-1,"X4": 1}, "real":{"X1":1,"X2":10,"X3":15,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":51.0}] },
+    { "id": 10, "coded": {"X1": 1,"X2":-1,"X3":-1,"X4": 1}, "real":{"X1":5,"X2":10,"X3":15,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":58.8}] },
+    { "id": 11, "coded": {"X1":-1,"X2": 1,"X3":-1,"X4": 1}, "real":{"X1":1,"X2":20,"X3":15,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":40.3}] },
+    { "id": 12, "coded": {"X1": 1,"X2": 1,"X3":-1,"X4": 1}, "real":{"X1":5,"X2":20,"X3":15,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":52.4}] },
+
+    { "id": 13, "coded": {"X1":-1,"X2":-1,"X3": 1,"X4": 1}, "real":{"X1":1,"X2":10,"X3":30,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":56.7}] },
+    { "id": 14, "coded": {"X1": 1,"X2":-1,"X3": 1,"X4": 1}, "real":{"X1":5,"X2":10,"X3":30,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":56.8}] },
+    { "id": 15, "coded": {"X1":-1,"X2": 1,"X3": 1,"X4": 1}, "real":{"X1":1,"X2":20,"X3":30,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":49.0}] },
+    { "id": 16, "coded": {"X1": 1,"X2": 1,"X3": 1,"X4": 1}, "real":{"X1":5,"X2":20,"X3":30,"X4":40}, "center":false, "replicates":[{"rep":1,"Y1":57.8}] }
+  ]
+}

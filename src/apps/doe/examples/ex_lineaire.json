@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "id": "ex_lineaire",
+    "title": "Rigidité de pièces en plastique — modèle linéaire",
+    "context": "Optimisation de la rigidité de pièces plastiques. Exemple issu du cours (types_de_modèles.pdf). Modèle d'ordre 1 : effets principaux uniquement. R² = 0.591 → ajustement insuffisant.",
+    "tags": ["modèle linéaire", "ordre 1", "3 facteurs", "plan fractionnaire"],
+    "difficulty": "débutant",
+    "real_data": true,
+    "source": "Tinsson W., Plans d'expérience : constructions et analyses statistiques, Springer, 2010"
+  },
+
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low":  { "real": 60, "coded": -1 },
+      "high": { "real": 70, "coded":  1 }
+    },
+    {
+      "id": "X2",
+      "name": "Pression",
+      "unit": "g/cm²",
+      "continuous": true,
+      "low":  { "real": 20, "coded": -1 },
+      "high": { "real": 30, "coded":  1 }
+    },
+    {
+      "id": "X3",
+      "name": "Durée",
+      "unit": "s",
+      "continuous": true,
+      "low":  { "real": 5, "coded": -1 },
+      "high": { "real": 8, "coded":  1 }
+    }
+  ],
+
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Élasticité",
+      "unit": ""
+    }
+  ],
+
+  "center_point": {
+    "present": true,
+    "replicates": 3
+  },
+
+  "model_default": ["X1", "X2", "X3"],
+
+  "runs": [
+    {
+      "id": 1,
+      "coded":  { "X1":  1, "X2": -1, "X3": -1 },
+      "real":   { "X1": 70, "X2": 20, "X3": 5 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 63.4 }]
+    },
+    {
+      "id": 2,
+      "coded":  { "X1": -1, "X2":  1, "X3": -1 },
+      "real":   { "X1": 60, "X2": 30, "X3": 5 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 57.2 }]
+    },
+    {
+      "id": 3,
+      "coded":  { "X1": -1, "X2": -1, "X3":  1 },
+      "real":   { "X1": 60, "X2": 20, "X3": 8 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 70.2 }]
+    },
+    {
+      "id": 4,
+      "coded":  { "X1":  1, "X2":  1, "X3":  1 },
+      "real":   { "X1": 70, "X2": 30, "X3": 8 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 56.6 }]
+    },
+    {
+      "id": 5,
+      "coded":  { "X1": 0, "X2": 0, "X3": 0 },
+      "real":   { "X1": 65, "X2": 25, "X3": 6.5 },
+      "center": true,
+      "replicates": [
+        { "rep": 1, "Y1": 54.8 },
+        { "rep": 2, "Y1": 55.2 },
+        { "rep": 3, "Y1": 54.6 }
+      ]
+    }
+  ]
+}

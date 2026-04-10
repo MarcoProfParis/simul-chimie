@@ -1,0 +1,292 @@
+{
+  "meta": {
+    "id": "ex_optimisation_reaction",
+    "title": "Optimisation d'une réaction de synthèse",
+    "context": "2 facteurs · Plan CCF 13 essais · Modèle quadratique · Maximum dans le domaine",
+    "difficulty": "avancé",
+    "real_data": false,
+    "source": "Exemple pédagogique BTS Métiers de la Chimie"
+  },
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low": {
+        "real": 50.0,
+        "coded": -1
+      },
+      "high": {
+        "real": 80.0,
+        "coded": 1
+      }
+    },
+    {
+      "id": "X2",
+      "name": "Durée de réaction",
+      "unit": "min",
+      "continuous": true,
+      "low": {
+        "real": 25.0,
+        "coded": -1
+      },
+      "high": {
+        "real": 65.0,
+        "coded": 1
+      }
+    }
+  ],
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Rendement",
+      "unit": "%"
+    }
+  ],
+  "center_point": {
+    "present": true,
+    "replicates": 5
+  },
+  "model_default": [
+    "X1",
+    "X2",
+    "X1X2"
+  ],
+  "runs": [
+    {
+      "id": 1,
+      "coded": {
+        "X1": -1,
+        "X2": -1
+      },
+      "real": {
+        "X1": 50,
+        "X2": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 54.61
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "coded": {
+        "X1": 1,
+        "X2": -1
+      },
+      "real": {
+        "X1": 80,
+        "X2": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 64.0
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "coded": {
+        "X1": -1,
+        "X2": 1
+      },
+      "real": {
+        "X1": 50,
+        "X2": 65
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 61.23
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "coded": {
+        "X1": 1,
+        "X2": 1
+      },
+      "real": {
+        "X1": 80,
+        "X2": 65
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 77.12
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "coded": {
+        "X1": -1,
+        "X2": 0
+      },
+      "real": {
+        "X1": 50,
+        "X2": 45
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 63.82
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "coded": {
+        "X1": 1,
+        "X2": 0
+      },
+      "real": {
+        "X1": 80,
+        "X2": 45
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 75.4
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "coded": {
+        "X1": 0,
+        "X2": -1
+      },
+      "real": {
+        "X1": 65,
+        "X2": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 68.0
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "coded": {
+        "X1": 0,
+        "X2": 1
+      },
+      "real": {
+        "X1": 65,
+        "X2": 65
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 77.24
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 65,
+        "X2": 45
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 78.37
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 65,
+        "X2": 45
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 78.57
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 65,
+        "X2": 45
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 78.64
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 65,
+        "X2": 45
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 79.2
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "coded": {
+        "X1": 0,
+        "X2": 0
+      },
+      "real": {
+        "X1": 65,
+        "X2": 45
+      },
+      "center": true,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 78.89
+        }
+      ]
+    }
+  ]
+}

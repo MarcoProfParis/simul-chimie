@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "id": "ex_revetement",
+    "title": "Formulation d'un revêtement",
+    "context": "4 facteurs · Viscosité",
+    "tags": ["modèle synergie", "4 facteurs", "plan factoriel complet 2⁴"],
+    "difficulty": "intermédiaire",
+    "real_data": false,
+    "source": ""
+  },
+
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Résine A",
+      "unit": "%",
+      "continuous": true,
+      "low":  { "real": 30, "coded": -1 },
+      "high": { "real": 50, "coded":  1 }
+    },
+    {
+      "id": "X2",
+      "name": "Résine B",
+      "unit": "%",
+      "continuous": true,
+      "low":  { "real": 10, "coded": -1 },
+      "high": { "real": 20, "coded":  1 }
+    },
+    {
+      "id": "X3",
+      "name": "Solvant",
+      "unit": "%",
+      "continuous": true,
+      "low":  { "real": 20, "coded": -1 },
+      "high": { "real": 30, "coded":  1 }
+    },
+    {
+      "id": "X4",
+      "name": "Température",
+      "unit": "°C",
+      "continuous": true,
+      "low":  { "real": 20, "coded": -1 },
+      "high": { "real": 40, "coded":  1 }
+    }
+  ],
+
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "Viscosité",
+      "unit": "mPa·s"
+    }
+  ],
+
+  "center_point": {
+    "present": false,
+    "replicates": 1
+  },
+
+  "model_default": ["X1", "X2", "X3", "X4", "X1X2", "X1X3", "X1X4"],
+
+  "runs": [
+    {
+      "id": 1,
+      "coded":  { "X1": -1, "X2": -1, "X3": -1, "X4": -1 },
+      "real":   { "X1": 30, "X2": 10, "X3": 20, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 397.216 }]
+    },
+    {
+      "id": 2,
+      "coded":  { "X1": -1, "X2": -1, "X3": -1, "X4":  1 },
+      "real":   { "X1": 30, "X2": 10, "X3": 20, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 431.233 }]
+    },
+    {
+      "id": 3,
+      "coded":  { "X1": -1, "X2": -1, "X3":  1, "X4": -1 },
+      "real":   { "X1": 30, "X2": 10, "X3": 30, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 477.08 }]
+    },
+    {
+      "id": 4,
+      "coded":  { "X1": -1, "X2": -1, "X3":  1, "X4":  1 },
+      "real":   { "X1": 30, "X2": 10, "X3": 30, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 504.538 }]
+    },
+    {
+      "id": 5,
+      "coded":  { "X1": -1, "X2":  1, "X3": -1, "X4": -1 },
+      "real":   { "X1": 30, "X2": 20, "X3": 20, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 281.91 }]
+    },
+    {
+      "id": 6,
+      "coded":  { "X1": -1, "X2":  1, "X3": -1, "X4":  1 },
+      "real":   { "X1": 30, "X2": 20, "X3": 20, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 306.357 }]
+    },
+    {
+      "id": 7,
+      "coded":  { "X1": -1, "X2":  1, "X3":  1, "X4": -1 },
+      "real":   { "X1": 30, "X2": 20, "X3": 30, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 351.881 }]
+    },
+    {
+      "id": 8,
+      "coded":  { "X1": -1, "X2":  1, "X3":  1, "X4":  1 },
+      "real":   { "X1": 30, "X2": 20, "X3": 30, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 391.083 }]
+    },
+    {
+      "id": 9,
+      "coded":  { "X1":  1, "X2": -1, "X3": -1, "X4": -1 },
+      "real":   { "X1": 50, "X2": 10, "X3": 20, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 509.934 }]
+    },
+    {
+      "id": 10,
+      "coded":  { "X1":  1, "X2": -1, "X3": -1, "X4":  1 },
+      "real":   { "X1": 50, "X2": 10, "X3": 20, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 526.613 }]
+    },
+    {
+      "id": 11,
+      "coded":  { "X1":  1, "X2": -1, "X3":  1, "X4": -1 },
+      "real":   { "X1": 50, "X2": 10, "X3": 30, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 512.57 }]
+    },
+    {
+      "id": 12,
+      "coded":  { "X1":  1, "X2": -1, "X3":  1, "X4":  1 },
+      "real":   { "X1": 50, "X2": 10, "X3": 30, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 573.228 }]
+    },
+    {
+      "id": 13,
+      "coded":  { "X1":  1, "X2":  1, "X3": -1, "X4": -1 },
+      "real":   { "X1": 50, "X2": 20, "X3": 20, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 475.147 }]
+    },
+    {
+      "id": 14,
+      "coded":  { "X1":  1, "X2":  1, "X3": -1, "X4":  1 },
+      "real":   { "X1": 50, "X2": 20, "X3": 20, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 494.564 }]
+    },
+    {
+      "id": 15,
+      "coded":  { "X1":  1, "X2":  1, "X3":  1, "X4": -1 },
+      "real":   { "X1": 50, "X2": 20, "X3": 30, "X4": 20 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 488.9 }]
+    },
+    {
+      "id": 16,
+      "coded":  { "X1":  1, "X2":  1, "X3":  1, "X4":  1 },
+      "real":   { "X1": 50, "X2": 20, "X3": 30, "X4": 40 },
+      "center": false,
+      "replicates": [{ "rep": 1, "Y1": 524.328 }]
+    }
+  ]
+}
