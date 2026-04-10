@@ -1,6 +1,9 @@
 // CIELABExplorer v5 -- cleaned
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { ZoomIn, ZoomOut, Download, Eye, EyeOff, Grid3x3, RotateCcw, ChevronDown } from "lucide-react";
+import { useAuth } from "../../AuthContext";
+import { supabase } from "../../lib/supabaseClient";
+import AuthModal from "../../components/AuthModal";
 
 // --- Custom Tabs (shadcn-style) -----------------------------------------------
 function Tabs({ value, onValueChange, children, className, style }) {
@@ -2186,6 +2189,8 @@ const COLS = ["#e74c3c","#3498db","#2ecc71","#f39c12","#9b59b6","#1abc9c","#e67e
 
 // --- ExerciceDE ---------------------------------------------------------------
 function ExerciceDE() {
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [ex, setEx] = useState(() => genExercice("simple"));
   const [inputs, setInputs] = useState(() => Array(3).fill(null).map(()=>({dL:"",da:"",db:"",dC:"",dh:"",de:""})));
   const [rowValid, setRowValid] = useState([false,false,false]);
@@ -2195,6 +2200,10 @@ function ExerciceDE() {
   const [showDisc, setShowDisc] = useState(false);
   const [equPopup, setEquPopup] = useState(null);
   const [allowedTypes, setAllowedTypes] = useState({simple:true, cmc:false, ch:false});
+  const [savedId, setSavedId]   = useState(null);
+  const [saveMsg, setSaveMsg]   = useState(null);
+  const [history, setHistory]   = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
   const discExportRef = useRef(null);
   const katexRef = useRef(null);
 
@@ -2209,13 +2218,77 @@ function ExerciceDE() {
     document.head.appendChild(script);
   }, []);
 
-  const reset = () => {
+  // Charger l'historique quand l'utilisateur est connecté
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("exercices_cielab")
+      .select("id, created_at, type, score, completed")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data }) => { if (data) setHistory(data); });
+  }, [user]);
+
+  const reset = (keepId = false) => {
     const opts = Object.entries(allowedTypes).filter(([,v])=>v).map(([k])=>k);
     const t = opts.length>0 ? opts[Math.floor(Math.random()*opts.length)] : "simple";
     setEx(genExercice(t));
     setInputs(Array(3).fill(null).map(()=>({dL:"",da:"",db:"",dC:"",dh:"",de:""})));
     setRowValid([false,false,false]); setRowCorr([false,false,false]);
     setChoix(null); setQ3({clarte:"",rouge:"",jaune:"",saturation:""}); setShowDisc(false);
+    if (!keepId) setSavedId(null);
+    setSaveMsg(null);
+  };
+
+  const computeScore = () => {
+    let pts = 0, total = 0;
+    rowValid.forEach(v => { total++; if (v) pts++; });
+    if (choix !== null) { total++; if (choix === ex.okIdx) pts++; }
+    return total > 0 ? Math.round((pts / total) * 100) : 0;
+  };
+
+  const handleSave = async () => {
+    if (!user) { setShowAuthModal(true); return; }
+    const payload = {
+      user_id: user.id,
+      type: ex.deType,
+      data: { std: ex.std, formules: ex.formules, deMax: ex.deMax, dCmax: ex.dCmax, dhMax: ex.dhMax, okIdx: ex.okIdx },
+      answers: { inputs, rowValid, rowCorr, choix, q3 },
+      completed: choix !== null,
+      score: computeScore(),
+    };
+    let result;
+    if (savedId) {
+      result = await supabase.from("exercices_cielab").update(payload).eq("id", savedId).select().single();
+    } else {
+      result = await supabase.from("exercices_cielab").insert(payload).select().single();
+    }
+    if (result.error) {
+      setSaveMsg({ type:"error", text: result.error.message });
+    } else {
+      setSavedId(result.data.id);
+      setSaveMsg({ type:"success", text: "Sauvegardé ✓" });
+      // Rafraîchir l'historique
+      const { data } = await supabase.from("exercices_cielab").select("id, created_at, type, score, completed").eq("user_id", user.id).order("created_at", { ascending: false }).limit(10);
+      if (data) setHistory(data);
+      setTimeout(() => setSaveMsg(null), 3000);
+    }
+  };
+
+  const loadSession = async (id) => {
+    const { data, error } = await supabase.from("exercices_cielab").select("*").eq("id", id).single();
+    if (error || !data) return;
+    const { std, formules, deMax, dCmax, dhMax, okIdx } = data.data;
+    setEx({ std, formules, deMax, dCmax: dCmax||null, dhMax: dhMax||null, okIdx, deType: data.type, trickIdx: null, formules });
+    setInputs(data.answers.inputs || Array(3).fill(null).map(()=>({dL:"",da:"",db:"",dC:"",dh:"",de:""})));
+    setRowValid(data.answers.rowValid || [false,false,false]);
+    setRowCorr(data.answers.rowCorr || [false,false,false]);
+    setChoix(data.answers.choix ?? null);
+    setQ3(data.answers.q3 || {clarte:"",rouge:"",jaune:"",saturation:""});
+    setSavedId(id);
+    setShowHistory(false);
+    setSaveMsg(null);
   };
 
   const { std, deMax, dCmax, dhMax, deType, formules, trickIdx } = ex;
@@ -2317,7 +2390,51 @@ function ExerciceDE() {
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {equPopup!==null && <EquationPopup fi={equPopup} onClose={()=>setEquPopup(null)} />}
+
+      {/* Gate connexion */}
+      {!user && (
+        <div style={{background:"#fffbeb",border:"1px solid #fcd34d",borderRadius:11,padding:"16px 20px",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+          <span style={{fontSize:22}}>🔒</span>
+          <div style={{flex:1,minWidth:180}}>
+            <div style={{fontSize:13,fontWeight:700,color:"#92400e"}}>Connexion requise</div>
+            <div style={{fontSize:11,color:"#78350f",marginTop:2}}>Connectez-vous pour sauvegarder vos exercices et accéder à votre historique.</div>
+          </div>
+          <button onClick={() => setShowAuthModal(true)} style={{padding:"8px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer",whiteSpace:"nowrap"}}>
+            Se connecter
+          </button>
+        </div>
+      )}
+
+      {/* Historique */}
+      {user && history.length > 0 && (
+        <div style={{background:"#f0fdf4",border:"0.5px solid #bbf7d0",borderRadius:11,padding:"10px 14px"}}>
+          <button onClick={() => setShowHistory(h => !h)} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",padding:0}}>
+            <span style={{fontSize:11,fontWeight:800,color:"#166534"}}>📋 Mes exercices ({history.length})</span>
+            <span style={{fontSize:10,color:"#4ade80"}}>{showHistory ? "▲" : "▼"}</span>
+          </button>
+          {showHistory && (
+            <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:5}}>
+              {history.map(h => (
+                <button key={h.id} onClick={() => loadSession(h.id)}
+                  style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 10px",borderRadius:7,border:"0.5px solid #bbf7d0",background: savedId===h.id ? "#dcfce7" : "#fff",cursor:"pointer",textAlign:"left"}}>
+                  <span style={{fontSize:11,color:"#166534",fontWeight:savedId===h.id?800:500}}>
+                    {new Date(h.created_at).toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}
+                    {" – "}ΔE{h.type==="simple"?"₇₆":h.type==="cmc"?" CMC":"₇₆+C*h°"}
+                  </span>
+                  <span style={{fontSize:11,fontWeight:700,color: h.completed?"#16a34a":"#f59e0b"}}>
+                    {h.completed ? `✅ ${h.score}/100` : "⏳ en cours"}
+                  </span>
+                </button>
+              ))}
+              <button onClick={() => { reset(); setShowHistory(false); }} style={{fontSize:10,padding:"5px 10px",borderRadius:6,border:"1px solid #bbf7d0",background:"#dcfce7",color:"#166534",fontWeight:700,cursor:"pointer",alignSelf:"flex-start"}}>
+                + Nouvel exercice
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Header */}
       <div style={{background:"#fff",border:"0.5px solid #e4e4e7",borderRadius:11,padding:14}}>
@@ -2343,14 +2460,24 @@ function ExerciceDE() {
                 </label>
               ))}
             </div>
-            <button onClick={reset} style={{fontSize:10,fontWeight:700,padding:"5px 12px",cursor:"pointer",border:"1px solid #e4e4e7",borderRadius:6,background:"#f4f4f5",color:"#525252",whiteSpace:"nowrap"}}>
+            <button onClick={() => reset()} style={{fontSize:10,fontWeight:700,padding:"5px 12px",cursor:"pointer",border:"1px solid #e4e4e7",borderRadius:6,background:"#f4f4f5",color:"#525252",whiteSpace:"nowrap"}}>
               🔄 Nouvel exercice
             </button>
+            {user && (
+              <button onClick={handleSave} style={{fontSize:10,fontWeight:700,padding:"5px 12px",cursor:"pointer",border:"1px solid #16a34a",borderRadius:6,background:"#f0fdf4",color:"#16a34a",whiteSpace:"nowrap"}}>
+                💾 {savedId ? "Mettre à jour" : "Sauvegarder"}
+              </button>
+            )}
             <button onClick={handleExport} style={{fontSize:10,fontWeight:700,padding:"5px 12px",cursor:"pointer",border:"1px solid #185FA5",borderRadius:6,background:"#EFF6FF",color:"#185FA5",whiteSpace:"nowrap"}}>
               ⬇ Exporter énoncé
             </button>
           </div>
         </div>
+        {saveMsg && (
+          <div style={{marginTop:8,fontSize:11,padding:"5px 10px",borderRadius:6,background:saveMsg.type==="success"?"#f0fdf4":"#fef2f2",color:saveMsg.type==="success"?"#16a34a":"#dc2626",border:`1px solid ${saveMsg.type==="success"?"#bbf7d0":"#fecaca"}`}}>
+            {saveMsg.text}
+          </div>
+        )}
 
         {/* Standard + tolerance -- 50/50 */}
         <div style={{display:"flex",gap:10,marginTop:12,flexWrap:"wrap"}}>

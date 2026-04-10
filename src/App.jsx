@@ -13,9 +13,12 @@ import {
   ArrowsPointingOutIcon,
   ArrowsPointingInIcon,
   UserCircleIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline"
 import { CATEGORIES } from "./config"
 import { useTheme } from "./ThemeContext"
+import { useAuth } from "./AuthContext"
+import AuthModal from "./components/AuthModal"
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Hook : détection mobile < 768 px
@@ -97,7 +100,9 @@ function useExpanded() {
 ───────────────────────────────────────────────────────────────────────────── */
 function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, expanded, setExpanded }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const isMobile = useIsMobile()
+  const { user, signOut } = useAuth()
 
   useEffect(() => { if (!isMobile) setMobileOpen(false) }, [isMobile])
   useEffect(() => {
@@ -257,29 +262,50 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
           </button>
         )}
 
-        {/* ── Bouton Connexion ── */}
-        <button
-          aria-label="Se connecter"
-          title="Se connecter"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
-          style={{
-            marginLeft: 8,
-            background: "rgba(16,185,129,0.10)",
-            border: "1px solid rgba(16,185,129,0.30)",
-            color: "#10b981",
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.background = "rgba(16,185,129,0.18)"
-            e.currentTarget.style.borderColor = "rgba(16,185,129,0.55)"
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.background = "rgba(16,185,129,0.10)"
-            e.currentTarget.style.borderColor = "rgba(16,185,129,0.30)"
-          }}
-        >
-          <UserCircleIcon className="w-4 h-4" />
-          {!isMobile && <span>Connexion</span>}
-        </button>
+        {/* ── Bouton Connexion / Avatar ── */}
+        {user ? (
+          <div style={{ display:"flex", alignItems:"center", gap:6, marginLeft:8 }}>
+            <span style={{ fontSize:12, color:"var(--text-muted)", maxWidth:120, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+              {!isMobile && (user.user_metadata?.full_name || user.email?.split("@")[0])}
+            </span>
+            <button
+              onClick={signOut}
+              aria-label="Se déconnecter"
+              title="Se déconnecter"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
+              style={{ background:"rgba(239,68,68,0.10)", border:"1px solid rgba(239,68,68,0.25)", color:"#ef4444" }}
+            >
+              <ArrowRightOnRectangleIcon className="w-4 h-4" />
+              {!isMobile && <span>Déconnexion</span>}
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            aria-label="Se connecter"
+            title="Se connecter"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
+            style={{
+              marginLeft: 8,
+              background: "rgba(16,185,129,0.10)",
+              border: "1px solid rgba(16,185,129,0.30)",
+              color: "#10b981",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "rgba(16,185,129,0.18)"
+              e.currentTarget.style.borderColor = "rgba(16,185,129,0.55)"
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "rgba(16,185,129,0.10)"
+              e.currentTarget.style.borderColor = "rgba(16,185,129,0.30)"
+            }}
+          >
+            <UserCircleIcon className="w-4 h-4" />
+            {!isMobile && <span>Connexion</span>}
+          </button>
+        )}
+
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
         {/* ── Bouton dark mode ── */}
         <button
