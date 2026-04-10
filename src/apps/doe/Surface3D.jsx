@@ -101,36 +101,37 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     gridRef.current = { grid, zMin, zR, GRID, rotX, rotY, zoom, panX, panY, W, H };
     const toW=(i,j)=>({x:-1+2*i/GRID, y:-((grid[i][j]-zMin)/zR-0.5), z:-1+2*j/GRID});
 
-    // Grilles des 3 plans
-    // Le plan sol (XZ) couvre X∈[−1,+1] et Z∈[−1,+1] → largeur 2
-    // Les murs (XY et YZ) doivent avoir la même hauteur effective :
-    // Y va de +0.5 (bas, valeur min) à −0.5 (haut, valeur max) → hauteur 1
-    // Pour que les cases soient carrées, on double les subdivisions verticales des murs
+    // Grilles des 3 plans — même N subdivisions, même pas 2/N dans les 3 directions
+    // Sol XZ : X∈[−1,+1] × Z∈[−1,+1] → N×N cases, pas = 2/N
+    // Murs : étendus à Y∈[−1,+1] (hauteur 2) avec N×N cases, pas = 2/N identique
     ctx.strokeStyle="rgba(160,170,200,0.35)"; ctx.lineWidth=0.7;
 
-    // Plan sol (XZ) à y = +0.5 — N subdivisions, cases carrées
+    // Plan sol (XZ) à y = +0.5
     for(let k=0;k<=N;k++){
       const t=-1+2*k/N;
       gl(t, 0.5,-1, t, 0.5, 1);   // lignes || Z
       gl(-1,0.5, t, 1, 0.5, t);   // lignes || X
     }
 
-    // Plan mur arrière (XY) à z = −1
-    // X ∈ [−1,+1] → N subdivisions · Y ∈ [+0.5,−0.5] → N/2 subdivisions (cases carrées)
+    // Plan mur arrière (XY) à z = −1 : X∈[−1,+1] × Y∈[+0.5,−1.5]
+    // On commence à y=+0.5 (bas de la surface) et on descend de 2/N par pas → N pas
     for(let k=0;k<=N;k++){
       const t=-1+2*k/N;
-      gl(t, 0.5,-1, t,-0.5,-1);                  // lignes || Y (verticales)
-      const y = 0.5 - k/N;                        // Y de +0.5 à -0.5 en N pas
-      gl(-1, y,-1, 1, y,-1);                      // lignes || X (horizontales)
+      gl(t, 0.5,-1, t, 0.5-2,-1);         // verticales de y=+0.5 à y=−1.5
+    }
+    for(let k=0;k<=N;k++){
+      const y = 0.5 - k*(2/N);             // y de +0.5 → −1.5 en N pas
+      gl(-1, y,-1, 1, y,-1);               // horizontales || X
     }
 
-    // Plan mur latéral (YZ) à x = −1
-    // Z ∈ [−1,+1] → N subdivisions · Y ∈ [+0.5,−0.5] → N/2 subdivisions (cases carrées)
+    // Plan mur latéral (YZ) à x = −1 : Z∈[−1,+1] × Y∈[+0.5,−1.5]
     for(let k=0;k<=N;k++){
       const t=-1+2*k/N;
-      gl(-1, 0.5,t,-1,-0.5, t);                   // lignes || Y (verticales)
-      const y = 0.5 - k/N;                         // Y de +0.5 à -0.5 en N pas
-      gl(-1, y,-1,-1, y, 1);                       // lignes || Z (horizontales)
+      gl(-1, 0.5,t,-1, 0.5-2, t);         // verticales de y=+0.5 à y=−1.5
+    }
+    for(let k=0;k<=N;k++){
+      const y = 0.5 - k*(2/N);
+      gl(-1, y,-1,-1, y, 1);               // horizontales || Z
     }
 
     // Surface
@@ -157,7 +158,8 @@ export default function Surface3D({ model, fit, factors, col, response }) {
       const a=proj(...p),b=proj(...arr[(i+1)%4]);
       ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke();
     });
-    gl(-1,0.5,-1,-1,-0.5,-1);
+    // Arête verticale du coin gauche-arrière : du sol (y=+0.5) jusqu'en bas des murs (y=−1.5)
+    gl(-1,0.5,-1,-1,-1.5,-1);
     // Axes avec flèches
     const axis=(x1,y1,z1,x2,y2,z2,lbl,color)=>{
       const f=proj(x1,y1,z1),t=proj(x2,y2,z2);
@@ -174,11 +176,11 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     };
     axis(-1,0.5,-1,1.45,0.5,-1,fa.name||fa.id,"#6366f1");
     axis(-1,0.5,-1,-1,0.5,1.45,fb.name||fb.id,"#10b981");
-    // Axe Z : même longueur que X et Y (1.45), label = nom de la réponse
+    // Axe Z : part du sol (y=+0.5) et monte — même longueur que X et Y
     const zLabel = response ? `${response.name||response.id}${response.unit?` (${response.unit})`:""} ↑` : "Y ↑";
     axis(-1,0.5,-1,-1,-1.45,-1, zLabel, "#f59e0b");
 
-    // Graduations Z
+    // Graduations Z — réparties sur [+0.5, −0.5] (zone de la surface)
     ctx.strokeStyle="rgba(100,120,160,0.4)";ctx.lineWidth=0.7;
     [0,0.25,0.5,0.75,1].forEach(t=>{
       const p=proj(-1,-(t-0.5),-1);
