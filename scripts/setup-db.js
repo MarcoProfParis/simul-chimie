@@ -3,10 +3,9 @@
  * setup-db.js — Exécute les migrations SQL via l'API Supabase Management
  *
  * Usage :
- *   SUPABASE_SERVICE_ROLE_KEY=<clé> node scripts/setup-db.js
+ *   node scripts/setup-db.js
  *
- * La clé service_role se trouve dans :
- *   Supabase Dashboard → Project Settings → API → service_role (secret)
+ * Lit automatiquement .env.local pour VITE_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY
  */
 
 import { readFileSync, readdirSync } from "fs"
@@ -14,25 +13,38 @@ import { join, dirname } from "path"
 import { fileURLToPath } from "url"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const root = join(__dirname, "..")
+
+// ── Lecture de .env.local ─────────────────────────────────────────────────────
+function loadEnv(filepath) {
+  try {
+    const lines = readFileSync(filepath, "utf8").split("\n")
+    for (const line of lines) {
+      const m = line.match(/^\s*([\w]+)\s*=\s*"?([^"\n]*)"?\s*$/)
+      if (m) process.env[m[1]] = m[2]
+    }
+  } catch { /* fichier absent, on ignore */ }
+}
+loadEnv(join(root, ".env.local"))
+loadEnv(join(root, ".env"))
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const SUPABASE_URL        = process.env.VITE_SUPABASE_URL        || ""
-const SERVICE_ROLE_KEY    = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+const SUPABASE_URL   = process.env.VITE_SUPABASE_URL       || ""
+const ACCESS_TOKEN   = process.env.SUPABASE_ACCESS_TOKEN   || ""  // PAT du compte
 
-if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+if (!SUPABASE_URL || !ACCESS_TOKEN) {
   console.error("❌  Variables manquantes.")
-  console.error("   Exporte VITE_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY avant de lancer ce script.")
+  console.error("   Assure-toi que .env.local contient :")
+  console.error("     VITE_SUPABASE_URL")
+  console.error("     SUPABASE_ACCESS_TOKEN  (PAT → supabase.com/dashboard/account/tokens)")
   process.exit(1)
 }
 
-// Extraire le ref du projet depuis l'URL (ex: rzuxykzepgujswfladxw)
 const projectRef = new URL(SUPABASE_URL).hostname.split(".")[0]
 
 // ── Lecture des fichiers SQL ───────────────────────────────────────────────────
-const sqlDir   = join(__dirname, "../sql")
-const sqlFiles = readdirSync(sqlDir)
-  .filter(f => f.endsWith(".sql"))
-  .sort()
+const sqlDir   = join(root, "sql")
+const sqlFiles = readdirSync(sqlDir).filter(f => f.endsWith(".sql")).sort()
 
 // ── Exécution via Management API ──────────────────────────────────────────────
 async function runSQL(filename, sql) {
@@ -42,17 +54,13 @@ async function runSQL(filename, sql) {
       method : "POST",
       headers: {
         "Content-Type" : "application/json",
-        "Authorization": `Bearer ${SERVICE_ROLE_KEY}`,
+        "Authorization": `Bearer ${ACCESS_TOKEN}`,
       },
       body: JSON.stringify({ query: sql }),
     }
   )
-
   const body = await res.json().catch(() => ({}))
-
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} — ${JSON.stringify(body)}`)
-  }
+  if (!res.ok) throw new Error(`HTTP ${res.status} — ${JSON.stringify(body)}`)
   return body
 }
 
@@ -73,3 +81,4 @@ for (const file of sqlFiles) {
 }
 
 console.log("\n✅  Toutes les migrations ont été appliquées.")
+

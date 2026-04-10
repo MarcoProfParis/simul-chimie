@@ -2,23 +2,29 @@
 
 ## Méthode automatique (recommandée)
 
-1. Récupérer la clé `service_role` :
-   - Supabase Dashboard → ton projet → **Settings → API**
-   - Copier la valeur **service_role** (secret)
+### 1. Créer un Personal Access Token (PAT)
+- Aller sur [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens)
+- Cliquer **Generate new token** → copier le token
 
-2. Lancer le script de migration :
+### 2. Ajouter dans `.env.local`
+```
+SUPABASE_ACCESS_TOKEN=<ton_token>
+```
 
+### 3. Lancer le script
 ```bash
-VITE_SUPABASE_URL="https://rzuxykzepgujswfladxw.supabase.co" \
-SUPABASE_SERVICE_ROLE_KEY="<ta_clé_service_role>" \
 node scripts/setup-db.js
 ```
 
 Le script exécutera tous les fichiers `sql/*.sql` dans l'ordre.
 
+> ⚠️ Le PAT est différent de la `service_role` key.  
+> La `service_role` sert aux opérations sur les données.  
+> Le PAT sert à l'API de gestion (Management API).
+
 ---
 
-## Méthode manuelle (alternative)
+## Méthode manuelle (alternative rapide)
 
 Copier le contenu de `sql/001_create_exercices_cielab.sql` dans :
 
