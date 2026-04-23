@@ -107,7 +107,7 @@ function LibrarySourceBadge() {
     source === "cache"    ? "#0891b2" :
     /* bundled */           "#64748b"
   const label =
-    source === "supabase" ? "Supabase" :
+    source === "supabase" ? "DB" :
     source === "api"      ? "API" :
     source === "cache"    ? "cache" :
     "local"
