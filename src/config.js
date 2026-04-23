@@ -4,6 +4,7 @@ import ZismanApp from "./apps/rheologie/ZismanApp"
 import AppCouleur from "./apps/couleur/AppCouleur.jsx"
 import CIELABExplorer from "./apps/couleur/CIELABExplorer"
 import PlanFactoriel from "./apps/doe/PlanFactoriel"   // ← ajouter
+import HSPApp from "./apps/hsp/HSPApp"
 
 export const CATEGORIES = [
   {
@@ -75,5 +76,21 @@ export const CATEGORIES = [
         component: PlanFactoriel,
       },
     ],
-  }
+  },
+  {
+    id: "solubilite",
+    label: "Solubilité",
+    emoji: "🧪",
+    description: "Paramètres de Hansen et compatibilité solvant",
+    color: "#ea580c",
+    apps: [
+      {
+        id: "hsp",
+        label: "Paramètres de Hansen (HSP)",
+        description: "Ajuster une sphère HSP à partir de données de solvants",
+        emoji: "🔶",
+        component: HSPApp,
+      },
+    ],
+  },
 ]

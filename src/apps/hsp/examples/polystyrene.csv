@@ -1,0 +1,36 @@
+Solvent,D,P,H,Score
+Toluene,18.0,1.4,2.0,1
+Benzene,18.4,0.0,2.0,1
+Chloroform,17.8,3.1,5.7,1
+Tetrahydrofuran (THF),16.8,5.7,8.0,1
+Dichloromethane,17.0,7.3,7.1,1
+"1,4-Dioxane",17.5,1.8,9.0,1
+Xylene,17.8,1.0,3.1,1
+Ethyl Acetate,15.8,5.3,7.2,1
+Methyl Ethyl Ketone (MEK),16.0,9.0,5.1,1
+Carbon Tetrachloride,17.8,0.0,0.6,1
+Carbon Disulfide,20.2,0.0,0.6,1
+Styrene,18.6,1.0,4.1,1
+"1,2-Dichloroethane",19.0,7.4,4.1,1
+Trichloroethylene,18.0,3.1,5.3,1
+Cyclohexanone,17.8,8.4,5.1,1
+Methyl Isobutyl Ketone (MIBK),15.3,6.1,4.1,1
+Chlorobenzene,19.0,4.3,2.0,1
+Ethylbenzene,17.8,0.6,1.4,1
+Water,15.5,16.0,42.3,6
+Methanol,14.7,12.3,22.3,6
+Ethanol,15.8,8.8,19.4,6
+1-Propanol,16.0,6.8,17.4,6
+2-Propanol,15.8,6.1,16.4,6
+1-Butanol,16.0,5.7,15.8,6
+Ethylene Glycol,17.0,11.0,26.0,6
+Glycerol,17.4,12.1,29.3,6
+Acetonitrile,15.3,18.0,6.1,6
+Formamide,17.2,26.2,19.0,6
+N-Hexane,14.9,0.0,0.0,6
+N-Pentane,14.5,0.0,0.0,6
+N-Heptane,15.3,0.0,0.0,6
+N-Decane,15.7,0.0,0.0,6
+Diethyl Ether,14.5,2.9,5.1,6
+Nitromethane,15.8,18.8,5.1,6
+Propylene Carbonate,20.0,18.0,4.1,6

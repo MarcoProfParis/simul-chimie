@@ -68,6 +68,15 @@ async function runSQL(filename, sql) {
 console.log(`🔧  Projet : ${projectRef}`)
 console.log(`📂  ${sqlFiles.length} fichier(s) SQL trouvé(s)\n`)
 
+// Idempotent : les erreurs "already exists" sont signalées mais n'arrêtent pas.
+// Codes Postgres tolérés : 42710 (duplicate policy/trigger), 42P07 (duplicate table/index),
+// 42701 (duplicate column), 42723 (duplicate function), 42711 (duplicate index/object).
+const IDEMPOTENT_MARKERS = ["already exists"]
+function isIdempotent(msg) {
+  const lower = (msg || "").toLowerCase()
+  return IDEMPOTENT_MARKERS.some(m => lower.includes(m))
+}
+
 for (const file of sqlFiles) {
   const sql = readFileSync(join(sqlDir, file), "utf8")
   process.stdout.write(`  ⏳  ${file} ...`)
@@ -75,6 +84,10 @@ for (const file of sqlFiles) {
     await runSQL(file, sql)
     console.log(" ✅")
   } catch (err) {
+    if (isIdempotent(err.message)) {
+      console.log(` ⏭  déjà appliqué (${err.message.split("\n")[0].slice(0, 80)}…)`)
+      continue
+    }
     console.log(` ❌\n     ${err.message}`)
     process.exit(1)
   }

@@ -1,0 +1,36 @@
+Solvent,D,P,H,Score
+Methanol,14.7,12.3,22.3,1
+Ethanol,15.8,8.8,19.4,1
+1-Propanol,16.0,6.8,17.4,1
+2-Propanol,15.8,6.1,16.4,1
+1-Butanol,16.0,5.7,15.8,1
+Ethylene Glycol,17.0,11.0,26.0,1
+Propylene Glycol,16.8,10.4,21.3,1
+Glycerol,17.4,12.1,29.3,1
+Dimethyl Sulfoxide (DMSO),18.4,16.4,10.2,1
+Dimethyl Formamide (DMF),17.4,13.7,11.3,1
+N-Methyl-2-Pyrrolidone (NMP),18.0,12.3,7.2,1
+Formamide,17.2,26.2,19.0,1
+Acetone,15.5,10.4,7.0,1
+N-Methyl Formamide,17.4,18.8,15.9,1
+"1,4-Dioxane",17.5,1.8,9.0,1
+Tetrahydrofuran (THF),16.8,5.7,8.0,1
+Acetic Acid,14.5,8.0,13.5,1
+2-Phenoxy Ethanol,17.8,5.7,14.3,1
+Methyl Ethyl Ketone (MEK),16.0,9.0,5.1,6
+Ethyl Acetate,15.8,5.3,7.2,6
+Butyl Acetate,15.8,3.7,6.3,6
+Dichloromethane,17.0,7.3,7.1,6
+Chloroform,17.8,3.1,5.7,6
+Carbon Tetrachloride,17.8,0.0,0.6,6
+Toluene,18.0,1.4,2.0,6
+Xylene,17.8,1.0,3.1,6
+Benzene,18.4,0.0,2.0,6
+Chlorobenzene,19.0,4.3,2.0,6
+N-Hexane,14.9,0.0,0.0,6
+N-Pentane,14.5,0.0,0.0,6
+N-Heptane,15.3,0.0,0.0,6
+Cyclohexane,16.8,0.0,0.2,6
+Diethyl Ether,14.5,2.9,5.1,6
+Acetonitrile,15.3,18.0,6.1,6
+Nitromethane,15.8,18.8,5.1,6
