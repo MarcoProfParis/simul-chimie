@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "setup-db": "node scripts/setup-db.js"
+    "setup-db": "node scripts/setup-db.js",
+    "seed-solvents": "node scripts/seed-solvents.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.10",
@@ -16,8 +17,11 @@
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/vite": "^4.2.2",
     "lucide-react": "^1.8.0",
+    "papaparse": "^5.5.3",
+    "plotly.js-dist-min": "^3.5.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-plotly.js": "^2.6.0",
     "react-router-dom": "^7.14.0",
     "recharts": "^3.8.1",
     "tailwindcss": "^4.2.2"
