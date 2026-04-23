@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import SolventEditModal from "./SolventEditModal"
 
 const ACCENT = "#ea580c"
 
@@ -75,9 +76,33 @@ async function loadPlot() {
   return createPlotlyComponent(Plotly)
 }
 
-export default function HSPPlot3D({ data, result, insideLimit = 1 }) {
+export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent }) {
   const [Plot, setPlot] = useState(null)
   const [err, setErr] = useState("")
+  const [editingSolvent, setEditingSolvent] = useState(null)
+
+  // Double-clic détecté manuellement : deux clics sur le même point en < 400 ms.
+  // Plotly 3D intercepte le double-clic natif (reset caméra), on bypasse via timing.
+  const lastClick = useRef({ name: null, time: 0 })
+
+  const handleClick = useCallback((event) => {
+    if (!event?.points?.length) return
+    const pt = event.points[0]
+    const raw = Array.isArray(pt.text) ? pt.text[0] : pt.text
+    if (!raw || !String(raw).includes("<br>")) return
+    const name = String(raw).split("<br>")[0].trim()
+    if (!name || name === "Centre") return
+
+    const now = Date.now()
+    if (lastClick.current.name === name && now - lastClick.current.time < 400) {
+      // Double-clic confirmé → ouvrir la popup
+      const row = data.find(r => r.solvent === name)
+      if (row) setEditingSolvent(row)
+      lastClick.current = { name: null, time: 0 }
+    } else {
+      lastClick.current = { name, time: now }
+    }
+  }, [data])
 
   useEffect(() => {
     let cancelled = false
@@ -295,6 +320,17 @@ export default function HSPPlot3D({ data, result, insideLimit = 1 }) {
   }, [data, result, insideLimit])
 
   return (
+    <>
+      {editingSolvent && (
+        <SolventEditModal
+          solvent={editingSolvent}
+          onClose={() => setEditingSolvent(null)}
+          onSave={(originalName, updated) => {
+            if (onEditSolvent) onEditSolvent(originalName, updated)
+            setEditingSolvent(null)
+          }}
+        />
+      )}
     <div style={{
       background: "var(--bg-card)",
       border: "1px solid var(--border)",
@@ -315,6 +351,7 @@ export default function HSPPlot3D({ data, result, insideLimit = 1 }) {
             useResizeHandler
             style={{ width: "100%", height: "100%" }}
             config={{ displaylogo: false, responsive: true, modeBarButtonsToRemove: ["sendDataToCloud"] }}
+            onClick={handleClick}
           />
         )}
       </div>
@@ -322,5 +359,6 @@ export default function HSPPlot3D({ data, result, insideLimit = 1 }) {
         Boîte cubique (aspectmode cube) · plages δD:δP:δH en rapport 1:2:2 → l'ellipsoïde Hansen (demi-axes R/2, R, R) apparaît comme une sphère.
       </p>
     </div>
+    </>
   )
 }

@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useMemo, useState } from "react"
+import SolventEditModal from "./SolventEditModal"
 import { MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowPathIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
 import { Popover, PopoverButton, PopoverPanel, Transition } from "@headlessui/react"
 import {
@@ -146,10 +147,24 @@ function HelpPopover() {
   )
 }
 
+// ─── Dot avec double-clic pour édition ──────────────────────────────────────
+function SolventDot({ cx, cy, payload, fill, onEdit }) {
+  if (cx == null || cy == null || !payload) return null
+  return (
+    <circle
+      cx={cx} cy={cy} r={5}
+      fill={fill} stroke="#fff" strokeWidth={1}
+      style={{ cursor: "pointer" }}
+      onDoubleClick={(e) => { e.stopPropagation(); onEdit(payload._row) }}
+    />
+  )
+}
+
 // ─── One chart per projection (independent zoom) ────────────────────────────
-function ProjectionChart({ proj, data, result, insideLimit }) {
+function ProjectionChart({ proj, data, result, insideLimit, onEditSolvent }) {
   const P = PROJECTIONS[proj]
   const [zoom, setZoom] = useState(1)
+  const [editingSolvent, setEditingSolvent] = useState(null)
 
   const setZoomClamped = useCallback(z => setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z))), [])
   const onWheel = useCallback(e => {
@@ -191,6 +206,7 @@ function ProjectionChart({ proj, data, result, insideLimit }) {
           x: r[P.xKey] * P.xScale, y: r[P.yKey],
           rawX: r[P.xKey], rawY: r[P.yKey],
           name: r.solvent, score: r.score,
+          _row: r,  // ligne complète pour l'édition
         }
         ;(isGood ? good : bad).push(pt)
       }
@@ -206,6 +222,17 @@ function ProjectionChart({ proj, data, result, insideLimit }) {
     }, [data, result, P, insideLimit, zoom])
 
   return (
+    <>
+    {editingSolvent && (
+      <SolventEditModal
+        solvent={editingSolvent}
+        onClose={() => setEditingSolvent(null)}
+        onSave={(originalName, updated) => {
+          onEditSolvent(originalName, updated)
+          setEditingSolvent(null)
+        }}
+      />
+    )}
     <div style={{
       background: "var(--bg-card)",
       border: "1px solid var(--border)",
@@ -273,13 +300,18 @@ function ProjectionChart({ proj, data, result, insideLimit }) {
               }}
             />
             <Scatter name="Sphère HSP" data={circle} fill="none" line={{ stroke: ACCENT, strokeWidth: 2 }} shape={() => null} />
-            <Scatter name="Compatibles"   data={good} fill="#16a34a" />
-            <Scatter name="Incompatibles" data={bad}  fill="#94a3b8" />
+            <Scatter name="Compatibles" data={good} fill="#16a34a"
+              shape={(p) => <SolventDot {...p} fill="#16a34a" onEdit={setEditingSolvent} />}
+            />
+            <Scatter name="Incompatibles" data={bad} fill="#94a3b8"
+              shape={(p) => <SolventDot {...p} fill="#94a3b8" onEdit={setEditingSolvent} />}
+            />
             <ReferenceDot x={center.x} y={center.y} r={5} fill={ACCENT} stroke="#fff" strokeWidth={2} />
           </ScatterChart>
         </ResponsiveContainer>
       </div>
     </div>
+    </>
   )
 }
 
@@ -295,7 +327,7 @@ function LegendItem({ color, label, line }) {
 }
 
 // ─── Main component ─────────────────────────────────────────────────────────
-export default function HSPPlot2D({ data, result, insideLimit = 1 }) {
+export default function HSPPlot2D({ data, result, insideLimit = 1, onEditSolvent }) {
   const [active, setActive] = useState(() => new Set(PROJ_ORDER))
 
   const toggle = (proj) => {
@@ -359,6 +391,7 @@ export default function HSPPlot2D({ data, result, insideLimit = 1 }) {
           <ProjectionChart
             key={proj} proj={proj}
             data={data} result={result} insideLimit={insideLimit}
+            onEditSolvent={onEditSolvent}
           />
         ))}
       </div>

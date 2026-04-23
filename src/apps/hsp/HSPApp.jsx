@@ -169,6 +169,22 @@ function HSPAppInner({ onBack }) {
     if (result) setResult(null)  // editing invalidates current fit
   }
 
+  const handleSolventEdit = useCallback((originalName, form) => {
+    setData(prev => prev.map(r =>
+      r.solvent === originalName
+        ? {
+            ...r,
+            solvent: form.solvent,
+            D: parseFloat(form.D),
+            P: parseFloat(form.P),
+            H: parseFloat(form.H),
+            score: form.score !== "" && form.score != null ? parseFloat(form.score) : null,
+          }
+        : r
+    ))
+    if (result) setResult(null)
+  }, [result])
+
   const handleFit = async () => {
     if (!data) return
     // Keep only rows with complete D/P/H triplets
@@ -303,8 +319,8 @@ function HSPAppInner({ onBack }) {
             </div>
 
             {view === "2d"
-              ? <HSPPlot2D data={data} result={result} insideLimit={insideLimit} />
-              : <HSPPlot3D data={data} result={result} insideLimit={insideLimit} />}
+              ? <HSPPlot2D data={data} result={result} insideLimit={insideLimit} onEditSolvent={handleSolventEdit} />
+              : <HSPPlot3D data={data} result={result} insideLimit={insideLimit} onEditSolvent={handleSolventEdit} />}
 
             <SolventTable data={data} result={result} insideLimit={insideLimit} />
           </>
