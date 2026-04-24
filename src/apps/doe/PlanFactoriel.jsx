@@ -2130,16 +2130,28 @@ function PlanFactorielInner() {
               </div>
             )}
 
-            {/* Tabs */}
+            {/* Tabs + bouton PDF */}
             <div className="mb-4">
-              <div className="grid grid-cols-1 sm:hidden">
-                <select value={part4Tab} onChange={e => setPart4Tab(e.target.value)}
-                  className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-2 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600">
-                  {TABS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
-                </select>
-                <ChevronDownIcon aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end fill-gray-500" />
+              {/* Mobile : select + icône PDF */}
+              <div className="flex items-center gap-2 sm:hidden">
+                <div className="relative flex-1">
+                  <select value={part4Tab} onChange={e => setPart4Tab(e.target.value)}
+                    className="w-full appearance-none rounded-md bg-white py-2 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600">
+                    {TABS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+                  </select>
+                  <ChevronDownIcon aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-5 fill-gray-500" />
+                </div>
+                <button
+                  onClick={() => exportPDF({ models, fits, factors, responses, activeResp, allValidRows, activeRows, excludedPoints, validY, modelDefault, matrix })}
+                  title="Exporter rapport PDF"
+                  className="shrink-0 flex items-center justify-center size-10 rounded-lg bg-gray-900 text-white hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
+                    <path fillRule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm4 9.75a.75.75 0 011.5 0v2.546l.943-1.048a.75.75 0 111.114 1.004l-2.25 2.5a.75.75 0 01-1.114 0l-2.25-2.5a.75.75 0 111.114-1.004l.943 1.048V11.75z" clipRule="evenodd" />
+                  </svg>
+                </button>
               </div>
-              <div className="hidden sm:block">
+              {/* Desktop : onglets à gauche, bouton PDF à droite */}
+              <div className="hidden sm:flex items-center justify-between">
                 <nav aria-label="Tabs" className="flex items-center space-x-1">
                   {TABS.map(t => (
                     <button key={t.id} onClick={() => setPart4Tab(t.id)}
@@ -2151,8 +2163,15 @@ function PlanFactorielInner() {
                       {t.label}
                     </button>
                   ))}
-
                 </nav>
+                <button
+                  onClick={() => exportPDF({ models, fits, factors, responses, activeResp, allValidRows, activeRows, excludedPoints, validY, modelDefault, matrix })}
+                  className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
+                    <path fillRule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm4 9.75a.75.75 0 011.5 0v2.546l.943-1.048a.75.75 0 111.114 1.004l-2.25 2.5a.75.75 0 01-1.114 0l-2.25-2.5a.75.75 0 111.114-1.004l.943 1.048V11.75z" clipRule="evenodd" />
+                  </svg>
+                  Exporter rapport PDF
+                </button>
               </div>
             </div>
 
@@ -2928,21 +2947,12 @@ function PlanFactorielInner() {
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                 ← {t("common.back")}
               </button>
-              <div className="flex items-center gap-3">
-                {editMode && (
-                  <button onClick={exportJSON}
-                    className="flex items-center gap-1.5 rounded-md border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100 transition-colors">
-                    Exporter JSON
-                  </button>
-                )}
-                <button onClick={() => exportPDF({ models, fits, factors, responses, activeResp, allValidRows, activeRows, excludedPoints, validY, modelDefault, matrix })}
-                  className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
-                    <path fillRule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm4 9.75a.75.75 0 011.5 0v2.546l.943-1.048a.75.75 0 111.114 1.004l-2.25 2.5a.75.75 0 01-1.114 0l-2.25-2.5a.75.75 0 111.114-1.004l.943 1.048V11.75z" clipRule="evenodd" />
-                  </svg>
-                  Exporter rapport PDF
+              {editMode && (
+                <button onClick={exportJSON}
+                  className="flex items-center gap-1.5 rounded-md border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100 transition-colors">
+                  Exporter JSON
                 </button>
-              </div>
+              )}
             </div>
           </>
         );
