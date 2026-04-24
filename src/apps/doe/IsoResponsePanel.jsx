@@ -98,31 +98,31 @@ export function IsoResponsePanel({ model, fit, factors, modelColors }) {
   const ticks = [-1, -0.5, 0, 0.5, 1];
 
   return (
-    <div className={`bg-white dark:bg-gray-900 border-2 ${modelColors.border} rounded-xl p-5`}>
+    <div className={`bg-white border-2 ${modelColors.border} rounded-xl p-5`}>
       <div className="flex items-center gap-2 mb-4">
         <span className={`size-2.5 rounded-full ${modelColors.dot}`} />
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{model.name} — {t("doe.iso.title")}</h3>
+        <h3 className="text-sm font-semibold text-gray-900">{model.name} — {t("doe.iso.title")}</h3>
       </div>
 
       <div className="flex flex-wrap gap-4 mb-4">
         <div className="flex items-center gap-2">
           <label className="text-xs text-gray-500">{t("doe.iso.xAxis")} :</label>
           <select value={f1Idx} onChange={e => setF1Idx(+e.target.value)}
-            className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {contFactors.map((f, i) => <option key={f.id} value={i} disabled={i === f2Idx}>{f.id} — {f.name}</option>)}
           </select>
         </div>
         <div className="flex items-center gap-2">
           <label className="text-xs text-gray-500">{t("doe.iso.yAxis")} :</label>
           <select value={f2Idx} onChange={e => setF2Idx(+e.target.value)}
-            className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {contFactors.map((f, i) => <option key={f.id} value={i} disabled={i === f1Idx}>{f.id} — {f.name}</option>)}
           </select>
         </div>
       </div>
 
       {factors.filter(f => f.continuous && f.id !== f1.id && f.id !== f2.id).length > 0 && (
-        <div className="flex flex-wrap gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="flex flex-wrap gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
           <p className="w-full text-[11px] text-gray-400 font-medium mb-1">{t("doe.iso.fixed")} :</p>
           {factors.filter(f => f.continuous && f.id !== f1.id && f.id !== f2.id).map(f => (
             <div key={f.id} className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export function IsoResponsePanel({ model, fit, factors, modelColors }) {
               <input type="range" min="-1" max="1" step="0.1" value={fixedVals[f.id] ?? 0}
                 onChange={e => setFixedVals(prev => ({ ...prev, [f.id]: +e.target.value }))}
                 className="w-20" />
-              <span className="text-xs font-mono text-gray-600 dark:text-gray-300 w-8">{(fixedVals[f.id] ?? 0).toFixed(1)}</span>
+              <span className="text-xs font-mono text-gray-600 w-8">{(fixedVals[f.id] ?? 0).toFixed(1)}</span>
               <span className="text-[10px] text-gray-400">({toReal(f, fixedVals[f.id] ?? 0)} {f.unit})</span>
             </div>
           ))}

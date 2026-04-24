@@ -36,7 +36,7 @@ export function QQPlotSVG({ residuals, MSE, col }) {
          style={{ fontFamily: "monospace", overflow: "visible" }}>
 
       <rect x={PAD.l} y={PAD.t} width={PW} height={PH}
-            fill="#f9fafb" stroke="#e5e7eb" strokeWidth="0.5" className="dark:fill-gray-800/50 dark:stroke-gray-700"/>
+            fill="#f9fafb" stroke="#e5e7eb" strokeWidth="0.5"/>
 
       {ticks.map(t => (
         <g key={t}>

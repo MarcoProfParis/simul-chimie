@@ -7,8 +7,6 @@ import {
   ChevronDownIcon,
   Bars3Icon,
   XMarkIcon,
-  SunIcon,
-  MoonIcon,
   ChevronRightIcon,
   ArrowsPointingOutIcon,
   ArrowsPointingInIcon,
@@ -16,7 +14,6 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline"
 import { CATEGORIES } from "./config"
-import { useTheme } from "./ThemeContext"
 import { useAuth } from "./AuthContext"
 import { useLang } from "./i18n"
 import AuthModal from "./components/AuthModal"
@@ -99,7 +96,7 @@ function useExpanded() {
 /* ─────────────────────────────────────────────────────────────────────────────
    Barre de navigation
 ───────────────────────────────────────────────────────────────────────────── */
-function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, expanded, setExpanded }) {
+function TopNav({ categoryId, appId, setCategoryId, setAppId, expanded, setExpanded }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const isMobile = useIsMobile()
@@ -330,25 +327,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
           ))}
         </div>
 
-        {/* ── Bouton dark mode ── */}
-        <button
-          onClick={() => setDark(d => !d)}
-          aria-label={dark ? t("nav.lightMode") : t("nav.darkMode")}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
-          style={{
-            marginLeft: 8,
-            background: dark ? "rgba(251,191,36,0.15)" : "rgba(99,102,241,0.10)",
-            border: dark ? "1px solid rgba(251,191,36,0.35)" : "1px solid rgba(99,102,241,0.25)",
-            color: dark ? "#fbbf24" : "#6366f1",
-          }}
-        >
-          {dark
-            ? <><SunIcon className="w-4 h-4" />{!isMobile && <span>{t("nav.lightMode")}</span>}</>
-            : <><MoonIcon className="w-4 h-4" />{!isMobile && <span>{t("nav.darkMode")}</span>}</>
-          }
-        </button>
-
-        {/* ── Hamburger mobile ── */}
+{/* ── Hamburger mobile ── */}
         {isMobile && (
           <button
             onClick={() => setMobileOpen(o => !o)}
@@ -521,7 +500,6 @@ function AppWrapper({ expanded, children }) {
 export default function App() {
   const [categoryId, setCategoryId] = useState(null)
   const [appId, setAppId]           = useState(null)
-  const { dark, setDark }           = useTheme()
   const [expanded, setExpanded]     = useExpanded()
   const { t }                       = useLang()
 
@@ -531,8 +509,6 @@ export default function App() {
       appId={appId}
       setCategoryId={setCategoryId}
       setAppId={setAppId}
-      dark={dark}
-      setDark={setDark}
       expanded={expanded}
       setExpanded={setExpanded}
     />

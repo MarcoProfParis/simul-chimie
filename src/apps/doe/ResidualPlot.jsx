@@ -152,16 +152,16 @@ export function ResidualPlot({ yHat, residuals, MSE, globalIndices, allValidRows
         const maxNormed = MSE > 0 ? Math.max(...residuals.map(r => Math.abs(r / Math.sqrt(MSE)))) : null;
         const hasAberrant = maxNormed !== null && maxNormed > 2;
         return (
-          <div className="flex flex-wrap items-center gap-4 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex flex-wrap items-center gap-4 mt-2 pt-2 border-t border-gray-100">
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] text-gray-400">{t("doe.residual.sce")} :</span>
-              <span className="text-[11px] font-mono font-semibold text-gray-600 dark:text-gray-300">{SCE.toFixed(4)}</span>
+              <span className="text-[11px] font-mono font-semibold text-gray-600">{SCE.toFixed(4)}</span>
               <span className="text-[10px] text-gray-400">(somme des carrés des écarts)</span>
             </div>
             {maxNormed !== null && (
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] text-gray-400">{t("doe.residual.maxNorm")} :</span>
-                <span className={`text-[11px] font-mono font-semibold ${hasAberrant ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                <span className={`text-[11px] font-mono font-semibold ${hasAberrant ? "text-red-500" : "text-emerald-600"}`}>
                   {maxNormed.toFixed(2)}
                 </span>
                 {hasAberrant
