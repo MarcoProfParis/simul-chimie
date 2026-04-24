@@ -41,6 +41,7 @@ import { PredictionPanel } from "./PredictionPanel.jsx";
 import { ResidualPlot } from "./ResidualPlot.jsx";
 import { QQPlotSVG } from "./QQPlotSVG.jsx";
 import { IsoResponsePanel } from "./IsoResponsePanel.jsx";
+import { InteractionPlotsPanel } from "./InteractionPlotsPanel.jsx";
 import ExcelImportModal from "./ExcelImportModal.jsx";
 
 const DEFAULT_RESPONSES = [{ id: "Y1", name: "Réponse 1", unit: "" }];
@@ -49,7 +50,7 @@ function PlanFactorielInner() {
   const { t } = useLang();
   void ChevronDownIcon;
 
-  const [part, setPart] = useState(0); // 0=accueil, 1=facteurs, 2=matrice, 3=modèle, 4=résultats
+  const [part, setPart] = useState(0); // 0=accueil, 1=facteurs, 2=matrice, 3=interactions, 4=modèle, 5=résultats
   // ── États écran d'accueil ────────────────────────────────────────────────
   const [welcomeModal, setWelcomeModal] = useState(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
@@ -1193,8 +1194,9 @@ function PlanFactorielInner() {
           {[
             { n: 1, id: "01", l: `${t("doe.factors")} & ${t("doe.responses")}` },
             { n: 2, id: "02", l: t("doe.matrix") },
-            { n: 3, id: "03", l: t("doe.model") },
-            { n: 4, id: "04", l: t("doe.effects") },
+            { n: 3, id: "03", l: t("doe.interactionGraphs") },
+            { n: 4, id: "04", l: t("doe.model") },
+            { n: 5, id: "05", l: t("doe.effects") },
           ].map((s, i, arr) => {
             const status = part > s.n ? "complete" : part === s.n ? "current" : "upcoming";
             return (
@@ -1796,18 +1798,28 @@ function PlanFactorielInner() {
                   Exporter JSON
                 </button>
               )}
-              {hasMissing && <span className="text-xs text-red-500">Compléter les réponses pour continuer</span>}
-              <button onClick={() => { if (!hasMissing) goTo(3); }} disabled={hasMissing}
-                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                {t("doe.model")} →
+              <button onClick={() => goTo(3)}
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                {t("doe.interactionGraphs")} →
               </button>
             </div>
           </div>
         </>
       )}
 
-      {/* ══════════════════════════════════════════════════════ PARTIE 3 */}
-      {part === 3 && (() => {
+      {/* ══════════════════════════════════════════════════════ PARTIE 3 — Graphe d'interactions */}
+      {part === 3 && matrix && (
+        <InteractionPlotsPanel
+          factors={factors}
+          matrix={matrix}
+          responses={responses}
+          onBack={() => goTo(2)}
+          onNext={() => goTo(4)}
+        />
+      )}
+
+      {/* ══════════════════════════════════════════════════════ PARTIE 4 — Modèle */}
+      {part === 4 && (() => {
         const nRuns = matrix ? matrix.length : 0;
         const maxTerms = nRuns - 1; // constante comprise = nRuns, donc termes hors constante = nRuns-1
         const activeModel = models.find(m => m.id === activeModelId);
@@ -2016,7 +2028,7 @@ function PlanFactorielInner() {
             </div>
 
             <div className="flex items-center justify-between mt-4">
-              <button onClick={() => goTo(2)}
+              <button onClick={() => goTo(3)}
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                 ← {t("common.back")}
               </button>
@@ -2030,7 +2042,7 @@ function PlanFactorielInner() {
                     Exporter JSON
                   </button>
                 )}
-                <button onClick={() => setPart(4)} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                <button onClick={() => setPart(5)} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
                   Continuer → ({models.length} modèle{models.length > 1 ? "s" : ""})
                 </button>
               </div>
@@ -2039,8 +2051,8 @@ function PlanFactorielInner() {
         );
       })()}
 
-      {/* ══════════════════════════════════════════════════════ PARTIE 4 */}
-      {part === 4 && (() => {
+      {/* ══════════════════════════════════════════════════════ PARTIE 5 — Résultats */}
+      {part === 5 && (() => {
         const contFactors = factors.filter(f => f.continuous);
         const has3D = contFactors.length >= 2;
         // Mode compact : raccourcis pour les classes (isCompact vient du composant parent)
@@ -2909,7 +2921,7 @@ function PlanFactorielInner() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-6">
-              <button onClick={() => goTo(3)}
+              <button onClick={() => goTo(4)}
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                 ← {t("common.back")}
               </button>
