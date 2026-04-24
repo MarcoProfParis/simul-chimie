@@ -14,7 +14,7 @@ const PAD_FACTOR = 1.2
 
 // ─── Projections (Hansen convention: 2·δD on x when D is involved) ─────────
 const PROJECTIONS = {
-  "δP-δH":  { xKey: "P", yKey: "H", xScale: 1, xRaw: "δP", yRaw: "δH", xLabel: "δP (MPa^½)",    yLabel: "δH (MPa^½)", needsHelp: false },
+  "δP-δH":  { xKey: "H", yKey: "P", xScale: 1, xRaw: "δH", yRaw: "δP", xLabel: "δH (MPa^½)",    yLabel: "δP (MPa^½)", needsHelp: false },
   "2δD-δP": { xKey: "D", yKey: "P", xScale: 2, xRaw: "δD", yRaw: "δP", xLabel: "2·δD (MPa^½)", yLabel: "δP (MPa^½)", needsHelp: true  },
   "2δD-δH": { xKey: "D", yKey: "H", xScale: 2, xRaw: "δD", yRaw: "δH", xLabel: "2·δD (MPa^½)", yLabel: "δH (MPa^½)", needsHelp: true  },
 }
