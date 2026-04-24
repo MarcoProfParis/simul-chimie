@@ -56,15 +56,22 @@ function MainEffectPlot({ factor, responseId, matrix }) {
   const COL = "#6366f1";
   const COL_CTR = "#f59e0b"; // amber for center point
 
-  // Build path through available points in order: low → center → high
-  const pts = [
-    mLow    !== null ? [x1, y1] : null,
-    mCenter !== null ? [x0, y0] : null,
-    mHigh   !== null ? [x2, y2] : null,
-  ].filter(Boolean);
-  const linePath = pts.length >= 2
-    ? `M ${pts[0][0]} ${pts[0][1]} ` + pts.slice(1).map(p => `L ${p[0]} ${p[1]}`).join(" ")
-    : null;
+  // Build path through available points: low → center → high
+  // When all 3 points exist, use a quadratic Bézier that passes exactly through
+  // the center point. Control point formula: cx=x0, cy=2·y0 − 0.5·y1 − 0.5·y2
+  let linePath = null;
+  if (y1 !== null && y0 !== null && y2 !== null) {
+    const bcy = 2 * y0 - 0.5 * y1 - 0.5 * y2; // bezier control-point Y
+    linePath = `M ${x1} ${y1} Q ${x0} ${bcy} ${x2} ${y2}`;
+  } else {
+    const pts = [
+      y1 !== null ? [x1, y1] : null,
+      y0 !== null ? [x0, y0] : null,
+      y2 !== null ? [x2, y2] : null,
+    ].filter(Boolean);
+    if (pts.length >= 2)
+      linePath = `M ${pts[0][0]} ${pts[0][1]} ` + pts.slice(1).map(p => `L ${p[0]} ${p[1]}`).join(" ");
+  }
 
   // Middle real value (center point label on X axis)
   const midReal = (factor.low?.real != null && factor.high?.real != null)
