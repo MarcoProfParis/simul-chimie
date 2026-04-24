@@ -1,7 +1,9 @@
 import React from "react";
 import { isQuadPure, quadPureTerm, formatTermDisplay } from "./modelUtils.js";
+import { useLang } from "../../i18n";
 
 export function PredictionPanel({ model, fit, factors, col }) {
+  const { t } = useLang();
   const initVals = () => {
     const v = {};
     factors.forEach(f => { v[f.id] = f.continuous ? 0 : -1; });
@@ -35,7 +37,7 @@ export function PredictionPanel({ model, fit, factors, col }) {
   return (
     <div className="mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
       <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-        Prédiction de réponse
+        {t("doe.predict.title")}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         {factors.map(f => {
@@ -86,12 +88,12 @@ export function PredictionPanel({ model, fit, factors, col }) {
         <button onClick={compute}
           className={`rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors ${col.tab || "bg-indigo-600 hover:bg-indigo-500"}`}
           style={{ background: col.dot === "bg-indigo-500" ? "#6366f1" : col.dot === "bg-emerald-500" ? "#10b981" : "#f59e0b" }}>
-          Calculer Ŷ
+          {t("doe.predict.btn")}
         </button>
         {predicted !== null && (
           <div className={`flex-1 flex items-center gap-3 rounded-xl border-2 ${col.border} ${col.bg} px-4 py-3`}>
             <div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-0.5">Réponse prédite</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-0.5">{t("doe.predict.result")}</p>
               <p className={`text-2xl font-bold font-mono ${col.text}`}>{predicted.toFixed(4)}</p>
             </div>
             <div className="ml-auto text-xs text-gray-400 dark:text-gray-500 font-mono">

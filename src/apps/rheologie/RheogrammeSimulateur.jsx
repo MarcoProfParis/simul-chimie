@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import GouttteMouillage from "./GouttteMouillage";
 import ZismanApp from "./ZismanApp";
+import { useLang } from "../../i18n";
 import {
   LineChart, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
@@ -707,6 +708,7 @@ const ChevronIcon = ({ dir }) => (
 
 export default function RheogrammeSimulateur({ onBack }) {
   useKatex();
+  const { t } = useLang();
 
   // ── Modèle & axes ──
   const [activeModel, setActiveModel] = useState("hb");
@@ -953,7 +955,7 @@ export default function RheogrammeSimulateur({ onBack }) {
 
         <div style={{ width: 34, height: 34, borderRadius: 8, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>⚗</div>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 700 }}>Simulateur de rhéogrammes</div>
+          <div style={{ fontSize: 15, fontWeight: 700 }}>{t("rheo.title")}</div>
           <div style={{ fontSize: 11, opacity: 0.6, marginTop: 1 }}>BTS Métiers de la Chimie — Module Rhéologie</div>
         </div>
       </div>
@@ -969,7 +971,7 @@ export default function RheogrammeSimulateur({ onBack }) {
             {/* Points déposés */}
             {annotPoints.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Points déposés</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>{t("rheo.points")}</div>
                 <div style={{ fontSize: 10, color: T.textMuted, marginBottom: 8 }}>Glissez sur le graphe pour déplacer</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {annotPoints.map((pt, idx) => (
@@ -1006,7 +1008,7 @@ export default function RheogrammeSimulateur({ onBack }) {
             </div>
 
             <div style={{ background: m.colorLight, border: `1px solid ${m.colorMid}`, borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: m.color, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Équation</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: m.color, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{t("rheo.equation")}</div>
               <Tex tex={m.formulaFull} block style={{ fontSize: 14 }} />
               <div style={{ borderTop: `1px solid ${m.colorMid}`, marginTop: 10, paddingTop: 8, fontSize: 11, color: T.textMuted, lineHeight: 1.55 }}>{m.note}</div>
             </div>
@@ -1017,12 +1019,12 @@ export default function RheogrammeSimulateur({ onBack }) {
             </div>
 
             <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "9px 12px", marginBottom: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Exemples industriels</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>{t("rheo.examples")}</div>
               <div style={{ fontSize: 12, color: T.textMid, lineHeight: 1.6 }}>{m.examples}</div>
             </div>
 
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Superposer</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{t("rheo.overlay")}</div>
               {Object.values(MODELS).map((mod) => (
                 <label key={mod.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7, cursor: "pointer" }}>
                   <input type="checkbox" checked={!!overlays[mod.id]} onChange={(e) => { setOverlays((prev) => ({ ...prev, [mod.id]: e.target.checked })); if (e.target.checked) setActiveModel(mod.id); }} style={{ accentColor: mod.color, width: 14, height: 14 }} />
@@ -1049,7 +1051,7 @@ export default function RheogrammeSimulateur({ onBack }) {
 
             <SegBtn active={tool === "draw"} onClick={() => setTool(tool === "draw" ? "none" : "draw")} accentColor={T.purple600} accentBg={T.purple50}>✏ Dessin libre</SegBtn>
             <SegBtn active={tool === "textbox"} onClick={() => setTool(tool === "textbox" ? "none" : "textbox")} accentColor={T.orange600} accentBg={T.orange50}>Texte</SegBtn>
-            <button onClick={() => { setAnnotPoints([]); setDrawings([]); setTexts([]); setTextBoxes([]); setEditingTextBoxId(null); }} style={{ padding: "5px 12px", border: `1px solid ${T.border}`, borderRadius: 6, background: T.white, color: T.textMuted, fontSize: 12, cursor: "pointer" }}>✕ Tout effacer</button>
+            <button onClick={() => { setAnnotPoints([]); setDrawings([]); setTexts([]); setTextBoxes([]); setEditingTextBoxId(null); }} style={{ padding: "5px 12px", border: `1px solid ${T.border}`, borderRadius: 6, background: T.white, color: T.textMuted, fontSize: 12, cursor: "pointer" }}>✕ {t("common.reset")}</button>
 
             <div style={{ width: 1, height: 24, background: T.border }} />
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -1073,7 +1075,7 @@ export default function RheogrammeSimulateur({ onBack }) {
             <div style={{ marginLeft: "auto" }}>
               <button onClick={handleExport} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 16px", border: `1px solid ${T.blue600}`, borderRadius: 7, background: T.blue50, color: T.blue600, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke={T.blue600} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                Exporter PNG (×3)
+                {t("common.export.png")} (×3)
               </button>
             </div>
           </div>
@@ -1168,7 +1170,7 @@ export default function RheogrammeSimulateur({ onBack }) {
                     ? <><path d="M7 9L4 12M7 9L10 12M7 9V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 5L4 2M7 5L10 2M7 5V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></>
                     : <><path d="M7 2L4 5M7 2L10 5M7 2V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 12L4 9M7 12L10 9M7 12V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></>}
                 </svg>
-                {chartTall ? "Réduire la hauteur" : "Agrandir la hauteur"}
+                {chartTall ? "Réduire la hauteur" : "Agrandir la hauteur"}{/* layout control, no i18n key */}
               </button>
             </div>
           </div>
@@ -1183,7 +1185,7 @@ export default function RheogrammeSimulateur({ onBack }) {
           <div style={{ background: T.white, border: `1px solid ${T.border}`, borderRadius: 12, overflow: "hidden" }}>
             <div style={{ padding: "9px 16px", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", gap: 10, background: m.colorLight }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: m.color }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: m.color }}>{m.name} — valeurs calculées</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: m.color }}>{m.name}</span>
               <span style={{ marginLeft: "auto", fontSize: 11, color: T.textMuted, fontFamily: T.fontMono }}>{Object.entries(p).map(([k, v]) => `${k} = ${Number(v).toPrecision(3)}`).join("  ·  ")}</span>
             </div>
             <div style={{ overflowX: "auto" }}>
@@ -1196,7 +1198,7 @@ export default function RheogrammeSimulateur({ onBack }) {
 
           {/* Récap formules */}
           <div style={{ background: T.white, border: `1px solid ${T.border}`, borderRadius: 12, padding: 18 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>Récapitulatif des modèles</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: T.textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>Récapitulatif des modèles</div>{/* no i18n key */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {Object.values(MODELS).map((mod) => (
                 <div key={mod.id} style={{ border: `1px solid ${mod.colorMid}`, borderRadius: 10, padding: "11px 13px", background: mod.colorLight, borderLeft: `4px solid ${mod.color}` }}>

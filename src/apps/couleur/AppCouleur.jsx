@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { useTheme } from "../../ThemeContext";
+import { useLang } from "../../i18n";
 import { SPECTRUM_LOCUS } from "./spectrumLocus";
 
 // Point-in-polygon test for the gamut bounded by spectrum locus + purple line
@@ -98,6 +99,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
   const canvasRef = useRef(null);
   const [hovered, setHovered] = useState(null);
   const { dark } = useTheme();
+  const { t } = useLang();
   const C = useCanvasColors(dark);
 
   useImperativeHandle(ref, () => ({ getCanvas: () => canvasRef.current }));
@@ -877,7 +879,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
         display: "flex", flexDirection: "column", gap: 4, paddingTop: 4,
         position: "sticky", top: 56, alignSelf: "flex-start", zIndex: 5,
       }}>
-        <button title={showReticle ? "Masquer le réticule" : "Afficher le réticule"} onClick={() => onToggleReticle && onToggleReticle()} style={showReticle ? btnActive : btnBase}>
+        <button title={showReticle ? t("couleur.hideReticle") : t("couleur.showReticle")} onClick={() => onToggleReticle && onToggleReticle()} style={showReticle ? btnActive : btnBase}>
           <svg width="26" height="26" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
             <line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" strokeWidth="1.3"/>
@@ -899,7 +901,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
         </button>
 
         <button
-          title={showColorFill ? "Masquer le fond coloré" : "Afficher le fond coloré"}
+          title={showColorFill ? t("couleur.hideBg") : t("couleur.showBg")}
           onClick={() => onToggleColorFill && onToggleColorFill()}
           style={showColorFill
             ? { ...btnBase, background: "transparent", border: `1px solid var(--border)`, overflow: "hidden" }
@@ -933,7 +935,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
 
         <div style={{ position: "relative" }}>
           <div ref={macadamRef}>
-            <button title="Tolérance colorimétrique (ellipses MacAdam)" onClick={() => setMacadamOpen(v => !v)} style={macadamFactor > 0 ? btnActive : btnBase}>
+            <button title={t("couleur.tolerance")} onClick={() => setMacadamOpen(v => !v)} style={macadamFactor > 0 ? btnActive : btnBase}>
               <svg width="26" height="26" viewBox="0 0 16 16" fill="none">
                 <ellipse cx="8" cy="8" rx="6" ry="3.5" stroke="currentColor" strokeWidth="1.3" transform="rotate(-30 8 8)"/>
                 <circle cx="8" cy="8" r="1.2" fill="currentColor"/>
@@ -941,7 +943,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
             </button>
             {macadamOpen && (
               <div style={{ position: "absolute", left: 58, top: 0, zIndex: 10, borderRadius: 8, padding: "8px 10px", whiteSpace: "nowrap", ...popupStyle }}>
-                <p style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)", margin: "0 0 6px" }}>Tolérance colorimétrique</p>
+                <p style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)", margin: "0 0 6px" }}>{t("couleur.tolerance")}</p>
                 <div style={{ display: "flex", gap: 4 }}>
                   {[0, 1, 2, 5, 10].map(f => (
                     <button key={f} onClick={() => { onSetMacadam && onSetMacadam(f); if (f === 0) setMacadamOpen(false); }}
@@ -1020,7 +1022,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
             ×{zoomLevel.toFixed(zoomLevel < 10 ? 1 : 0)}
           </span>
           {isZoomed && (
-            <button onClick={resetZoom} title="Réinitialiser le zoom"
+            <button onClick={resetZoom} title={t("couleur.zoomReset")}
               style={{ ...btnBase, fontSize: 12, fontWeight: 600, width: "auto", padding: "0 10px", color: "var(--text-muted)" }}
             >↺ ×1</button>
           )}
@@ -1064,7 +1066,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
               zIndex: 20,
               animation: "fadeInHint 0.15s ease",
             }}>
-              {hint.outside ? "Hors du gamut visible" : "Double-cliquer pour ajouter un point"}
+              {hint.outside ? "Hors du gamut visible" : t("cielab.dblclick")}
             </div>
           )}
         </div>
@@ -1421,6 +1423,7 @@ function PointPopup({ pt, screenX, screenY, index, illuminant, onClose, onMove, 
 
 // ── Composant principal ───────────────────────────────────────────────────────
 export default function AppCouleur() {
+  const { t } = useLang();
   const [illuminant, setIlluminant] = useState("D65");
   const [hovered, setHovered] = useState(null);
   const [tab, setTab] = useState("diagram");
@@ -1444,8 +1447,8 @@ export default function AppCouleur() {
   const [annotations, setAnnotations] = useState([]);
 
   const tabs = [
-    { id: "diagram", label: "Diagramme de chromaticité" },
-    { id: "info",    label: "À propos" },
+    { id: "diagram", label: t("couleur.title") },
+    { id: "info",    label: t("couleur.about") },
   ];
 
   const exportPNG = () => {
@@ -1542,14 +1545,14 @@ export default function AppCouleur() {
           marginLeft: "auto", background: "none", border: `0.5px solid var(--border)`,
           padding: "6px 14px", cursor: "pointer", fontSize: 12, fontWeight: 500,
           color: "var(--text)", borderRadius: 5, display: "flex", alignItems: "center", gap: 5, marginBottom: 4,
-        }}>⬇ Exporter</button>
+        }}>⬇ {t("common.export.png")}</button>
       </div>
 
       {tab === "diagram" && (
         <div>
           {/* Barre illuminants */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12, padding: "10px 16px", background: "var(--bg-card)", borderRadius: 8, border: `1px solid var(--border)`, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Illuminant</span>
+            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>{t("couleur.illuminant")}</span>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
               {[...Object.entries(ILLUMINANTS), ["", { label: "Aucun" }]].map(([k, v]) => (
                 <label key={k || "none"} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 13, fontWeight: illuminant === k ? 600 : 400, color: illuminant === k ? "var(--text)" : "var(--text-muted)" }}>

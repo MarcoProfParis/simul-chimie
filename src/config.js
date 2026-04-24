@@ -3,28 +3,30 @@ import GouttteMouillage from "./apps/rheologie/GouttteMouillage"
 import ZismanApp from "./apps/rheologie/ZismanApp"
 import AppCouleur from "./apps/couleur/AppCouleur.jsx"
 import CIELABExplorer from "./apps/couleur/CIELABExplorer"
-import PlanFactoriel from "./apps/doe/PlanFactoriel"   // ← ajouter
+import PlanFactoriel from "./apps/doe/PlanFactoriel"
 import HSPApp from "./apps/hsp/HSPApp"
 
+// Les champs label/description sont des clés i18n (ex. "cat.couleur.label").
+// App.jsx les résout via t(key) depuis le contexte de langue.
 export const CATEGORIES = [
   {
     id: "couleur",
-    label: "Couleur",
+    labelKey: "cat.couleur.label",
+    descriptionKey: "cat.couleur.description",
     emoji: "🎨",
-    description: "Colorimétrie et espaces colorimétriques",
     color: "#7c3aed",
     apps: [
       {
         id: "cie-xy",
-        label: "Diagramme CIE xy",
-        description: "Plan chromatique CIE 1931, illuminants, ellipses MacAdam",
+        labelKey: "app.cie-xy.label",
+        descriptionKey: "app.cie-xy.description",
         emoji: "🌈",
         component: AppCouleur,
       },
       {
         id: "cielab",
-        label: "Explorateur CIELAB",
-        description: "Plan a*b*, ΔE*₇₆, coordonnées C*/h°",
+        labelKey: "app.cielab.label",
+        descriptionKey: "app.cielab.description",
         emoji: "🔬",
         component: CIELABExplorer,
       },
@@ -32,46 +34,45 @@ export const CATEGORIES = [
   },
   {
     id: "rheologie",
-    label: "Rhéologie & Mouillage",
+    labelKey: "cat.rheologie.label",
+    descriptionKey: "cat.rheologie.description",
     emoji: "💧",
-    description: "Comportement des fluides et interfaces",
     color: "#0891b2",
     apps: [
       {
         id: "rheogramme",
-        label: "Rhéogrammes",
-        description: "Newton, Ostwald, Bingham, Herschel-Bulkley",
+        labelKey: "app.rheogramme.label",
+        descriptionKey: "app.rheogramme.description",
         emoji: "📈",
         component: RheogrammeSimulateur,
       },
       {
         id: "mouillage",
-        label: "Goutte de mouillage",
-        description: "Angle de contact, loi de Young",
+        labelKey: "app.mouillage.label",
+        descriptionKey: "app.mouillage.description",
         emoji: "💧",
         component: GouttteMouillage,
       },
       {
         id: "zisman",
-        label: "Droite de Zisman",
-        description: "Tension critique, énergie de surface",
+        labelKey: "app.zisman.label",
+        descriptionKey: "app.zisman.description",
         emoji: "📐",
         component: ZismanApp,
       },
     ],
   },
-  // ── NOUVELLE CATÉGORIE ────────────────────────────────────────────────────
   {
     id: "doe",
-    label: "Plans d'expériences",
+    labelKey: "cat.doe.label",
+    descriptionKey: "cat.doe.description",
     emoji: "🧪",
-    description: "Méthodologie des plans factoriels",
     color: "#16a34a",
     apps: [
       {
         id: "plan-factoriel",
-        label: "Plan factoriel",
-        description: "Plans 2ⁿ, effets principaux et interactions",
+        labelKey: "app.plan-factoriel.label",
+        descriptionKey: "app.plan-factoriel.description",
         emoji: "📊",
         component: PlanFactoriel,
       },
@@ -79,15 +80,15 @@ export const CATEGORIES = [
   },
   {
     id: "solubilite",
-    label: "Solubilité",
+    labelKey: "cat.solubilite.label",
+    descriptionKey: "cat.solubilite.description",
     emoji: "🧪",
-    description: "Paramètres de Hansen et compatibilité solvant",
     color: "#ea580c",
     apps: [
       {
         id: "hsp",
-        label: "Paramètres de Hansen (HSP)",
-        description: "Ajuster une sphère HSP à partir de données de solvants",
+        labelKey: "app.hsp.label",
+        descriptionKey: "app.hsp.description",
         emoji: "🔶",
         component: HSPApp,
       },

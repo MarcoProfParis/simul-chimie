@@ -2,12 +2,14 @@ import { useCallback } from "react"
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { SOLVENT_LIBRARY } from "../data/solventLibrary"
 import SolventCombobox from "./SolventCombobox"
+import { useLang } from "../../../i18n"
 
 const ACCENT = "#ea580c"
 
 const EMPTY_ROW = () => ({ solvent: "", D: null, P: null, H: null, score: null })
 
 export default function SolventEditor({ data, fileName, onChange, onReset }) {
+  const { t } = useLang()
   const update = useCallback((i, patch) => {
     const next = data.slice()
     next[i] = { ...next[i], ...patch }
@@ -57,11 +59,11 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
       <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
-            Édition des solvants
+            {t("editor.title")}
           </p>
           <p style={{ margin: "2px 0 0", fontSize: 11, color: "var(--text-muted)" }}>
-            {fileName ? `Source : ${fileName} · ` : ""}
-            {completeRows.length} solvants complets, {labeledRows.length} étiquetés.
+            {fileName ? `${t("editor.source")} : ${fileName} · ` : ""}
+            {t("editor.complete", { n: completeRows.length })}, {t("editor.labeled", { n: labeledRows.length })}.
           </p>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -73,7 +75,7 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
               background: `${ACCENT}15`, border: `1px solid ${ACCENT}40`, color: ACCENT, cursor: "pointer",
             }}
           >
-            <PlusIcon style={{ width: 12, height: 12 }} /> Solvant
+            <PlusIcon style={{ width: 12, height: 12 }} /> {t("editor.addSolvent")}
           </button>
           <button
             onClick={addTenEmpty}
@@ -82,18 +84,18 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
               background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-muted)", cursor: "pointer",
             }}
           >
-            +10 lignes
+            {t("editor.addRows")}
           </button>
           <button
             onClick={onReset}
-            title="Vider et retourner au choix de source"
+            title={t("editor.clearTooltip")}
             style={{
               display: "inline-flex", alignItems: "center", gap: 4,
               padding: "6px 10px", fontSize: 11, fontWeight: 600, borderRadius: 6,
               background: "var(--bg-card)", border: "1px solid var(--border)", color: "#dc2626", cursor: "pointer",
             }}
           >
-            <XMarkIcon style={{ width: 12, height: 12 }} /> Effacer
+            <XMarkIcon style={{ width: 12, height: 12 }} /> {t("editor.clear")}
           </button>
         </div>
       </div>
@@ -113,7 +115,7 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
             {data.length === 0 && (
               <tr>
                 <td colSpan={6} style={{ padding: "24px 14px", textAlign: "center", color: "var(--text-muted)", fontSize: 12 }}>
-                  Aucun solvant. Clique sur <b>+ Solvant</b> pour commencer.
+                  {t("editor.empty")}
                 </td>
               </tr>
             )}
@@ -122,7 +124,7 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
                 <td style={{ padding: "4px 8px", overflow: "visible" }}>
                   <SolventCombobox
                     value={r.solvent ?? ""}
-                    placeholder={`Solvant ${i + 1}`}
+                    placeholder={t("csv.solventN", { n: i + 1 })}
                     onPick={(pick) => onSolventPick(i, pick)}
                   />
                 </td>
@@ -133,7 +135,7 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
                 <td style={{ padding: "4px 8px", textAlign: "center" }}>
                   <button
                     onClick={() => removeRow(i)}
-                    title="Supprimer la ligne"
+                    title={t("editor.deleteRow")}
                     style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", padding: 4, display: "inline-flex" }}
                   >
                     <TrashIcon style={{ width: 13, height: 13 }} />
@@ -145,7 +147,7 @@ export default function SolventEditor({ data, fileName, onChange, onReset }) {
         </table>
       </div>
       <div style={{ padding: "10px 14px", borderTop: "1px solid var(--border)", fontSize: 11, color: "var(--text-muted)", background: "var(--bg)" }}>
-        Score : 1 = bon solvant, &gt; seuil = mauvais, vide = non classé (ignoré à l'ajustement). {SOLVENT_LIBRARY.length} solvants dans la base — tape un nom non listé pour saisie libre.
+        {t("editor.scoreInfo", { n: SOLVENT_LIBRARY.length })}
       </div>
     </div>
   )

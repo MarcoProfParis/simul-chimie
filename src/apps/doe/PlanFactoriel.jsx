@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useTheme } from "../../ThemeContext";
+import { useLang } from "../../i18n";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { EXAMPLE_FILES } from "./exampleFiles";
 import {
@@ -47,6 +48,7 @@ const DEFAULT_RESPONSES = [{ id: "Y1", name: "Réponse 1", unit: "" }];
 
 function PlanFactorielInner() {
   const { theme } = useTheme();
+  const { t } = useLang();
   void ChevronDownIcon;
 
   const [part, setPart] = useState(0); // 0=accueil, 1=facteurs, 2=matrice, 3=modèle, 4=résultats
@@ -792,7 +794,7 @@ function PlanFactorielInner() {
         <div className="min-h-[80vh] flex flex-col">
           {/* En-tête */}
           <div className="text-center mb-8 mt-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Plans d'expériences</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{t("doe.title")}</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">BTS Métiers de la Chimie — Choisissez comment démarrer</p>
           </div>
 
@@ -860,7 +862,8 @@ function PlanFactorielInner() {
               return (
                 <div key={diff}>
                   <p className={`text-[11px] font-semibold uppercase tracking-widest mb-3 ${diffColors[diff]}`}>
-                    {diff === "débutant" ? "● " : diff === "intermédiaire" ? "●● " : "●●● "}{diff}
+                    {diff === "débutant" ? "● " : diff === "intermédiaire" ? "●● " : "●●● "}
+                    {diff === "débutant" ? t("doe.difficulty.beginner") : diff === "intermédiaire" ? t("doe.difficulty.intermediate") : t("doe.difficulty.advanced")}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {diffExs.map(ex => (
@@ -919,7 +922,7 @@ function PlanFactorielInner() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => setWelcomeModal(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Annuler</button>
+                  <button onClick={() => setWelcomeModal(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{t("common.cancel")}</button>
                   <button onClick={() => createNewPlan(newNbFactors, newNbResponses)} className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">Créer →</button>
                 </div>
               </div>
@@ -963,8 +966,8 @@ function PlanFactorielInner() {
                   <p className="mt-2 text-xs text-red-500 dark:text-red-400">{jsonImportError}</p>
                 )}
                 <div className="flex gap-2 mt-4">
-                  <button onClick={() => setWelcomeModal(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Annuler</button>
-                  <button onClick={() => importFromJsonText(jsonPasteText)} disabled={!jsonPasteText.trim()} className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">Valider →</button>
+                  <button onClick={() => setWelcomeModal(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{t("common.cancel")}</button>
+                  <button onClick={() => importFromJsonText(jsonPasteText)} disabled={!jsonPasteText.trim()} className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">{t("common.validate")} →</button>
                 </div>
               </div>
             </div>
@@ -1024,7 +1027,7 @@ function PlanFactorielInner() {
                 </div>
 
                 <div className="flex gap-2">
-                  <button onClick={() => setWelcomeModal(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Annuler</button>
+                  <button onClick={() => setWelcomeModal(null)} className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{t("common.cancel")}</button>
                   <button onClick={() => {
                     loadExample(exampleEditData.ex);
                     setWelcomeModal(null);
@@ -1190,10 +1193,10 @@ function PlanFactorielInner() {
       {part > 0 && <nav aria-label="Progression" className="mb-6">
         <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0 dark:divide-white/15 dark:border-white/15">
           {[
-            { n: 1, id: "01", l: "Facteurs & réponses" },
-            { n: 2, id: "02", l: "Matrice" },
-            { n: 3, id: "03", l: "Modèle" },
-            { n: 4, id: "04", l: "Modélisation" },
+            { n: 1, id: "01", l: `${t("doe.factors")} & ${t("doe.responses")}` },
+            { n: 2, id: "02", l: t("doe.matrix") },
+            { n: 3, id: "03", l: t("doe.model") },
+            { n: 4, id: "04", l: t("doe.effects") },
           ].map((s, i, arr) => {
             const status = part > s.n ? "complete" : part === s.n ? "current" : "upcoming";
             return (
@@ -1253,7 +1256,7 @@ function PlanFactorielInner() {
               <div className="flex items-center gap-2">
                 <button onClick={() => { setEditMode(false); }}
                   className="rounded-md border border-indigo-200 dark:border-indigo-700 px-2.5 py-1 text-xs text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors">
-                  Annuler
+                  {t("common.cancel")}
                 </button>
                 <button onClick={exportJSON}
                   className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors">
@@ -1581,7 +1584,7 @@ function PlanFactorielInner() {
             </p>
             <button onClick={buildMatrix}
               className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-600 transition-colors shadow-sm">
-              Construire la table de données →
+              {t("doe.matrix")} →
             </button>
           </div>
         </>
@@ -1625,11 +1628,11 @@ function PlanFactorielInner() {
                 <div className="flex justify-end gap-2 mt-5">
                   <button onClick={() => setAddRowLevels(null)}
                     className="rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    Annuler
+                    {t("common.cancel")}
                   </button>
                   <button onClick={confirmAddRow}
                     className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
-                    Ajouter
+                    {t("common.validate")}
                   </button>
                 </div>
               </DialogPanel>
@@ -1653,11 +1656,11 @@ function PlanFactorielInner() {
                 <div className="grid grid-cols-2 gap-3">
                   <button onClick={() => setShowRandomDialog(false)}
                     className="rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    Annuler
+                    {t("common.cancel")}
                   </button>
                   <button onClick={fillRandom}
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
-                    Confirmer
+                    {t("common.validate")}
                   </button>
                 </div>
               </DialogPanel>
@@ -1783,7 +1786,7 @@ function PlanFactorielInner() {
           <div className="flex items-center justify-between mt-4">
             <button onClick={() => goTo(1)}
               className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              ← Retour
+              ← {t("common.back")}
             </button>
             <div className="flex items-center gap-3">
               {editMode && (
@@ -1798,7 +1801,7 @@ function PlanFactorielInner() {
               {hasMissing && <span className="text-xs text-red-500 dark:text-red-400">Compléter les réponses pour continuer</span>}
               <button onClick={() => { if (!hasMissing) goTo(3); }} disabled={hasMissing}
                 className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                Choisir le modèle →
+                {t("doe.model")} →
               </button>
             </div>
           </div>
@@ -2017,7 +2020,7 @@ function PlanFactorielInner() {
             <div className="flex items-center justify-between mt-4">
               <button onClick={() => goTo(2)}
                 className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                ← Retour
+                ← {t("common.back")}
               </button>
               <div className="flex items-center gap-3">
                 {editMode && (
@@ -2044,13 +2047,13 @@ function PlanFactorielInner() {
         const has3D = contFactors.length >= 2;
         // Mode compact : raccourcis pour les classes (isCompact vient du composant parent)
         const TABS = [
-          { id: "effets_calcul", label: "Calcul des effets" },
+          { id: "effets_calcul", label: t("doe.effects") },
           { id: "coefficients", label: "Coefficients" },
-          { id: "residus", label: "Résidus" },
-          { id: "anova", label: "ANOVA & Validation" },
-          { id: "effets", label: "Effets (Pareto)" },
-          { id: "isoresponse", label: "Isoréponses" },
-          ...(has3D ? [{ id: "iso3d", label: "Surface 3D" }] : []),
+          { id: "residus", label: t("doe.residuals") },
+          { id: "anova", label: t("doe.anova") },
+          { id: "effets", label: `${t("doe.effects")} (${t("doe.pareto")})` },
+          { id: "isoresponse", label: t("doe.isoresponse") },
+          ...(has3D ? [{ id: "iso3d", label: t("doe.surface3d") }] : []),
         ];
 
         const modelColors = [
@@ -2197,7 +2200,7 @@ function PlanFactorielInner() {
             {part4Tab === "coefficients" && (
               <div className={cardSpace}>
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Coefficients estimés</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t("doe.effects")}</h3>
                   <HelpButton topic="coefficients" size="xs" />
                 </div>
 
@@ -2282,7 +2285,7 @@ function PlanFactorielInner() {
                         {part4Tab === "residus" && (
               <div className={cardSpace}>
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Analyse des résidus</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t("doe.residuals")}</h3>
                   <HelpButton topic="residus" size="xs" />
                 </div>
                 {/* Info points exclus */}
@@ -2293,7 +2296,7 @@ function PlanFactorielInner() {
                     </span>
                     <button onClick={() => setExcludedPoints(new Set())}
                       className="text-xs text-amber-600 dark:text-amber-400 hover:underline">
-                      Réinclure tous
+                      {t("doe.residual.exclude")} (tous)
                     </button>
                   </div>
                 )}
@@ -2405,7 +2408,7 @@ function PlanFactorielInner() {
             {part4Tab === "anova" && (
               <div className={cardSpace}>
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Analyse de la variance (ANOVA)</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t("doe.anova")}</h3>
                   <HelpButton topic="anova" size="xs" />
                 </div>
 
@@ -2467,11 +2470,11 @@ function PlanFactorielInner() {
                             <tr className="border-b border-gray-100 dark:border-gray-800">
                               {[
                                 { label: "Source", help: null },
-                                { label: "SC", help: "Somme des Carrés — mesure la dispersion de chaque source" },
-                                { label: "dl", help: "Degrés de Liberté — nombre de valeurs indépendantes" },
-                                { label: "CM", help: "Carré Moyen = SC/dl — variance estimée" },
-                                { label: "F", help: "Statistique de Fisher = CM_R/CM_E — grand F = bon modèle" },
-                                { label: "Prob > F", help: "p-valeur : < 0.05 → modèle significatif ✓" },
+                                { label: t("doe.ss"), help: "Somme des Carrés — mesure la dispersion de chaque source" },
+                                { label: t("doe.df"), help: "Degrés de Liberté — nombre de valeurs indépendantes" },
+                                { label: t("doe.ms"), help: "Carré Moyen = SC/dl — variance estimée" },
+                                { label: t("doe.fstat"), help: "Statistique de Fisher = CM_R/CM_E — grand F = bon modèle" },
+                                { label: t("doe.pvalue"), help: "p-valeur : < 0.05 → modèle significatif ✓" },
                               ].map(({ label, help }) => (
                                 <th key={label} className="text-left text-[11px] font-medium text-gray-400 pb-2 px-2">
                                   <span className="flex items-center gap-1">
@@ -2568,7 +2571,7 @@ function PlanFactorielInner() {
             {part4Tab === "effets" && (
               <div className={cardSpace}>
                 <div className="flex items-center gap-2 mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Diagramme de Pareto des effets</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t("doe.pareto")}</h3>
                   <HelpButton topic="pareto" size="xs" />
                 </div>
 
@@ -2609,7 +2612,7 @@ function PlanFactorielInner() {
                     <div key={m.id} className={`bg-white dark:bg-gray-900 ${cardCls} ${col.border}`}>
                       <div className="flex items-center gap-2 mb-4">
                         <span className={`size-2.5 rounded-full ${col.dot}`} />
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{m.name} — Diagramme de Pareto des effets</h3>
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{m.name} — {t("doe.pareto")}</h3>
                       </div>
                       {/* ── Diagramme de Pareto ── */}
                       {(() => {
@@ -2823,7 +2826,7 @@ function PlanFactorielInner() {
             {part4Tab === "isoresponse" && (
               <div className={cardSpace}>
                 <div className="flex items-center gap-2 mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Courbes isoréponses</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t("doe.isoresponse")}</h3>
                   <HelpButton topic="isoreponse" size="xs" />
                 </div>
 
@@ -2895,7 +2898,7 @@ function PlanFactorielInner() {
                       <div className="flex items-center gap-2 mb-4">
                         <span className={`size-2.5 rounded-full ${col.dot}`} />
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {m.name} — Surface de réponse 3D
+                          {m.name} — {t("doe.surface3d")}
                         </h3>
                         <HelpButton topic="isoreponse" size="xs" className="ml-auto" />
                       </div>
@@ -2910,7 +2913,7 @@ function PlanFactorielInner() {
             <div className="flex items-center justify-between mt-6">
               <button onClick={() => goTo(3)}
                 className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                ← Retour
+                ← {t("common.back")}
               </button>
               <div className="flex items-center gap-3">
                 {editMode && (

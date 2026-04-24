@@ -1,3 +1,5 @@
+import { useLang } from "../../../i18n"
+
 const ACCENT = "#ea580c"
 
 function Stat({ label, value, color = "var(--text)" }) {
@@ -14,6 +16,7 @@ function Stat({ label, value, color = "var(--text)" }) {
 }
 
 export default function ResultsCard({ result }) {
+  const { t } = useLang()
   if (!result) return null
   const { hsp, datafit, accuracy, nSolventsIn, nSolventsOut, nWrongIn, nWrongOut } = result
   const datafitColor = datafit > 0.95 ? "#16a34a" : datafit > 0.85 ? "#ea580c" : "#dc2626"
@@ -27,32 +30,32 @@ export default function ResultsCard({ result }) {
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
-          Paramètres de Hansen ajustés
+          {t("results.title")}
         </p>
         <span style={{ fontSize: 10, fontWeight: 600, color: ACCENT, background: `${ACCENT}15`, padding: "3px 8px", borderRadius: 6 }}>
-          Méthode classique
+          {t("results.method")}
         </span>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
         <Stat label="δD" value={hsp.D.toFixed(2)} color={ACCENT} />
         <Stat label="δP" value={hsp.P.toFixed(2)} color={ACCENT} />
         <Stat label="δH" value={hsp.H.toFixed(2)} color={ACCENT} />
-        <Stat label="RAYON R₀" value={hsp.R.toFixed(2)} color={ACCENT} />
-        <Stat label="DATAFIT" value={datafit.toFixed(4)} color={datafitColor} />
-        <Stat label="PRÉCISION" value={`${(accuracy * 100).toFixed(1)} %`} color={datafitColor} />
+        <Stat label={t("results.radius")} value={hsp.R.toFixed(2)} color={ACCENT} />
+        <Stat label={t("results.datafit")} value={datafit.toFixed(4)} color={datafitColor} />
+        <Stat label={t("results.accuracy")} value={`${(accuracy * 100).toFixed(1)} %`} color={datafitColor} />
       </div>
       <div style={{
         marginTop: 14, paddingTop: 12,
         borderTop: "1px solid var(--border)",
         display: "flex", gap: 16, flexWrap: "wrap", fontSize: 12, color: "var(--text-muted)",
       }}>
-        <span><b style={{ color: "#16a34a" }}>{nSolventsIn}</b> bons solvants</span>
-        <span><b style={{ color: "#64748b" }}>{nSolventsOut}</b> mauvais solvants</span>
-        {nWrongIn > 0 && <span><b style={{ color: "#dc2626" }}>{nWrongIn}</b> faux positifs</span>}
-        {nWrongOut > 0 && <span><b style={{ color: "#dc2626" }}>{nWrongOut}</b> faux négatifs</span>}
+        <span><b style={{ color: "#16a34a" }}>{nSolventsIn}</b> {t("results.goodSolvents")}</span>
+        <span><b style={{ color: "#64748b" }}>{nSolventsOut}</b> {t("results.badSolvents")}</span>
+        {nWrongIn > 0 && <span><b style={{ color: "#dc2626" }}>{nWrongIn}</b> {t("results.falsePos")}</span>}
+        {nWrongOut > 0 && <span><b style={{ color: "#dc2626" }}>{nWrongOut}</b> {t("results.falseNeg")}</span>}
       </div>
       <p style={{ margin: "12px 0 0", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5 }}>
-        Unités : MPa<sup>½</sup>. Un solvant est compatible si RED = dist / R₀ ≤ 1.
+        {t("results.units")}
       </p>
     </div>
   )

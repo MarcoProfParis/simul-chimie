@@ -15,6 +15,15 @@ import {
   LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import { useLang } from "../../i18n";
+
+// Map from HELP_CONTENT topic key → i18n translation key (for topics that have one)
+const HELP_TITLE_KEYS = {
+  anova:        "doe.help.anova",
+  residus:      "doe.help.residuals",
+  pareto:       "doe.help.pareto",
+  isoreponse:   "doe.help.isoresponse",
+};
 
 // ─── Contexte global du drawer ────────────────────────────────────────────────
 const HelpCtx = createContext(null);
@@ -43,6 +52,7 @@ export function HelpProvider({ children }) {
 
 // ─── Bouton déclencheur ───────────────────────────────────────────────────────
 export function HelpButton({ topic, label, size = "sm", className = "" }) {
+  const { t } = useLang();
   const ctx = useContext(HelpCtx);
   if (!ctx) return null;
   const sizeCls = size === "xs"
@@ -50,12 +60,15 @@ export function HelpButton({ topic, label, size = "sm", className = "" }) {
     : size === "sm"
     ? "size-4 text-xs"
     : "size-5 text-sm";
+  const topicTitle = HELP_TITLE_KEYS[topic]
+    ? t(HELP_TITLE_KEYS[topic])
+    : (HELP_CONTENT[topic]?.title || topic);
 
   return (
     <button
       type="button"
       onClick={(e) => { e.stopPropagation(); ctx.openHelp(topic); }}
-      title={`Aide : ${HELP_CONTENT[topic]?.title || topic}`}
+      title={`${t("doe.help")} : ${topicTitle}`}
       className={`inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-600
         dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors ${className}`}
     >
@@ -822,8 +835,12 @@ const HELP_CONTENT = {
 
 // ─── Drawer principal ─────────────────────────────────────────────────────────
 function HelpDrawer({ open, topic, onClose }) {
+  const { t } = useLang();
   const content = topic ? HELP_CONTENT[topic] : null;
   const Icon = content?.icon || BookOpenIcon;
+  const titleText = topic && HELP_TITLE_KEYS[topic]
+    ? t(HELP_TITLE_KEYS[topic])
+    : (content?.title || t("doe.help"));
 
   return (
     <>
@@ -848,9 +865,9 @@ function HelpDrawer({ open, topic, onClose }) {
             <Icon className="size-5 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 mb-0.5">Aide pédagogique</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 mb-0.5">{t("doe.help")}</p>
             <h2 className="text-sm font-bold text-gray-900 dark:text-white leading-snug">
-              {content?.title || "Aide"}
+              {titleText}
             </h2>
           </div>
           <button

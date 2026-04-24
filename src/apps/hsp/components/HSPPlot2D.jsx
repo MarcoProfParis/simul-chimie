@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useMemo, useState } from "react"
 import SolventEditModal from "./SolventEditModal"
+import { useLang } from "../../../i18n"
 import { MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowPathIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
 import { Popover, PopoverButton, PopoverPanel, Transition } from "@headlessui/react"
 import {
@@ -94,10 +95,11 @@ function circlePoints(cx, cy, r, n = 96) {
 
 // ─── Help popover for 2·δD projections ──────────────────────────────────────
 function HelpPopover() {
+  const { t } = useLang()
   return (
     <Popover className="relative">
       <PopoverButton
-        title="Pourquoi 2·δD ?"
+        title={t("plot2d.why2d")}
         style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           width: 22, height: 22, borderRadius: "50%",
@@ -125,21 +127,21 @@ function HelpPopover() {
             boxShadow: "0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06)",
           }}
         >
-          <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Pourquoi 2·δD en abscisse ?</p>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>{t("plot2d.why2d.title")}</p>
           <p style={{ margin: "8px 0" }}>
-            Dans le modèle de Hansen, la distance entre deux solvants dans l'espace (δD, δP, δH) est définie par :
+            {t("plot2d.why2d.body1")}
           </p>
           <p style={{ margin: "6px 0", textAlign: "center", fontFamily: "monospace", background: "var(--bg)", padding: "6px 8px", borderRadius: 4 }}>
             d² = <b style={{ color: ACCENT }}>4</b>·(ΔδD)² + (ΔδP)² + (ΔδH)²
           </p>
           <p style={{ margin: "8px 0" }}>
-            Le coefficient <b>4</b> sur δD traduit l'importance empiriquement plus grande de la composante dispersive dans les interactions de solubilité.
+            {t("plot2d.why2d.body2")}
           </p>
           <p style={{ margin: "8px 0" }}>
-            Si on trace δD tel quel, la « sphère » de Hansen apparaît comme un ellipsoïde aplati selon l'axe δD. Pour obtenir un <b>vrai cercle</b> (visuellement parlant), on trace <b style={{ color: ACCENT }}>2·δD</b> : puisque <code>(2·ΔδD)² = 4·(ΔδD)²</code>, le facteur 4 est « absorbé » dans l'axe.
+            {t("plot2d.why2d.body3")}
           </p>
           <p style={{ margin: 0, color: "var(--text-muted)", fontStyle: "italic" }}>
-            C'est la convention historique utilisée par Charles M. Hansen dans ses ouvrages de référence.
+            {t("plot2d.why2d.footer")}
           </p>
         </PopoverPanel>
       </Transition>
@@ -162,6 +164,7 @@ function SolventDot({ cx, cy, payload, fill, onEdit }) {
 
 // ─── One chart per projection (independent zoom) ────────────────────────────
 function ProjectionChart({ proj, data, result, insideLimit, onEditSolvent }) {
+  const { t } = useLang()
   const P = PROJECTIONS[proj]
   const [zoom, setZoom] = useState(1)
   const [editingSolvent, setEditingSolvent] = useState(null)
@@ -247,15 +250,15 @@ function ProjectionChart({ proj, data, result, insideLimit, onEditSolvent }) {
           {P.needsHelp && <HelpPopover />}
         </div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10, color: "var(--text-muted)" }}>
-          <button onClick={() => setZoomClamped(zoom / 1.3)} disabled={zoom <= MIN_ZOOM} title="Zoom arrière"
+          <button onClick={() => setZoomClamped(zoom / 1.3)} disabled={zoom <= MIN_ZOOM} title={t("plot2d.zoomOut")}
             style={{ display: "inline-flex", padding: 4, background: "transparent", border: "1px solid var(--border)", borderRadius: 4, cursor: zoom <= MIN_ZOOM ? "default" : "pointer", color: "var(--text-muted)" }}>
             <MagnifyingGlassMinusIcon style={{ width: 12, height: 12 }} />
           </button>
-          <button onClick={() => setZoom(1)} title="Réinitialiser"
+          <button onClick={() => setZoom(1)} title={t("plot2d.zoomReset")}
             style={{ display: "inline-flex", padding: 4, background: "transparent", border: "1px solid var(--border)", borderRadius: 4, cursor: "pointer", color: "var(--text-muted)" }}>
             <ArrowPathIcon style={{ width: 12, height: 12 }} />
           </button>
-          <button onClick={() => setZoomClamped(zoom * 1.3)} disabled={zoom >= MAX_ZOOM} title="Zoom avant"
+          <button onClick={() => setZoomClamped(zoom * 1.3)} disabled={zoom >= MAX_ZOOM} title={t("plot2d.zoomIn")}
             style={{ display: "inline-flex", padding: 4, background: "transparent", border: "1px solid var(--border)", borderRadius: 4, cursor: zoom >= MAX_ZOOM ? "default" : "pointer", color: "var(--text-muted)" }}>
             <MagnifyingGlassPlusIcon style={{ width: 12, height: 12 }} />
           </button>
@@ -299,11 +302,11 @@ function ProjectionChart({ proj, data, result, insideLimit, onEditSolvent }) {
                 )
               }}
             />
-            <Scatter name="Sphère HSP" data={circle} fill="none" line={{ stroke: ACCENT, strokeWidth: 2 }} shape={() => null} />
-            <Scatter name="Compatibles" data={good} fill="#16a34a"
+            <Scatter name={t("plot2d.sphere")} data={circle} fill="none" line={{ stroke: ACCENT, strokeWidth: 2 }} shape={() => null} />
+            <Scatter name={t("plot2d.compatible")} data={good} fill="#16a34a"
               shape={(p) => <SolventDot {...p} fill="#16a34a" onEdit={setEditingSolvent} />}
             />
-            <Scatter name="Incompatibles" data={bad} fill="#94a3b8"
+            <Scatter name={t("plot2d.incompatible")} data={bad} fill="#94a3b8"
               shape={(p) => <SolventDot {...p} fill="#94a3b8" onEdit={setEditingSolvent} />}
             />
             <ReferenceDot x={center.x} y={center.y} r={5} fill={ACCENT} stroke="#fff" strokeWidth={2} />
@@ -328,6 +331,7 @@ function LegendItem({ color, label, line }) {
 
 // ─── Main component ─────────────────────────────────────────────────────────
 export default function HSPPlot2D({ data, result, insideLimit = 1, onEditSolvent }) {
+  const { t } = useLang()
   const [active, setActive] = useState(() => new Set(PROJ_ORDER))
 
   const toggle = (proj) => {
@@ -350,9 +354,9 @@ export default function HSPPlot2D({ data, result, insideLimit = 1, onEditSolvent
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
         <div>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>Projections 2D</p>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{t("plot2d.title")}</p>
           <p style={{ margin: "2px 0 0", fontSize: 11, color: "var(--text-muted)" }}>
-            Convention Hansen (2·δD) · chaque graphe a son propre zoom (molette / pinch).
+            {t("plot2d.subtitle")}
           </p>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -364,7 +368,7 @@ export default function HSPPlot2D({ data, result, insideLimit = 1, onEditSolvent
                 key={proj}
                 onClick={() => toggle(proj)}
                 disabled={lastOne}
-                title={lastOne ? "Au moins une projection doit rester active" : undefined}
+                title={lastOne ? t("plot2d.lastProj") : undefined}
                 style={{
                   padding: "5px 12px", fontSize: 11, fontWeight: 700, borderRadius: 999,
                   background: isOn ? ACCENT : "transparent",
@@ -397,9 +401,9 @@ export default function HSPPlot2D({ data, result, insideLimit = 1, onEditSolvent
       </div>
 
       <div style={{ marginTop: 12, display: "flex", gap: 14, flexWrap: "wrap", fontSize: 11, color: "var(--text-muted)" }}>
-        <LegendItem color="#16a34a" label="Compatibles" />
-        <LegendItem color="#94a3b8" label="Incompatibles" />
-        <LegendItem color={ACCENT} label="Sphère HSP" line />
+        <LegendItem color="#16a34a" label={t("plot2d.compatible")} />
+        <LegendItem color="#94a3b8" label={t("plot2d.incompatible")} />
+        <LegendItem color={ACCENT} label={t("plot2d.sphere")} line />
       </div>
     </div>
   )

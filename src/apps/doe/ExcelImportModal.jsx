@@ -4,8 +4,10 @@
 //         excelImportError, setExcelImportError
 
 import React from "react";
+import { useLang } from "../../i18n";
 
 export default function ExcelImportModal({ onClose, excelDragOver, setExcelDragOver, importFromExcel, excelImportError, setExcelImportError }) {
+  const { t } = useLang();
   const [xlsTab, setXlsTab] = React.useState('info');
 
   const TABS = [
@@ -98,7 +100,7 @@ export default function ExcelImportModal({ onClose, excelDragOver, setExcelDragO
 
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white">Importer depuis Excel / CSV</h2>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-white">{t("doe.import.title")}</h2>
           <button onClick={onClose} className="size-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -115,14 +117,14 @@ export default function ExcelImportModal({ onClose, excelDragOver, setExcelDragO
             onDrop={e => { e.preventDefault(); setExcelDragOver(false); const f = e.dataTransfer.files[0]; if (f) importFromExcel(f); }}
             className={`rounded-xl border-2 border-dashed p-4 text-center transition-colors ${excelDragOver ? "border-amber-400 bg-amber-50 dark:bg-amber-900/20" : "border-gray-200 dark:border-gray-700"}`}
           >
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Glissez votre fichier ici</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t("doe.import.drop")}</p>
             <p className="text-xs text-gray-400 mb-3">.xlsx · .xls · .csv acceptés</p>
             <label className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-400 transition-colors cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
                 <path d="M9.25 13.25a.75.75 0 001.5 0V4.636l2.955 3.129a.75.75 0 001.09-1.03l-4.25-4.5a.75.75 0 00-1.09 0l-4.25 4.5a.75.75 0 101.09 1.03L9.25 4.636v8.614z"/>
                 <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"/>
               </svg>
-              Parcourir…
+              {t("doe.import.browse")}
               <input type="file" accept=".xlsx,.xls,.csv" className="hidden"
                 onChange={e => { const f = e.target.files[0]; if (f) importFromExcel(f); e.target.value = ''; }} />
             </label>
@@ -301,11 +303,11 @@ export default function ExcelImportModal({ onClose, excelDragOver, setExcelDragO
           <div className="flex gap-2 mt-1">
             <button onClick={onClose}
               className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              Fermer
+              {t("common.cancel")}
             </button>
             <button onClick={downloadTemplate}
               className="flex-1 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-400 transition-colors">
-              ↓ Télécharger le modèle .xlsx
+              ↓ {t("doe.import.template")}
             </button>
           </div>
 

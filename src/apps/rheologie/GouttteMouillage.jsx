@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useLang } from "../../i18n";
 
 const SURFACES = [
   { name: "PTFE (Téflon)",    gc: 19,  gSV: 19,  gD: 18.5, gP: 0.5,  gSL: 5,  color: "#0891b2", surfBg: "#e0f2fe", surfStroke: "#38bdf8", pattern: "lines",
@@ -292,11 +293,11 @@ Object.assign(MOLECULES, {
 
 function cosY(s, g) { return Math.max(-1, Math.min(1, (s.gSV - s.gSL) / g)); }
 function toDeg(c)   { return Math.round(Math.acos(c) * 180 / Math.PI); }
-function regime(t) {
-  if (t <= 0)  return { label: "Mouillage total",                bg: "#dcfce7", fg: "#15803d", dot: "#22c55e" };
-  if (t < 90)  return { label: "Mouillage partiel",              bg: "#eff6ff", fg: "#1d4ed8", dot: "#3b82f6" };
-  if (t < 150) return { label: "Mauvais mouillage (hydrophobe)", bg: "#fef9c3", fg: "#92400e", dot: "#f59e0b" };
-  return         { label: "Non-mouillage (superhydrophobe)",     bg: "#fee2e2", fg: "#991b1b", dot: "#ef4444" };
+function regime(theta) {
+  if (theta <= 0)  return { key: "wetting.total",          bg: "#dcfce7", fg: "#15803d", dot: "#22c55e" };
+  if (theta < 90)  return { key: "wetting.partial",        bg: "#eff6ff", fg: "#1d4ed8", dot: "#3b82f6" };
+  if (theta < 150) return { key: "wetting.hydrophobic",    bg: "#fef9c3", fg: "#92400e", dot: "#f59e0b" };
+  return             { key: "wetting.superHydrophobic",    bg: "#fee2e2", fg: "#991b1b", dot: "#ef4444" };
 }
 
 function Pattern({ id, type, bg, stroke }) {
@@ -492,6 +493,7 @@ function Canvas({ theta, surf, liquid, showV, svgRef }) {
 
 
 export default function GouttteMouillage({ onBack }) {
+  const { t } = useLang();
   const [surf,       setSurf]      = useState(SURFACES[3]);
   const [liquid,     setLiquid]    = useState(LIQUIDS[0]);
   const [gammaLV,    setGamma]     = useState(LIQUIDS[0].gamma);
@@ -530,7 +532,7 @@ export default function GouttteMouillage({ onBack }) {
 
       <div style={{ background: "white", borderBottom: "1px solid #e2e8f0", padding: "14px 24px", display: "flex", alignItems: "center", gap: 12 }}>
         
-        <span style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, letterSpacing: -.5 }}>Mouillage</span>
+        <span style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, letterSpacing: -.5 }}>{t("wetting.title")}</span>
         <span style={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>Simulation de l'angle de mouillage · BTS Métiers de la Chimie</span>
       </div>
 
@@ -541,7 +543,7 @@ export default function GouttteMouillage({ onBack }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
           <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 8 }}>Substrat solide</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 8 }}>{t("wetting.substrate")}</div>
             <div style={{ maxHeight: 260, overflowY: "auto", marginRight: -4, paddingRight: 4 }}>
               {SURFACES.map(s => (
                 <button key={s.name} onClick={() => setSurf(s)} style={{
@@ -560,7 +562,7 @@ export default function GouttteMouillage({ onBack }) {
           </div>
 
           <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 8 }}>Liquide</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 8 }}>{t("wetting.liquid")}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 12 }}>
               {LIQUIDS.map(l => (
                 <button key={l.name} onClick={() => { setLiquid(l); setGamma(l.gamma); }} style={{
@@ -574,7 +576,7 @@ export default function GouttteMouillage({ onBack }) {
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4 }}>γ<sub>LV</sub> personnalisé</div>
+            <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4 }}>{t("wetting.surfaceTension")} γ<sub>LV</sub></div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input type="range" min={15} max={75} step={0.5} value={gammaLV}
                 onChange={e => setGamma(parseFloat(e.target.value))}
@@ -586,12 +588,12 @@ export default function GouttteMouillage({ onBack }) {
           </div>
 
           <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 10 }}>Résultats</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 10 }}>{t("wetting.results")}</div>
             {[
-              { label: "Angle de contact θ",  value: `${theta}°`,                                   note: "mesuré dans le liquide" },
-              { label: "cos θ",               value: cosT.toFixed(3),                                note: "loi de Young" },
-              { label: "Énergie d'adhésion",  value: `${Wa} mJ·m⁻²`,                               note: "Wa = γLV(1 + cos θ)" },
-              { label: "Coeff. d'étalement",  value: `${parseFloat(S)>=0?"+":""}${S}`,              note: "S = γSV − γSL − γLV" },
+              { label: t("wetting.contactAngle"),    value: `${theta}°`,                                   note: "mesuré dans le liquide" },
+              { label: t("wetting.cosTheta"),        value: cosT.toFixed(3),                                note: "loi de Young" },
+              { label: t("wetting.adhesionEnergy"),  value: `${Wa} mJ·m⁻²`,                               note: "Wa = γLV(1 + cos θ)" },
+              { label: t("wetting.spreadingCoeff"),  value: `${parseFloat(S)>=0?"+":""}${S}`,              note: "S = γSV − γSL − γLV" },
             ].map(m => (
               <div key={m.label} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: "0.5px solid #f1f5f9" }}>
                 <div style={{ fontSize: 10, color: "#94a3b8" }}>{m.label}</div>
@@ -602,7 +604,7 @@ export default function GouttteMouillage({ onBack }) {
             <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 11px",
               borderRadius: 99, background: reg.bg, color: reg.fg, fontSize: 11, fontWeight: 600, marginTop: 2 }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: reg.dot }}/>
-              {reg.label}
+              {t(reg.key)}
             </div>
           </div>
         </div>
@@ -629,7 +631,7 @@ export default function GouttteMouillage({ onBack }) {
                   background: showV ? "#eff6ff" : "transparent",
                   color: showV ? "#1d4ed8" : "#64748b", cursor: "pointer",
                 }}>
-                  {showV ? "Masquer les vecteurs γ" : "Afficher les vecteurs γ"}
+                  {showV ? t("wetting.hideVectors") : t("wetting.showVectors")}
                 </button>
                 <button onClick={handleExport} style={{
                   padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600,
@@ -640,7 +642,7 @@ export default function GouttteMouillage({ onBack }) {
                     <path d="M8 2v8m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
                   </svg>
-                  Exporter PNG
+                  {t("common.export.png")}
                 </button>
               </div>
             </div>
@@ -727,7 +729,7 @@ export default function GouttteMouillage({ onBack }) {
           </div>
 
           <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 12, padding: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 10 }}>Convention de mesure</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#94a3b8", marginBottom: 10 }}>{t("wetting.youngEq")}</div>
             <p style={{ margin: "0 0 10px", fontSize: 13, color: "#475569", lineHeight: 1.75 }}>
               L'angle θ est mesuré <strong style={{ color: "#1e293b" }}>depuis la surface solide</strong>, au point de contact triple,
               jusqu'à la <strong style={{ color: "#1e293b" }}>tangente immédiate à l'interface liquide/vapeur</strong>.
