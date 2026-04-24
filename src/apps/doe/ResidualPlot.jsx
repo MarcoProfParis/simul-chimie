@@ -1,6 +1,8 @@
 import React from "react";
+import { useLang } from "../../i18n";
 
 export function ResidualPlot({ yHat, residuals, MSE, globalIndices, allValidRows, onExclude, onReinclude, excludedGlobalIndices, minRequired, color }) {
+  const { t } = useLang();
   const [hovered, setHovered] = React.useState(null);
   const [clicked, setClicked] = React.useState(null);
 
@@ -59,10 +61,10 @@ export function ResidualPlot({ yHat, residuals, MSE, globalIndices, allValidRows
                 <button
                   style={{ width: "100%", fontSize: 10, padding: "3px 8px", background: "#fee2e2", color: "#dc2626", border: "1px solid #fca5a5", borderRadius: 6, cursor: "pointer", fontWeight: 700 }}
                   onClick={(e) => { e.stopPropagation(); onExclude && onExclude(gIdx); setClicked(null); setHovered(null); }}>
-                  ✕ Exclure ce point
+                  ✕ {t("doe.residual.exclude")}
                 </button>
               ) : (
-                <div style={{ fontSize: 9, color: "#f59e0b", textAlign: "center" }}>Pas assez de points restants</div>
+                <div style={{ fontSize: 9, color: "#f59e0b", textAlign: "center" }}>{t("doe.residual.notEnough")}</div>
               )}
             </div>
           </div>
@@ -92,8 +94,8 @@ export function ResidualPlot({ yHat, residuals, MSE, globalIndices, allValidRows
           </text>
         ))}
 
-        <text x={PAD.l + PW / 2} y={H - 4} textAnchor="middle" fontSize="11" fill="#94a3b8">Ŷ (valeur prédite)</text>
-        <text x={10} y={PAD.t + PH / 2} textAnchor="middle" fontSize="11" fill="#94a3b8" transform={`rotate(-90, 10, ${PAD.t + PH / 2})`}>Résidu</text>
+        <text x={PAD.l + PW / 2} y={H - 4} textAnchor="middle" fontSize="11" fill="#94a3b8">{t("doe.residual.predicted")}</text>
+        <text x={10} y={PAD.t + PH / 2} textAnchor="middle" fontSize="11" fill="#94a3b8" transform={`rotate(-90, 10, ${PAD.t + PH / 2})`}>{t("doe.residual.label")}</text>
 
         {yHat.map((x, i) => {
           const px = cx(x), py = cy(residuals[i]);
@@ -152,13 +154,13 @@ export function ResidualPlot({ yHat, residuals, MSE, globalIndices, allValidRows
         return (
           <div className="flex flex-wrap items-center gap-4 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] text-gray-400">SCE :</span>
+              <span className="text-[11px] text-gray-400">{t("doe.residual.sce")} :</span>
               <span className="text-[11px] font-mono font-semibold text-gray-600 dark:text-gray-300">{SCE.toFixed(4)}</span>
               <span className="text-[10px] text-gray-400">(somme des carrés des écarts)</span>
             </div>
             {maxNormed !== null && (
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-gray-400">Résidu normé max :</span>
+                <span className="text-[11px] text-gray-400">{t("doe.residual.maxNorm")} :</span>
                 <span className={`text-[11px] font-mono font-semibold ${hasAberrant ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
                   {maxNormed.toFixed(2)}
                 </span>

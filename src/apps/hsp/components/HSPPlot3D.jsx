@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import SolventEditModal from "./SolventEditModal"
+import { useLang } from "../../../i18n"
 
 const ACCENT = "#ea580c"
 
@@ -77,6 +78,7 @@ async function loadPlot() {
 }
 
 export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent }) {
+  const { t } = useLang()
   const [Plot, setPlot] = useState(null)
   const [err, setErr] = useState("")
   const [editingSolvent, setEditingSolvent] = useState(null)
@@ -91,7 +93,7 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
     const raw = Array.isArray(pt.text) ? pt.text[0] : pt.text
     if (!raw || !String(raw).includes("<br>")) return
     const name = String(raw).split("<br>")[0].trim()
-    if (!name || name === "Centre") return
+    if (!name || name === t("plot3d.center")) return
 
     const now = Date.now()
     if (lastClick.current.name === name && now - lastClick.current.time < 400) {
@@ -102,7 +104,7 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
     } else {
       lastClick.current = { name, time: now }
     }
-  }, [data])
+  }, [data, t])
 
   useEffect(() => {
     let cancelled = false
@@ -275,25 +277,25 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
       ...tickTraces,
       {
         type: "scatter3d", mode: "lines",
-        name: "Sphère HSP",
+        name: t("plot3d.sphere"),
         x: wire.x, y: wire.y, z: wire.z,
         line: { color: ACCENT, width: 2 },
         hoverinfo: "skip",
       },
       {
-        type: "scatter3d", mode: "markers", name: "Compatibles",
+        type: "scatter3d", mode: "markers", name: t("plot3d.compatible"),
         x: good.x, y: good.y, z: good.z, text: good.text, hoverinfo: "text",
         marker: { size: 5, color: "#16a34a", line: { color: "#fff", width: 0.5 } },
       },
       {
-        type: "scatter3d", mode: "markers", name: "Incompatibles",
+        type: "scatter3d", mode: "markers", name: t("plot3d.incompatible"),
         x: bad.x, y: bad.y, z: bad.z, text: bad.text, hoverinfo: "text",
         marker: { size: 4, color: "#94a3b8", line: { color: "#fff", width: 0.5 } },
       },
       {
-        type: "scatter3d", mode: "markers", name: "Centre",
+        type: "scatter3d", mode: "markers", name: t("plot3d.center"),
         x: [cx], y: [cy], z: [cz], hoverinfo: "text",
-        text: [`Centre<br>δD=${D.toFixed(2)} δP=${P.toFixed(2)} δH=${H.toFixed(2)}<br>R₀=${R.toFixed(2)}`],
+        text: [`${t("plot3d.center")}<br>δD=${D.toFixed(2)} δP=${P.toFixed(2)} δH=${H.toFixed(2)}<br>R₀=${R.toFixed(2)}`],
         marker: { size: 7, color: ACCENT, symbol: "diamond", line: { color: "#fff", width: 1 } },
       },
     ]
@@ -331,7 +333,7 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
       paper_bgcolor: "transparent",
     }
     return { traces, layout }
-  }, [data, result, insideLimit])
+  }, [data, result, insideLimit, t])
 
   return (
     <>
@@ -353,11 +355,11 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
       boxShadow: "var(--shadow)",
     }}>
       <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
-        Sphère HSP 3D
+        {t("plot3d.title")}
       </p>
       <div style={{ width: "100%", height: 460 }}>
-        {err && <p style={{ fontSize: 12, color: "#dc2626" }}>Erreur de chargement Plotly : {err}</p>}
-        {!err && !Plot && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Chargement du graphe 3D…</p>}
+        {err && <p style={{ fontSize: 12, color: "#dc2626" }}>{t("plot3d.error", { msg: err })}</p>}
+        {!err && !Plot && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{t("plot3d.loading")}</p>}
         {!err && Plot && (
           <Plot
             data={traces}
@@ -370,7 +372,7 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
         )}
       </div>
       <p style={{ margin: "8px 0 0", fontSize: 11, color: "var(--text-muted)" }}>
-        Boîte cubique (aspectmode cube) · plages δD:δP:δH en rapport 1:2:2 → l'ellipsoïde Hansen (demi-axes R/2, R, R) apparaît comme une sphère.
+        {t("plot3d.subtitle")}
       </p>
     </div>
     </>

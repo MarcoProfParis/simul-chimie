@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useLang } from "../../i18n";
 
 // ── Webhooks ──────────────────────────────────────────────────────────────────
 const WEBHOOK_URL        = "https://n8n.srv757556.hstgr.cloud/webhook/zisman_results";
@@ -166,6 +167,7 @@ function lineFrom2(p1, p2) {
 
 // ── Role Popup (email OTP) ────────────────────────────────────────────────────
 function RolePopup({ onSelect }) {
+  const { t } = useLang();
   const [step, setStep]       = useState("choose"); // choose|password|email|otp
   const [pwd, setPwd]         = useState("");
   const [pwdErr, setPwdErr]   = useState(false);
@@ -239,25 +241,25 @@ function RolePopup({ onSelect }) {
 
         {step==="choose" && <>
           <div style={{fontSize:11,fontWeight:700,color:C.muted,letterSpacing:1.5,textTransform:"uppercase",marginBottom:6}}>BTS Métiers de la Chimie · Mouillage</div>
-          <div style={{fontSize:22,fontWeight:900,color:C.text,marginBottom:6}}>Droite de Zisman</div>
+          <div style={{fontSize:22,fontWeight:900,color:C.text,marginBottom:6}}>{t("zisman.title")}</div>
           <div style={{fontSize:14,fontWeight:600,color:C.muted,marginBottom:28,lineHeight:1.5}}>Choisissez votre profil pour accéder à l'application.</div>
           <div style={{display:"flex",gap:12}}>
-            <button onClick={()=>setStep("password")} style={{flex:1,padding:"16px 0",borderRadius:10,border:`2px solid ${C.accent}`,background:C.accent,color:"#fff",fontFamily:F,fontSize:15,fontWeight:900,cursor:"pointer"}}>Je suis Prof</button>
-            <button onClick={()=>setStep("email")} style={{flex:1,padding:"16px 0",borderRadius:10,border:`2px solid ${C.green}`,background:C.green,color:"#fff",fontFamily:F,fontSize:15,fontWeight:900,cursor:"pointer"}}>Je suis Élève</button>
+            <button onClick={()=>setStep("password")} style={{flex:1,padding:"16px 0",borderRadius:10,border:`2px solid ${C.accent}`,background:C.accent,color:"#fff",fontFamily:F,fontSize:15,fontWeight:900,cursor:"pointer"}}>{t("zisman.teacher")}</button>
+            <button onClick={()=>setStep("email")} style={{flex:1,padding:"16px 0",borderRadius:10,border:`2px solid ${C.green}`,background:C.green,color:"#fff",fontFamily:F,fontSize:15,fontWeight:900,cursor:"pointer"}}>{t("zisman.student")}</button>
           </div>
         </>}
 
         {step==="password" && <>
-          <button onClick={()=>{setStep("choose");setPwd("");setPwdErr(false);}} style={{fontSize:12,fontWeight:700,color:C.muted,background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:16,fontFamily:F}}>← Retour</button>
+          <button onClick={()=>{setStep("choose");setPwd("");setPwdErr(false);}} style={{fontSize:12,fontWeight:700,color:C.muted,background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:16,fontFamily:F}}>← {t("common.back")}</button>
           <div style={{fontSize:20,fontWeight:900,color:C.text,marginBottom:6}}>Accès professeur</div>
           <div style={{fontSize:13,fontWeight:600,color:C.muted,marginBottom:20}}>Entrez le mot de passe pour continuer.</div>
           <input ref={inputRef} type="password" value={pwd} onChange={e=>setPwd(e.target.value)} onKeyDown={e=>e.key==="Enter"&&tryPwd()} placeholder="Mot de passe" style={iStyle(pwdErr)}/>
           {pwdErr && <div style={{fontSize:12,fontWeight:700,color:C.red,marginBottom:10}}>Mot de passe incorrect.</div>}
-          <button onClick={tryPwd} style={{width:"100%",padding:"13px 0",borderRadius:8,border:`2px solid ${C.accent}`,background:C.accent,color:"#fff",fontFamily:F,fontSize:14,fontWeight:900,cursor:"pointer"}}>Valider</button>
+          <button onClick={tryPwd} style={{width:"100%",padding:"13px 0",borderRadius:8,border:`2px solid ${C.accent}`,background:C.accent,color:"#fff",fontFamily:F,fontSize:14,fontWeight:900,cursor:"pointer"}}>{t("common.validate")}</button>
         </>}
 
         {step==="email" && <>
-          <button onClick={()=>{setStep("choose");setEmail("");setOtpErr("");}} style={{fontSize:12,fontWeight:700,color:C.muted,background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:16,fontFamily:F}}>← Retour</button>
+          <button onClick={()=>{setStep("choose");setEmail("");setOtpErr("");}} style={{fontSize:12,fontWeight:700,color:C.muted,background:"none",border:"none",cursor:"pointer",padding:0,marginBottom:16,fontFamily:F}}>← {t("common.back")}</button>
           <div style={{fontSize:20,fontWeight:900,color:C.text,marginBottom:4}}>Connexion élève</div>
           <div style={{fontSize:13,fontWeight:600,color:C.muted,marginBottom:20,lineHeight:1.5}}>
             Entrez votre adresse email — un code à 4 chiffres vous sera envoyé.
@@ -287,7 +289,7 @@ function RolePopup({ onSelect }) {
             style={{...iStyle(!!otpErr), fontSize:28, fontWeight:900, letterSpacing:14, textAlign:"center"}}/>
           {otpErr && <div style={{fontSize:12,fontWeight:700,color:C.red,marginBottom:10}}>{otpErr}</div>}
           <button onClick={verifyOtp} style={{width:"100%",padding:"13px 0",borderRadius:8,border:`2px solid ${C.green}`,background:C.green,color:"#fff",fontFamily:F,fontSize:14,fontWeight:900,cursor:"pointer"}}>
-            Valider le code →
+            {t("zisman.validate")} →
           </button>
           <button onClick={()=>{setLoading(true);sendCode();}} style={{width:"100%",marginTop:8,padding:"10px 0",borderRadius:8,border:`1.5px solid ${C.border}`,background:"transparent",color:C.muted,fontFamily:F,fontSize:13,fontWeight:700,cursor:"pointer"}}>
             Renvoyer le code
@@ -325,6 +327,7 @@ function AddPointRow({ mat, onAdd }) {
 
 // ── Main App ──────────────────────────────────────────────────────────────────
 export default function ZismanApp({ onBack }) {
+  const { t } = useLang();
   // BYPASS TEMPORAIRE — remettre `null` pour réactiver la demande de profil
   const [role,          setRole]          = useState("prof");
   const [eleveInfo,     setEleveInfo]     = useState({ email: "" });
@@ -610,15 +613,15 @@ export default function ZismanApp({ onBack }) {
         <div>
           <div style={{fontSize:12,fontWeight:700,color:C.muted,letterSpacing:1.5,textTransform:"uppercase",marginBottom:2}}>BTS Métiers de la Chimie · Mouillage</div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{fontSize:24,fontWeight:900,color:C.text}}>Droite de Zisman</div>
-            {role && <span style={{fontSize:11,fontWeight:800,padding:"3px 10px",borderRadius:99,background:isProf?C.accent+"22":C.green+"22",color:isProf?C.accent:C.green,border:`1px solid ${isProf?C.accent:C.green}`}}>{isProf?"Professeur":`Élève — ${eleveInfo.email}`}</span>}
+            <div style={{fontSize:24,fontWeight:900,color:C.text}}>{t("zisman.title")}</div>
+            {role && <span style={{fontSize:11,fontWeight:800,padding:"3px 10px",borderRadius:99,background:isProf?C.accent+"22":C.green+"22",color:isProf?C.accent:C.green,border:`1px solid ${isProf?C.accent:C.green}`}}>{isProf?t("zisman.teacher"):`${t("zisman.student")} — ${eleveInfo.email}`}</span>}
             {isEleve && nDone>0 && <span style={{fontSize:11,fontWeight:800,padding:"3px 10px",borderRadius:99,background:C.amber+"22",color:C.amber,border:`1px solid ${C.amber}`}}>{nDone}/{nTotal} validés</span>}
           </div>
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
           {role && <>
             {isProf && smBtn("Modèle CSV",()=>downloadFile(materialsToCSV(MATERIALS_PROF),"zisman_modele.csv"),C.muted)}
-            {smBtn("Exporter CSV",()=>{const all=materials.map(m=>({...m,liquids:savedData[m.name]??m.liquids}));downloadFile(materialsToCSV(all),"zisman_donnees.csv");},C.green)}
+            {smBtn(t("common.export.csv"),()=>{const all=materials.map(m=>({...m,liquids:savedData[m.name]??m.liquids}));downloadFile(materialsToCSV(all),"zisman_donnees.csv");},C.green)}
             <label style={{fontSize:12,fontWeight:800,fontFamily:F,padding:"5px 12px",borderRadius:6,border:`1.5px solid ${C.accent}`,background:C.accent+"22",color:C.accent,cursor:"pointer"}}>
               Importer CSV<input ref={fileRef} type="file" accept=".csv" onChange={handleCSVImport} style={{display:"none"}}/>
             </label>
@@ -628,8 +631,8 @@ export default function ZismanApp({ onBack }) {
           )}
           
           <button onClick={()=>setRole(null)} style={{fontSize:12,fontWeight:800,fontFamily:F,padding:"5px 12px",borderRadius:6,border:`1.5px solid ${C.border}`,background:"transparent",color:C.muted,cursor:"pointer"}}>Changer de profil</button>
-          {[["graph","Graphe"],["theory","Théorie"],["quiz","Quiz"]].map(([t,l])=>(
-            <button key={t} onClick={()=>setTab(t)} style={{padding:"9px 20px",borderRadius:8,fontSize:14,fontWeight:800,fontFamily:F,border:`2px solid ${tab===t?C.accent:C.border}`,background:tab===t?C.accent:"transparent",color:tab===t?"#fff":C.muted,cursor:"pointer"}}>{l}</button>
+          {[["graph",t("zisman.tab.graph")],["theory",t("zisman.tab.theory")],["quiz",t("zisman.tab.quiz")]].map(([tabKey,label])=>(
+            <button key={tabKey} onClick={()=>setTab(tabKey)} style={{padding:"9px 20px",borderRadius:8,fontSize:14,fontWeight:800,fontFamily:F,border:`2px solid ${tab===tabKey?C.accent:C.border}`,background:tab===tabKey?C.accent:"transparent",color:tab===tabKey?"#fff":C.muted,cursor:"pointer"}}>{label}</button>
           ))}
         </div>
       </div>
@@ -645,7 +648,7 @@ export default function ZismanApp({ onBack }) {
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               {card(<>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-                  <div style={{fontSize:13,fontWeight:900,color:C.text,textTransform:"uppercase",letterSpacing:1}}>Choisir le substrat</div>
+                  <div style={{fontSize:13,fontWeight:900,color:C.text,textTransform:"uppercase",letterSpacing:1}}>{t("zisman.substrate")}</div>
                   {isProf && <button onClick={()=>setShowGcList(v=>!v)} style={{fontSize:11,fontWeight:800,fontFamily:F,padding:"4px 10px",borderRadius:6,border:`1.5px solid ${C.border}`,background:showGcList?C.amber+"22":C.surface2,color:showGcList?C.amber:C.muted,cursor:"pointer"}}>{showGcList?"Masquer γc":"Afficher γc"}</button>}
                 </div>
                 {materials.map(m=>{
@@ -683,10 +686,10 @@ export default function ZismanApp({ onBack }) {
 
               <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap",alignItems:"center"}}>
                 {isEleve && <button onClick={()=>setShowInfo(true)} title="Aide" style={{width:34,height:34,borderRadius:"50%",border:`2px solid ${C.accent}`,background:C.accent+"18",color:C.accent,fontFamily:F,fontSize:16,fontWeight:900,cursor:"pointer",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>?</button>}
-                {!isLockedMat && mode==="idle" && DATA.length>=2 && <Btn label="Tracer la droite" onClick={startDrawing} bg={C.accent} bdr={C.accent}/>}
+                {!isLockedMat && mode==="idle" && DATA.length>=2 && <Btn label={t("zisman.drawLine")} onClick={startDrawing} bg={C.accent} bdr={C.accent}/>}
                 {!isLockedMat && mode==="idle" && DATA.length<2 && <span style={{fontSize:13,fontWeight:700,color:C.amber,padding:"9px 0"}}>Ajoutez au moins 2 points.</span>}
                 {!isLockedMat && (mode==="first_click"||mode==="drawing") && <Btn label="Annuler" onClick={reset} bg="transparent" bdr={C.border} col={C.muted}/>}
-                {!isLockedMat && mode==="done" && !validated && <><Btn label="Valider — afficher γc" onClick={()=>setValidated(true)} bg={C.green} bdr={C.green}/><Btn label="Recommencer" onClick={startDrawing} bg="transparent" bdr={C.accent} col={C.accent}/></>}
+                {!isLockedMat && mode==="done" && !validated && <><Btn label={`${t("zisman.validate")} — afficher γc`} onClick={()=>setValidated(true)} bg={C.green} bdr={C.green}/><Btn label="Recommencer" onClick={startDrawing} bg="transparent" bdr={C.accent} col={C.accent}/></>}
                 {!isLockedMat && mode==="done" && validated && isProf && <><Btn label="Recommencer la droite" onClick={startDrawing} bg="transparent" bdr={C.accent} col={C.accent}/><Btn label="Reset" onClick={reset} bg="transparent" bdr={C.red} col={C.red}/></>}
                 {!isLockedMat && mode==="done" && validated && isEleve && <>
                   <Btn label="Recommencer la droite" onClick={startDrawing} bg="transparent" bdr={C.muted} col={C.muted}/>
@@ -733,7 +736,7 @@ export default function ZismanApp({ onBack }) {
 
               {isLockedMat && eleveResults[mat.name] && (
                 <div style={{marginTop:12,padding:"14px 16px",borderRadius:8,background:"#dcfce7",border:"2px solid #16a34a"}}>
-                  <div style={{fontSize:14,fontWeight:900,color:C.green,marginBottom:8}}>Résultat enregistré — {mat.name}</div>
+                  <div style={{fontSize:14,fontWeight:900,color:C.green,marginBottom:8}}>{t("zisman.results")} — {mat.name}</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
                     {[["γc trouvé",`${eleveResults[mat.name].gcEleve} mN·m⁻¹`],["γc théorique",`${eleveResults[mat.name].gcTheo} mN·m⁻¹`],["Écart",`${eleveResults[mat.name].errPct}%`]].map(([k,v])=>(
                       <div key={k} style={{background:C.surface,borderRadius:8,padding:"8px 12px",textAlign:"center"}}>
@@ -749,7 +752,7 @@ export default function ZismanApp({ onBack }) {
               <div style={{marginTop:14,padding:"14px 16px",background:C.surface2,borderRadius:10,border:`1px solid ${C.border}`}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,flexWrap:"wrap",gap:8}}>
                   <div>
-                    <div style={{fontSize:13,fontWeight:900,color:C.text,textTransform:"uppercase",letterSpacing:1}}>Données — {mat.name}</div>
+                    <div style={{fontSize:13,fontWeight:900,color:C.text,textTransform:"uppercase",letterSpacing:1}}>{t("zisman.data")} — {mat.name}</div>
                     {hasSaved&&!hasEdits&&<div style={{fontSize:11,fontWeight:700,color:C.green,marginTop:2}}>Valeurs sauvegardées</div>}
                     {hasEdits&&<div style={{fontSize:11,fontWeight:700,color:C.amber,marginTop:2}}>Modifications non sauvegardées</div>}
                   </div>

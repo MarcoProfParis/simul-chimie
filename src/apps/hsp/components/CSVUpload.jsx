@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 import Papa from "papaparse"
 import { EXAMPLES } from "../examples"
+import { useLang } from "../../../i18n"
 
 const ACCENT = "#ea580c"
 
@@ -43,6 +44,7 @@ function normalize(rows, fields) {
 }
 
 export default function CSVUpload({ onLoaded, onError, onBlank }) {
+  const { t } = useLang()
   const inputRef = useRef(null)
   const [dragOver, setDragOver] = useState(false)
   const [fileName, setFileName] = useState("")
@@ -103,24 +105,24 @@ export default function CSVUpload({ onLoaded, onError, onBlank }) {
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
       />
       <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
-        {fileName ? `✓ ${fileName}` : "Déposer un fichier CSV ou cliquer pour choisir"}
+        {fileName ? `✓ ${fileName}` : t("csv.drop")}
       </p>
       <p style={{ margin: "6px 0 12px", fontSize: 11, color: "var(--text-muted)" }}>
-        Colonnes attendues : Solvent, D, P, H, Score (ou dD, dP, dH)
+        {t("csv.columns")}
       </p>
       <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }} onClick={e => e.stopPropagation()}>
         <button
           type="button"
           onClick={onBlank}
-          title="Commencer avec un tableau vierge"
+          title={t("csv.blankTooltip")}
           style={{
             fontSize: 12, fontWeight: 700, padding: "6px 12px", borderRadius: 8,
             background: ACCENT, border: `1px solid ${ACCENT}`, color: "#fff", cursor: "pointer",
           }}
         >
-          Saisie vierge
+          {t("csv.blank")}
         </button>
-        <span style={{ fontSize: 11, color: "var(--text-muted)", alignSelf: "center" }}>ou un exemple :</span>
+        <span style={{ fontSize: 11, color: "var(--text-muted)", alignSelf: "center" }}>{t("csv.or")}</span>
         {EXAMPLES.map(ex => (
           <button
             key={ex.id}

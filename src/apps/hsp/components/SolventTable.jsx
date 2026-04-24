@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react"
 import { hansenDistance } from "../HSPEstimator.js"
+import { useLang } from "../../../i18n"
 
 const ACCENT = "#ea580c"
 
 export default function SolventTable({ data, result, insideLimit = 1 }) {
+  const { t } = useLang()
   const [filter, setFilter] = useState("all") // all | misclassified | good | bad
 
   const rows = useMemo(() => {
@@ -38,14 +40,14 @@ export default function SolventTable({ data, result, insideLimit = 1 }) {
     }}>
       <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
-          Solvants ({filtered.length})
+          {t("table.solvents", { n: filtered.length })}
         </p>
         <div style={{ display: "flex", gap: 4 }}>
           {[
-            { id: "all", label: "Tous" },
-            { id: "good", label: "Compatibles" },
-            { id: "bad", label: "Incompatibles" },
-            { id: "misclassified", label: "Erreurs" },
+            { id: "all", label: t("table.all") },
+            { id: "good", label: t("table.compatible") },
+            { id: "bad", label: t("table.incompatible") },
+            { id: "misclassified", label: t("table.errors") },
           ].map(b => (
             <button
               key={b.id}
@@ -67,8 +69,8 @@ export default function SolventTable({ data, result, insideLimit = 1 }) {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead style={{ position: "sticky", top: 0, background: "var(--bg-card)" }}>
             <tr style={{ borderBottom: "1px solid var(--border)" }}>
-              {["Solvant", "δD", "δP", "δH", "Score", "Distance", "RED", "Prédit"].map(h => (
-                <th key={h} style={{ padding: "8px 10px", textAlign: h === "Solvant" ? "left" : "right", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", letterSpacing: ".05em" }}>
+              {[t("table.colSolvent"), "δD", "δP", "δH", "Score", t("table.colDistance"), t("table.colRed"), t("table.colPredicted")].map((h, idx) => (
+                <th key={h} style={{ padding: "8px 10px", textAlign: idx === 0 ? "left" : "right", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", letterSpacing: ".05em" }}>
                   {h}
                 </th>
               ))}
@@ -92,7 +94,7 @@ export default function SolventTable({ data, result, insideLimit = 1 }) {
                   <td style={{ padding: "7px 10px", textAlign: "right", fontFamily: "monospace", color: r.red <= 1 ? "#16a34a" : "#dc2626" }}>{r.red.toFixed(2)}</td>
                   <td style={{ padding: "7px 10px", textAlign: "right" }}>
                     <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: pillBg, color: pillColor }}>
-                      {r.predicted === "good" ? "COMPATIBLE" : "—"}
+                      {r.predicted === "good" ? t("table.compatible.label") : "—"}
                     </span>
                   </td>
                 </tr>

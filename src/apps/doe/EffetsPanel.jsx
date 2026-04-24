@@ -7,6 +7,7 @@
 //   - le coefficient résultant et son interprétation
 
 import React, { useState } from "react";
+import { useLang } from "../../i18n";
 
 // ─── Utilitaire : signe d'un terme pour un essai ─────────────────────────────
 function getSign(row, termFactors, factors) {
@@ -21,6 +22,7 @@ function getSign(row, termFactors, factors) {
 
 // ─── Composant principal ──────────────────────────────────────────────────────
 export default function EffetsPanel({ model, fit, matrix, factors, responses, activeResp, col, compact = false }) {
+  const { t } = useLang();
   const [selectedTerm, setSelectedTerm] = useState(null);
   const [showCalcPopup, setShowCalcPopup] = useState(false);
   const [popupPos, setPopupPos] = useState({ x: 80, y: 80 });
@@ -110,7 +112,7 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
       {/* ── Sélecteur de terme ── */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-          Sélectionner un terme à calculer
+          {t("doe.selectTerm")}
         </p>
         <div className="flex flex-wrap gap-2">
           {linearAndInteractionTerms.map(t => {
@@ -217,7 +219,7 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3.5">
                     <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z" clipRule="evenodd" />
                   </svg>
-                  Montrer les calculs
+                  {t("doe.showCalc")}
                 </button>
               )}
             </div>

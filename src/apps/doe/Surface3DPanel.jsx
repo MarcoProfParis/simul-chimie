@@ -1,8 +1,10 @@
 import React from "react";
 import { useCompact } from "./CompactContext";
 import { isQuadPure, quadPureTerm } from "./modelUtils.js";
+import { useLang } from "../../i18n";
 
 export function Surface3DPanel({ model, fit, factors, col }) {
+  const { t } = useLang();
   const { compact: isCompact } = useCompact();
   const cardCls = isCompact ? "border rounded-lg p-3" : "border-2 rounded-xl p-5";
 
@@ -119,19 +121,19 @@ export function Surface3DPanel({ model, fit, factors, col }) {
     <div className={`bg-white dark:bg-gray-900 ${cardCls} ${col.border}`}>
       <div className="flex items-center gap-2 mb-4">
         <span className={`size-2.5 rounded-full ${col.dot}`} />
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{model.name} — Surface de réponse 3D</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{model.name} — {t("doe.surface.title")}</h3>
       </div>
 
       <div className="flex flex-wrap gap-4 mb-4">
         <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-500">Axe X :</label>
+          <label className="text-xs text-gray-500">{t("doe.surface.xAxis")} :</label>
           <select value={f1Idx} onChange={e => setF1Idx(+e.target.value)}
             className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {contFactors.map((f, i) => <option key={f.id} value={i} disabled={i === f2Idx}>{f.id} — {f.name}</option>)}
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-500">Axe Y :</label>
+          <label className="text-xs text-gray-500">{t("doe.surface.yAxis")} :</label>
           <select value={f2Idx} onChange={e => setF2Idx(+e.target.value)}
             className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
             {contFactors.map((f, i) => <option key={f.id} value={i} disabled={i === f1Idx}>{f.id} — {f.name}</option>)}
@@ -141,7 +143,7 @@ export function Surface3DPanel({ model, fit, factors, col }) {
 
       {factors.filter(f => f.continuous && f.id !== f1?.id && f.id !== f2?.id).length > 0 && (
         <div className="flex flex-wrap gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p className="w-full text-[11px] text-gray-400 font-medium">Autres facteurs fixés :</p>
+          <p className="w-full text-[11px] text-gray-400 font-medium">{t("doe.surface.fixed")} :</p>
           {factors.filter(f => f.continuous && f.id !== f1?.id && f.id !== f2?.id).map(f => (
             <div key={f.id} className="flex items-center gap-2">
               <label className="text-xs text-gray-500">{f.id} :</label>
@@ -195,7 +197,7 @@ export function Surface3DPanel({ model, fit, factors, col }) {
           <span>{maxZ.toFixed(2)}</span>
         </div>
       </div>
-      <p className="text-[10px] text-gray-400 mt-2">Cliquez et faites glisser pour faire pivoter la surface</p>
+      <p className="text-[10px] text-gray-400 mt-2">{t("doe.surface.rotate")}</p>
     </div>
   );
 }

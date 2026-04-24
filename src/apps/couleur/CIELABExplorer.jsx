@@ -4,6 +4,7 @@ import { ZoomIn, ZoomOut, Download, Eye, EyeOff, Grid3x3, RotateCcw, ChevronDown
 import { useAuth } from "../../AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import AuthModal from "../../components/AuthModal";
+import { useLang } from "../../i18n";
 
 // --- Custom Tabs (shadcn-style) -----------------------------------------------
 function Tabs({ value, onValueChange, children, className, style }) {
@@ -407,6 +408,7 @@ function PointPopup({ point, idx, allPoints, pairA, pairB, showDelta, onClose, o
 
 // --- Disc canvas -------------------------------------------------------------
 function AbDisc({ L, points, setPoints, zoom, setZoom, showColor, showGrid, Lval, coordMode, exportRef, pairLine = null, pairA = null, pairB = null, showDelta = false, showEllipse = false, ellipseDE = 1, ellipseFormula = "76", ellipseCmcL = 1, ellipseCmcC = 1}) {
+  const { t } = useLang();
   const colRef    = useRef(null);
   const ovRef     = useRef(null);
   const discContainerRef = useRef(null);
@@ -1210,8 +1212,8 @@ function AbDisc({ L, points, setPoints, zoom, setZoom, showColor, showGrid, Lval
         if (isPoint && popup?.idx === hoverHint.idx) return null;
         if (!isPoint && !hoverHint.fromClick) return null;
         const text = isPoint
-          ? "Cliquer pour afficher les détails"
-          : "Double-clic pour créer un point";
+          ? t("cielab.clickDetails")
+          : t("cielab.dblclick");
         const leftPct = hoverHint.x / 520 * 100;
         const topPct  = hoverHint.y / 520 * 100;
         return (
@@ -1269,11 +1271,10 @@ function AbDisc({ L, points, setPoints, zoom, setZoom, showColor, showGrid, Lval
             display: "flex", flexDirection: "column", gap: 4, zIndex: 10,
           }}>
             <button style={btnStyle(canZoomIn)}
-              onClick={() => canZoomIn && setZoom(STEPS[idx + 1])}
-              title="Agrandir">+</button>
+              onClick={() => canZoomIn && setZoom(STEPS[idx + 1])}>+</button>
             <button style={btnStyle(canZoomOut)}
               onClick={() => canZoomOut && setZoom(STEPS[idx - 1])}
-              title="Réduire">−</button>
+              title={t("cielab.reduce")}>−</button>
           </div>
         );
       })()}
@@ -1340,6 +1341,7 @@ function chToAB(C, h) {
 
 // --- Delta panel -------------------------------------------------------------
 function DeltaPanel({ points, pairA, setPairA, pairB, setPairB, compact = false }) {
+  const { t } = useLang();
   // Resolve IDs -> point objects (fallback to first/second if ID not found)
   const pa = points.find(p => p.id === pairA) || points[0];
   const pb = points.find(p => p.id === pairB) || points[1];
@@ -1359,11 +1361,11 @@ function DeltaPanel({ points, pairA, setPairA, pairB, setPairB, compact = false 
 
   return (
     <div className="cielab-card" style={{ padding: compact ? "8px 10px" : "12px 14px" }}>
-      <div style={{ fontSize: 9, fontWeight: 800, color: "var(--color-text-secondary)", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: compact ? 7 : 10 }}>Écart colorimétrique</div>
+      <div style={{ fontSize: 9, fontWeight: 800, color: "var(--color-text-secondary)", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: compact ? 7 : 10 }}>{t("cielab.deltaE")}</div>
 
       {/* Pair selector */}
       <div style={{ display: "flex", flexDirection: "column", gap: compact ? 4 : 5, marginBottom: compact ? 8 : 12 }}>
-        {[["Standard", pairA, setPairA], ["Échantillon", pairB, setPairB]].map(([lbl, val, setter]) => {
+        {[[t("cielab.standard"), pairA, setPairA], [t("cielab.sample"), pairB, setPairB]].map(([lbl, val, setter]) => {
           const pt = points.find(p => p.id === val);
           return (
             <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -1386,7 +1388,7 @@ function DeltaPanel({ points, pairA, setPairA, pairB, setPairB, compact = false 
       {/* Swatches */}
       {pa && pb && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: compact ? 5 : 8, marginBottom: compact ? 8 : 12 }}>
-          {[[pa, "Std"], [pb, "Éch"]].map(([p, role]) => (
+          {[[pa, t("cielab.standard")], [pb, t("cielab.sample")]].map(([p, role]) => (
             <div key={p.id}>
               <div style={{ fontSize: 8, color: "var(--color-text-secondary)", marginBottom: 2 }}>
                 {role} -- {ptLabel(p, points.indexOf(p))}
@@ -1425,7 +1427,7 @@ function DeltaPanel({ points, pairA, setPairA, pairB, setPairB, compact = false 
 
       {/* Scale legend */}
       <div style={{ fontSize: 8, color: "var(--color-text-secondary)", display: "flex", flexWrap: "wrap", gap: "2px 6px" }}>
-        {[["<1","Imperceptible","#1D9E75"],["1–2","Expert","#639922"],["2–3.5","Œil nu","#EF9F27"],["3.5–5","Nette","#D85A30"],[">5","Majeure","#E24B4A"]].map(([r,l,c]) => (
+        {[["<1","Imperceptible","#1D9E75"],["1–2","Expert","#639922"],["2–3.5",t("cielab.perceptible"),"#EF9F27"],["3.5–5",t("cielab.clearDiff"),"#D85A30"],[">5",t("cielab.majorDiff"),"#E24B4A"]].map(([r,l,c]) => (
           <span key={r} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}>
             <span style={{ width: 5, height: 5, borderRadius: 1, background: c, display: "inline-block", flexShrink: 0 }} />
             {r} {l}
@@ -2021,9 +2023,10 @@ function FrozenDisc({ std, formules, deMax, okIdx, COLS, deType="simple", export
 
 // --- FormulaReminderButton ----------------------------------------------------
 function FormulaReminderButton({ deType, std, katexRef, compact=false }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
-  const label = deType==="cmc" ? "ΔE CMC(1:1)" : deType==="ch" ? "ΔE₇₆+C*h°" : "ΔE₇₆ (CIELab)";
+  const label = deType==="cmc" ? t("cielab.decmc") : deType==="ch" ? "ΔE₇₆+C*h°" : t("cielab.de76");
 
   const Tex = ({ t, display }) => {
     const ref = useRef(null);
@@ -2189,6 +2192,7 @@ const COLS = ["#e74c3c","#3498db","#2ecc71","#f39c12","#9b59b6","#1abc9c","#e67e
 
 // --- ExerciceDE ---------------------------------------------------------------
 function ExerciceDE() {
+  const { t } = useLang();
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [ex, setEx] = useState(() => genExercice("simple"));
@@ -2268,7 +2272,7 @@ function ExerciceDE() {
       setSaveMsg({ type:"error", text: result.error.message });
     } else {
       setSavedId(result.data.id);
-      setSaveMsg({ type:"success", text: "Sauvegardé ✓" });
+      setSaveMsg({ type:"success", text: t("cielab.saved") });
       // Rafraîchir l'historique
       const { data } = await supabase.from("exercices_cielab").select("id, created_at, type, score, completed").eq("user_id", user.id).order("created_at", { ascending: false }).limit(10);
       if (data) setHistory(data);
@@ -2318,7 +2322,7 @@ function ExerciceDE() {
     const W=600, H=canvas?canvas.height+300:700;
     const exp=document.createElement("canvas"); exp.width=W; exp.height=H;
     const ctx=exp.getContext("2d"); ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H);
-    ctx.fillStyle="#18181b"; ctx.font="bold 16px sans-serif"; ctx.fillText("Exercice -- Contrôle colorimétrique",24,36);
+    ctx.fillStyle="#18181b"; ctx.font="bold 16px sans-serif"; ctx.fillText(t("cielab.exercise"),24,36);
     ctx.font="12px sans-serif"; ctx.fillStyle="#525252";
     ctx.fillText(`Formule : ΔE${deType==="cmc"?" CMC(1:1)":deType==="ch"?"₇₆+C*h°":"₇₆"}   ·   ΔEmax = ${deMax}${dCmax?`   ·   ΔC*max=${dCmax}   ·   Δh°max=${dhMax}°`:""}`, 24, 58);
     ctx.font="11px sans-serif"; ctx.fillStyle="#333";
@@ -2329,7 +2333,7 @@ function ExerciceDE() {
     ctx.strokeStyle="#e4e4e7"; ctx.lineWidth=0.5; ctx.beginPath(); ctx.moveTo(24,lineY); ctx.lineTo(W-24,lineY); ctx.stroke(); lineY+=14;
     ctx.font="bold 11px sans-serif"; ctx.fillStyle="#18181b"; ctx.fillText("Standard :",24,lineY);
     ctx.font="11px monospace"; ctx.fillStyle="#333"; ctx.fillText(`L* = ${std.L.toFixed(2)}   a* = ${std.a.toFixed(2)}   b* = ${std.b.toFixed(2)}`,100,lineY); lineY+=22;
-    ctx.font="bold 11px sans-serif"; ctx.fillStyle="#18181b"; ctx.fillText("Formules à évaluer :",24,lineY); lineY+=18;
+    ctx.font="bold 11px sans-serif"; ctx.fillStyle="#18181b"; ctx.fillText(t("cielab.formulas"),24,lineY); lineY+=18;
     const fcols=["#e74c3c","#3498db","#2ecc71"];
     formules.forEach((f,fi) => { ctx.font="bold 11px sans-serif"; ctx.fillStyle=fcols[fi]; ctx.fillText(`Formule ${fi+1} :`,24,lineY+fi*20); ctx.font="11px monospace"; ctx.fillStyle="#333"; ctx.fillText(`L* = ${f.L.toFixed(2)}   a* = ${f.a.toFixed(2)}   b* = ${f.b.toFixed(2)}`,110,lineY+fi*20); });
     lineY+=formules.length*20+10;
@@ -2440,7 +2444,7 @@ function ExerciceDE() {
       <div style={{background:"#fff",border:"0.5px solid #e4e4e7",borderRadius:11,padding:14}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10,flexWrap:"wrap"}}>
           <div>
-            <div style={{fontSize:12,fontWeight:800,marginBottom:4}}>Exercice -- Contrôle colorimétrique</div>
+            <div style={{fontSize:12,fontWeight:800,marginBottom:4}}>{t("cielab.exercise")}</div>
             <div style={{fontSize:10,color:"#525252",lineHeight:1.6}}>
               Votre société fabrique un produit en plastique teinté dans la masse.<br/>
               Vous devez valider une formule de coloration par rapport au standard ci-dessous.
@@ -2465,7 +2469,7 @@ function ExerciceDE() {
             </button>
             {user && (
               <button onClick={handleSave} style={{fontSize:10,fontWeight:700,padding:"5px 12px",cursor:"pointer",border:"1px solid #16a34a",borderRadius:6,background:"#f0fdf4",color:"#16a34a",whiteSpace:"nowrap"}}>
-                💾 {savedId ? "Mettre à jour" : "Sauvegarder"}
+                💾 {savedId ? t("cielab.update") : "Sauvegarder"}
               </button>
             )}
             <button onClick={handleExport} style={{fontSize:10,fontWeight:700,padding:"5px 12px",cursor:"pointer",border:"1px solid #185FA5",borderRadius:6,background:"#EFF6FF",color:"#185FA5",whiteSpace:"nowrap"}}>
@@ -2721,7 +2725,7 @@ function ExerciceDE() {
           {(()=>{
             const c=correct(okIdx);
             const attrs=[
-              {key:"clarte",label:"Clarté (L*)",val:c.dL,pos:"Plus clair",neg:"Plus sombre",nul:"Même clarté"},
+              {key:"clarte",label:t("cielab.lightness"),val:c.dL,pos:"Plus clair",neg:"Plus sombre",nul:"Même clarté"},
               {key:"rouge",label:"Rouge/Vert (a*)",val:c.da,pos:"Plus rouge",neg:"Plus vert",nul:"Même a*"},
               {key:"jaune",label:"Jaune/Bleu (b*)",val:c.db,pos:"Plus jaune",neg:"Plus bleu",nul:"Même b*"},
               {key:"saturation",label:"Saturation (C*)",val:c.dC,pos:"Plus saturé",neg:"Moins saturé",nul:"Même saturation"},
@@ -2756,6 +2760,7 @@ function ExerciceDE() {
 }
 
 export default function CIELABExplorer() {
+  const { t } = useLang();
   const [tab,       setTab]       = useState("carto");
   const [Lval,      setLval]      = useState(60);
   const [zoom,      setZoom]      = useState(1);
@@ -2812,15 +2817,15 @@ export default function CIELABExplorer() {
       <span style={{ fontSize: 11, fontWeight: 700, minWidth: 20, fontFamily: "monospace", color: "var(--color-text-primary)" }}>{Lval}</span>
       <Sep />
       <span style={{ fontSize: 9, fontWeight: 700, color: "var(--color-text-secondary)", letterSpacing: ".06em" }}>ZOOM</span>
-      <button className="cielab-tb-btn" onClick={() => setZoom(ZOOM_STEPS[Math.max(0, zoomIdx - 1)])} disabled={zoomIdx === 0} title="Dézoomer">
+      <button className="cielab-tb-btn" onClick={() => setZoom(ZOOM_STEPS[Math.max(0, zoomIdx - 1)])} disabled={zoomIdx === 0}>
         <ZoomOut size={13} />
       </button>
       <span style={{ fontSize: 11, fontWeight: 700, minWidth: 28, textAlign: "center", fontFamily: "monospace" }}>×{zoom}</span>
-      <button className="cielab-tb-btn" onClick={() => setZoom(ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, zoomIdx + 1)])} disabled={zoomIdx === ZOOM_STEPS.length - 1} title="Zoomer">
+      <button className="cielab-tb-btn" onClick={() => setZoom(ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, zoomIdx + 1)])} disabled={zoomIdx === ZOOM_STEPS.length - 1}>
         <ZoomIn size={13} />
       </button>
       {zoom !== 1 && (
-        <button className="cielab-tb-btn" onClick={() => setZoom(1)} title="Réinitialiser zoom">
+        <button className="cielab-tb-btn" onClick={() => setZoom(1)} title={t("couleur.zoomReset")}>
           <RotateCcw size={11} />
         </button>
       )}
@@ -2869,7 +2874,7 @@ export default function CIELABExplorer() {
         </>
       )}
       <div style={{ marginLeft: "auto" }}>
-        <button className="cielab-export-btn" onClick={() => exportRef.current && exportRef.current()} title="Exporter PNG">
+        <button className="cielab-export-btn" onClick={() => exportRef.current && exportRef.current()} title={t("common.export.png")}>
           <Download size={12} /> PNG
         </button>
       </div>
@@ -2883,7 +2888,7 @@ export default function CIELABExplorer() {
         <TabsList className="mb-2 h-9" style={{ marginLeft: 90, display: "inline-flex" }}>
           {["carto","analyse","exercice","explorer","theory"].map(v => (
             <TabsTrigger key={v} value={v} activeValue={tab} onValueChange={setTab}>
-              {v==="carto"?"CIE LAB":v==="analyse"?"Analyse ΔE":v==="exercice"?"Exercice":v==="explorer"?"Explorateur":"Théorie"}
+              {v==="carto"?"CIE LAB":v==="analyse"?t("cielab.analysis"):v==="exercice"?"Exercice":v==="explorer"?"Explorateur":"Théorie"}
             </TabsTrigger>
           ))}
         </TabsList>
