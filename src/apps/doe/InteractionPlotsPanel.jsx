@@ -3,8 +3,9 @@
 // brutes de la matrice (avant tout ajustement de modèle).
 // Chaque graphe peut être masqué individuellement.
 
-import React, { useState } from "react";
-import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
+import { EyeSlashIcon, EyeIcon, ArrowsPointingOutIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useLang } from "../../i18n";
 import { useCompact } from "./CompactContext";
 
@@ -274,23 +275,138 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
   );
 }
 
+// ─── DraggablePopup ───────────────────────────────────────────────────────────
+
+function DraggablePopup({ title, onClose, children }) {
+  const popupRef  = useRef(null);
+  const dragging  = useRef(false);
+  const offset    = useRef({ x: 0, y: 0 });
+  const [pos, setPos] = useState({ x: -1, y: -1 }); // -1 = not placed yet
+
+  // Centre in viewport on first mount
+  useEffect(() => {
+    const el = popupRef.current;
+    if (!el) return;
+    setPos({
+      x: Math.max(16, (window.innerWidth  - el.offsetWidth)  / 2),
+      y: Math.max(16, (window.innerHeight - el.offsetHeight) / 2),
+    });
+  }, []);
+
+  const onMouseMove = useCallback((e) => {
+    if (!dragging.current) return;
+    setPos({
+      x: Math.max(0, Math.min(window.innerWidth  - 60, e.clientX - offset.current.x)),
+      y: Math.max(0, Math.min(window.innerHeight - 40, e.clientY - offset.current.y)),
+    });
+  }, []);
+
+  const onMouseUp = useCallback(() => { dragging.current = false; }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup",   onMouseUp);
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup",   onMouseUp);
+    };
+  }, [onMouseMove, onMouseUp]);
+
+  const onDragHandleDown = (e) => {
+    if (e.target.closest("button")) return; // don't hijack close button
+    dragging.current = true;
+    const rect = popupRef.current.getBoundingClientRect();
+    offset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    e.preventDefault();
+  };
+
+  const visible = pos.x >= 0;
+
+  return createPortal(
+    <div
+      ref={popupRef}
+      style={{
+        position:  "fixed",
+        left:      visible ? pos.x : "50%",
+        top:       visible ? pos.y : "50%",
+        transform: visible ? "none" : "translate(-50%,-50%)",
+        zIndex:    9999,
+        width:     500,
+        maxWidth:  "95vw",
+        background: "#fff",
+        borderRadius: 16,
+        boxShadow: "0 24px 64px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08)",
+        border:    "1px solid #e5e7eb",
+        userSelect: "none",
+        opacity:   visible ? 1 : 0,
+        transition: "opacity 0.12s",
+      }}
+    >
+      {/* ── Drag handle / title bar ── */}
+      <div
+        onMouseDown={onDragHandleDown}
+        style={{
+          cursor: "grab",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "10px 14px",
+          borderBottom: "1px solid #f3f4f6",
+          borderRadius: "16px 16px 0 0",
+          background: "#fafafa",
+        }}
+      >
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#374151", letterSpacing: "0.01em" }}>
+          {title}
+        </span>
+        <button
+          onClick={onClose}
+          style={{
+            background: "none", border: "none", cursor: "pointer",
+            color: "#9ca3af", padding: 4, borderRadius: 6, display: "flex",
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = "#374151"}
+          onMouseLeave={e => e.currentTarget.style.color = "#9ca3af"}
+        >
+          <XMarkIcon style={{ width: 16, height: 16 }} />
+        </button>
+      </div>
+      {/* ── Content (larger plot) ── */}
+      <div style={{ padding: "16px 20px 20px" }}>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 // ─── PlotCard ─────────────────────────────────────────────────────────────────
 
-function PlotCard({ title, plotKey, onToggle, isCompact, children }) {
+function PlotCard({ title, plotKey, onToggle, onExpand, isCompact, children }) {
   const cardCls = isCompact ? "border rounded-lg p-2.5" : "border rounded-xl p-3";
   return (
     <div className={`bg-white ${cardCls} border-gray-200 flex flex-col`}>
       <div className="flex items-center justify-between mb-1.5 gap-1">
         <span className="text-[11px] font-semibold text-gray-700 truncate">{title}</span>
-        <button
-          onClick={() => onToggle(plotKey)}
-          title="Masquer"
-          className="shrink-0 p-0.5 rounded text-gray-300 hover:text-gray-500 hover:bg-gray-100 transition-colors"
-        >
-          <EyeSlashIcon className="size-3.5" />
-        </button>
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
+            onClick={onExpand}
+            title="Agrandir"
+            className="p-0.5 rounded text-gray-300 hover:text-indigo-500 hover:bg-indigo-50 transition-colors"
+          >
+            <ArrowsPointingOutIcon className="size-3.5" />
+          </button>
+          <button
+            onClick={() => onToggle(plotKey)}
+            title="Masquer"
+            className="p-0.5 rounded text-gray-300 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            <EyeSlashIcon className="size-3.5" />
+          </button>
+        </div>
       </div>
-      {children}
+      {/* clicking the plot area also expands */}
+      <div onClick={onExpand} className="cursor-zoom-in">
+        {children}
+      </div>
     </div>
   );
 }
@@ -302,6 +418,8 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
   const { compact: isCompact } = useCompact();
 
   const [hidden, setHidden] = useState(new Set());
+  // popup = { title, content } | null
+  const [popup, setPopup] = useState(null);
 
   const toggle = (key) =>
     setHidden(prev => {
@@ -415,9 +533,13 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                   return (
                     <PlotCard
                       key={key}
-                      title={f.name || f.id}
+                      title={`${f.name || f.id}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`}
                       plotKey={key}
                       onToggle={toggle}
+                      onExpand={() => setPopup({
+                        title: `${f.name || f.id}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`,
+                        content: <MainEffectPlot factor={f} responseId={resp.id} matrix={matrix} />,
+                      })}
                       isCompact={isCompact}
                     >
                       <MainEffectPlot factor={f} responseId={resp.id} matrix={matrix} />
@@ -441,9 +563,13 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                     return (
                       <PlotCard
                         key={key}
-                        title={title}
+                        title={`${title}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`}
                         plotKey={key}
                         onToggle={toggle}
+                        onExpand={() => setPopup({
+                          title: `${title}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`,
+                          content: <InteractionPlot fa={fa} fb={fb} responseId={resp.id} matrix={matrix} />,
+                        })}
                         isCompact={isCompact}
                       >
                         <InteractionPlot fa={fa} fb={fb} responseId={resp.id} matrix={matrix} />
@@ -472,6 +598,13 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
           {t("doe.model")} →
         </button>
       </div>
+
+      {/* ── Popup agrandi (draggable) ── */}
+      {popup && (
+        <DraggablePopup title={popup.title} onClose={() => setPopup(null)}>
+          {popup.content}
+        </DraggablePopup>
+      )}
     </div>
   );
 }
