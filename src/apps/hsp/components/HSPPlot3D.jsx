@@ -174,32 +174,33 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
     // → longueur physique identique pour les trois bras.
     // Convention couleur standard 3D : X=rouge, Y=vert, Z=bleu
     const AX_COLORS = { D: "#e11d48", P: "#16a34a", H: "#2563eb" }
-    // Ligne de l'axe (mode:lines) + label séparé (mode:text) au bout positif.
-    // On sépare les deux car scatter3d "lines+text" ne rend pas le texte
-    // de façon fiable dans toutes les versions de Plotly.
     const axisLine = (x, y, z, color) => ({
       type: "scatter3d", mode: "lines",
       showlegend: false, hoverinfo: "skip",
       x, y, z,
       line: { color, width: 6 },
     })
-    const axisLabel = (lx, ly, lz, label, color) => ({
-      type: "scatter3d", mode: "markers+text",
-      showlegend: false, hoverinfo: "skip",
-      x: [lx], y: [ly], z: [lz],
-      text: [label],
-      textposition: "top center",
-      textfont: { color, size: 15, family: "system-ui, sans-serif" },
-      marker: { size: 1, opacity: 0, color },
-    })
     const axisTraces = [
-      axisLine([cx - R,    cx + R   ], [cy,       cy      ], [cz,       cz       ], AX_COLORS.D),
-      axisLabel(cx + R,    cy,         cz,                    "δD",                  AX_COLORS.D),
-      axisLine([cx,        cx       ], [cy - 2*R, cy + 2*R], [cz,       cz       ], AX_COLORS.P),
-      axisLabel(cx,        cy + 2*R,   cz,                    "δP",                  AX_COLORS.P),
-      axisLine([cx,        cx       ], [cy,       cy      ], [cz - 2*R, cz + 2*R], AX_COLORS.H),
-      axisLabel(cx,        cy,         cz + 2*R,              "δH",                  AX_COLORS.H),
+      axisLine([cx - R, cx + R], [cy,       cy      ], [cz,       cz      ], AX_COLORS.D),
+      axisLine([cx,     cx    ], [cy - 2*R, cy + 2*R], [cz,       cz      ], AX_COLORS.P),
+      axisLine([cx,     cx    ], [cy,       cy      ], [cz - 2*R, cz + 2*R], AX_COLORS.H),
     ]
+
+    // Labels δD/δP/δH via layout.scene.annotations — seul moyen fiable
+    // de placer du texte en 3D dans Plotly.
+    // Positionnés à 55 % du bras positif de chaque axe → clairement à
+    // l'intérieur du cube, bien lisibles quelle que soit la rotation.
+    const axisAnnotations = [
+      { x: cx + R * 0.55,    y: cy,            z: cz,            text: "<b>δD</b>", font: { color: AX_COLORS.D, size: 14 } },
+      { x: cx,               y: cy + 2*R * 0.55, z: cz,          text: "<b>δP</b>", font: { color: AX_COLORS.P, size: 14 } },
+      { x: cx,               y: cy,            z: cz + 2*R * 0.55, text: "<b>δH</b>", font: { color: AX_COLORS.H, size: 14 } },
+    ].map(a => ({
+      ...a,
+      showarrow: false,
+      bgcolor: "rgba(0,0,0,0)",
+      bordercolor: "rgba(0,0,0,0)",
+      xanchor: "center", yanchor: "bottom",
+    }))
 
     // ── 4b. Graduations sur les axes centrés ───────────────────────────────
     // Tirets perpendiculaires à chaque axe + labels numériques.
@@ -324,6 +325,7 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
         zaxis: { ...axisBase, title: { text: "δH (MPa½)", font: { size: 13, color: "#1e293b" } }, range: [zMin, zMax] },
         aspectmode: "cube",
         camera: { eye: { x: 1.6, y: 1.6, z: 0.9 } },
+        annotations: axisAnnotations,
       },
       legend: { font: { size: 11 }, x: 0, y: 1 },
       paper_bgcolor: "transparent",
