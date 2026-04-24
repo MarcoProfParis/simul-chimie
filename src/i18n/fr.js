@@ -1,0 +1,136 @@
+// ── Traductions françaises ───────────────────────────────────────────────────
+const fr = {
+  // ── App shell ──────────────────────────────────────────────────────────────
+  "app.title":            "Simulations MDC",
+  "app.subtitle":         "BTS Métiers de la Chimie",
+  "nav.home":             "Accueil",
+  "nav.expand":           "Étendre sur toute la largeur",
+  "nav.collapse":         "Réduire la largeur",
+  "nav.darkMode":         "Sombre",
+  "nav.lightMode":        "Clair",
+  "nav.login":            "Connexion",
+  "nav.logout":           "Déconnexion",
+
+  // ── Config — catégories ────────────────────────────────────────────────────
+  "cat.couleur.label":         "Couleur",
+  "cat.couleur.description":   "Colorimétrie et espaces colorimétriques",
+  "cat.rheologie.label":       "Rhéologie & Mouillage",
+  "cat.rheologie.description": "Comportement des fluides et interfaces",
+  "cat.doe.label":             "Plans d'expériences",
+  "cat.doe.description":       "Méthodologie des plans factoriels",
+  "cat.solubilite.label":      "Solubilité",
+  "cat.solubilite.description":"Paramètres de Hansen et compatibilité solvant",
+
+  // ── Config — apps ──────────────────────────────────────────────────────────
+  "app.cie-xy.label":          "Diagramme CIE xy",
+  "app.cie-xy.description":    "Plan chromatique CIE 1931, illuminants, ellipses MacAdam",
+  "app.cielab.label":          "Explorateur CIELAB",
+  "app.cielab.description":    "Plan a*b*, ΔE*₇₆, coordonnées C*/h°",
+  "app.rheogramme.label":      "Rhéogrammes",
+  "app.rheogramme.description":"Newton, Ostwald, Bingham, Herschel-Bulkley",
+  "app.mouillage.label":       "Goutte de mouillage",
+  "app.mouillage.description": "Angle de contact, loi de Young",
+  "app.zisman.label":          "Droite de Zisman",
+  "app.zisman.description":    "Tension critique, énergie de surface",
+  "app.plan-factoriel.label":       "Plan factoriel",
+  "app.plan-factoriel.description": "Plans 2ⁿ, effets principaux et interactions",
+  "app.hsp.label":             "Paramètres de Hansen (HSP)",
+  "app.hsp.description":       "Ajuster une sphère HSP à partir de données de solvants",
+
+  // ── HSP App ────────────────────────────────────────────────────────────────
+  "hsp.title":              "Paramètres de Hansen (HSP)",
+  "hsp.subtitle":           "Ajustement d'une sphère de solubilité par la méthode classique (cube d'exploration)",
+  "hsp.back":               "Retour",
+  "hsp.myfits":             "Mes ajustements",
+  "hsp.threshold":          "SEUIL « BON SOLVANT » (score ≤ …)",
+  "hsp.solventsLoaded":     "{n} solvants chargés, dont {labeled} étiquetés.",
+  "hsp.loadCsv":            "Chargez un CSV pour commencer.",
+  "hsp.fit":                "Ajuster la sphère",
+  "hsp.fitting":            "Ajustement…",
+  "hsp.noCompleteRows":     "Aucune ligne complète (δD, δP, δH requis).",
+  "hsp.saveName":           "Nom de l'ajustement",
+  "hsp.save":               "Enregistrer",
+  "hsp.saved":              "Enregistré ✓",
+  "hsp.saveError":          "Erreur : {msg}",
+  "hsp.view2d":             "Projections 2D",
+  "hsp.view3d":             "Ellipsoïde 3D",
+  "hsp.savedFits":          "Ajustements enregistrés",
+  "hsp.loading":            "Chargement…",
+  "hsp.noSavedFits":        "Aucun ajustement enregistré.",
+  "hsp.load":               "Charger",
+  "hsp.deleteConfirm":      "Supprimer \"{name}\" ?",
+  "hsp.solvents":           "{n} solvants",
+  "hsp.source.db":          "DB",
+  "hsp.source.api":         "API",
+  "hsp.source.cache":       "cache",
+  "hsp.source.local":       "local",
+
+  // ── HSP — CSV Upload ───────────────────────────────────────────────────────
+  "csv.title":              "Importer des solvants",
+  "csv.drop":               "Glissez un fichier CSV ici",
+  "csv.or":                 "ou",
+  "csv.browse":             "Parcourir…",
+  "csv.blank":              "Saisie vierge",
+  "csv.format":             "Colonnes attendues : solvent, D, P, H, score (optionnel)",
+
+  // ── HSP — SolventEditor ────────────────────────────────────────────────────
+  "editor.reset":           "Réinitialiser",
+  "editor.addRow":          "Ajouter un solvant",
+  "editor.solvent":         "Solvant",
+  "editor.score":           "Score",
+  "editor.delete":          "Supprimer",
+
+  // ── HSP — SolventEditModal ─────────────────────────────────────────────────
+  "modal.editSolvent":      "Modifier le solvant",
+  "modal.name":             "Nom du solvant",
+  "modal.score":            "Score",
+  "modal.scoreHint":        "0 = incompatible · 1 = compatible",
+  "modal.save":             "Enregistrer",
+  "modal.cancel":           "Annuler",
+  "modal.validationError":  "δD, δP et δH doivent être des nombres valides.",
+
+  // ── HSP — ResultsCard ─────────────────────────────────────────────────────
+  "results.title":          "Résultats de l'ajustement",
+  "results.center":         "Centre",
+  "results.radius":         "Rayon R₀",
+  "results.datafit":        "Datafit",
+  "results.inside":         "solvants dans la sphère",
+  "results.outside":        "solvants hors sphère",
+
+  // ── HSP — SolventTable ────────────────────────────────────────────────────
+  "table.title":            "Tableau des solvants",
+  "table.solvent":          "Solvant",
+  "table.d":                "δD",
+  "table.p":                "δP",
+  "table.h":                "δH",
+  "table.score":            "Score",
+  "table.distance":         "Distance",
+  "table.inside":           "Dans la sphère",
+  "table.yes":              "Oui",
+  "table.no":               "Non",
+
+  // ── HSP — Plot2D ──────────────────────────────────────────────────────────
+  "plot2d.title":           "Projections 2D",
+  "plot2d.subtitle":        "Convention Hansen (2·δD) · chaque graphe a son propre zoom (molette / pinch).",
+  "plot2d.compatible":      "Compatibles",
+  "plot2d.incompatible":    "Incompatibles",
+  "plot2d.sphere":          "Sphère HSP",
+  "plot2d.why2d":           "Pourquoi 2·δD ?",
+  "plot2d.why2d.body1":     "Dans le modèle de Hansen, la distance entre deux solvants dans l'espace (δD, δP, δH) est définie par :",
+  "plot2d.why2d.formula":   "d² = 4·(ΔδD)² + (ΔδP)² + (ΔδH)²",
+  "plot2d.why2d.body2":     "Le coefficient 4 sur δD traduit l'importance empiriquement plus grande de la composante dispersive.",
+  "plot2d.why2d.body3":     "Si on trace δD tel quel, la « sphère » apparaît comme un ellipsoïde aplati. Pour obtenir un vrai cercle, on trace 2·δD.",
+  "plot2d.why2d.footer":    "C'est la convention historique utilisée par Charles M. Hansen.",
+
+  // ── HSP — Plot3D ──────────────────────────────────────────────────────────
+  "plot3d.title":           "Sphère HSP 3D",
+  "plot3d.subtitle":        "Boîte cubique (aspectmode cube) · plages δD:δP:δH en rapport 1:2:2 → l'ellipsoïde Hansen (demi-axes R/2, R, R) apparaît comme une sphère.",
+  "plot3d.compatible":      "Compatibles",
+  "plot3d.incompatible":    "Incompatibles",
+  "plot3d.sphere":          "Sphère HSP",
+  "plot3d.center":          "Centre",
+  "plot3d.loading":         "Chargement du graphe 3D…",
+  "plot3d.error":           "Erreur de chargement Plotly : {msg}",
+}
+
+export default fr

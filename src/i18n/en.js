@@ -1,0 +1,136 @@
+// ── English translations ─────────────────────────────────────────────────────
+const en = {
+  // ── App shell ──────────────────────────────────────────────────────────────
+  "app.title":            "MDC Simulations",
+  "app.subtitle":         "Chemistry Vocational Training",
+  "nav.home":             "Home",
+  "nav.expand":           "Expand to full width",
+  "nav.collapse":         "Collapse width",
+  "nav.darkMode":         "Dark",
+  "nav.lightMode":        "Light",
+  "nav.login":            "Sign in",
+  "nav.logout":           "Sign out",
+
+  // ── Config — categories ────────────────────────────────────────────────────
+  "cat.couleur.label":         "Colour",
+  "cat.couleur.description":   "Colorimetry and colour spaces",
+  "cat.rheologie.label":       "Rheology & Wetting",
+  "cat.rheologie.description": "Fluid behaviour and interfaces",
+  "cat.doe.label":             "Design of Experiments",
+  "cat.doe.description":       "Factorial design methodology",
+  "cat.solubilite.label":      "Solubility",
+  "cat.solubilite.description":"Hansen parameters and solvent compatibility",
+
+  // ── Config — apps ──────────────────────────────────────────────────────────
+  "app.cie-xy.label":          "CIE xy Diagram",
+  "app.cie-xy.description":    "CIE 1931 chromaticity diagram, illuminants, MacAdam ellipses",
+  "app.cielab.label":          "CIELAB Explorer",
+  "app.cielab.description":    "a*b* plane, ΔE*₇₆, C*/h° coordinates",
+  "app.rheogramme.label":      "Rheograms",
+  "app.rheogramme.description":"Newton, Ostwald, Bingham, Herschel-Bulkley",
+  "app.mouillage.label":       "Wetting Drop",
+  "app.mouillage.description": "Contact angle, Young's law",
+  "app.zisman.label":          "Zisman Plot",
+  "app.zisman.description":    "Critical surface tension, surface energy",
+  "app.plan-factoriel.label":       "Factorial Design",
+  "app.plan-factoriel.description": "2ⁿ designs, main effects and interactions",
+  "app.hsp.label":             "Hansen Solubility Parameters (HSP)",
+  "app.hsp.description":       "Fit an HSP sphere from solvent data",
+
+  // ── HSP App ────────────────────────────────────────────────────────────────
+  "hsp.title":              "Hansen Solubility Parameters (HSP)",
+  "hsp.subtitle":           "Solubility sphere fitting using the classic exploration-cube method",
+  "hsp.back":               "Back",
+  "hsp.myfits":             "My fits",
+  "hsp.threshold":          "GOOD SOLVENT THRESHOLD (score ≤ …)",
+  "hsp.solventsLoaded":     "{n} solvents loaded, {labeled} labelled.",
+  "hsp.loadCsv":            "Load a CSV file to start.",
+  "hsp.fit":                "Fit sphere",
+  "hsp.fitting":            "Fitting…",
+  "hsp.noCompleteRows":     "No complete rows (δD, δP, δH required).",
+  "hsp.saveName":           "Fit name",
+  "hsp.save":               "Save",
+  "hsp.saved":              "Saved ✓",
+  "hsp.saveError":          "Error: {msg}",
+  "hsp.view2d":             "2D Projections",
+  "hsp.view3d":             "3D Ellipsoid",
+  "hsp.savedFits":          "Saved fits",
+  "hsp.loading":            "Loading…",
+  "hsp.noSavedFits":        "No saved fits.",
+  "hsp.load":               "Load",
+  "hsp.deleteConfirm":      "Delete \"{name}\"?",
+  "hsp.solvents":           "{n} solvents",
+  "hsp.source.db":          "DB",
+  "hsp.source.api":         "API",
+  "hsp.source.cache":       "cache",
+  "hsp.source.local":       "local",
+
+  // ── HSP — CSV Upload ───────────────────────────────────────────────────────
+  "csv.title":              "Import solvents",
+  "csv.drop":               "Drop a CSV file here",
+  "csv.or":                 "or",
+  "csv.browse":             "Browse…",
+  "csv.blank":              "Blank entry",
+  "csv.format":             "Expected columns: solvent, D, P, H, score (optional)",
+
+  // ── HSP — SolventEditor ────────────────────────────────────────────────────
+  "editor.reset":           "Reset",
+  "editor.addRow":          "Add solvent",
+  "editor.solvent":         "Solvent",
+  "editor.score":           "Score",
+  "editor.delete":          "Delete",
+
+  // ── HSP — SolventEditModal ─────────────────────────────────────────────────
+  "modal.editSolvent":      "Edit solvent",
+  "modal.name":             "Solvent name",
+  "modal.score":            "Score",
+  "modal.scoreHint":        "0 = incompatible · 1 = compatible",
+  "modal.save":             "Save",
+  "modal.cancel":           "Cancel",
+  "modal.validationError":  "δD, δP and δH must be valid numbers.",
+
+  // ── HSP — ResultsCard ─────────────────────────────────────────────────────
+  "results.title":          "Fit results",
+  "results.center":         "Centre",
+  "results.radius":         "Radius R₀",
+  "results.datafit":        "Datafit",
+  "results.inside":         "solvents inside sphere",
+  "results.outside":        "solvents outside sphere",
+
+  // ── HSP — SolventTable ────────────────────────────────────────────────────
+  "table.title":            "Solvent table",
+  "table.solvent":          "Solvent",
+  "table.d":                "δD",
+  "table.p":                "δP",
+  "table.h":                "δH",
+  "table.score":            "Score",
+  "table.distance":         "Distance",
+  "table.inside":           "Inside sphere",
+  "table.yes":              "Yes",
+  "table.no":               "No",
+
+  // ── HSP — Plot2D ──────────────────────────────────────────────────────────
+  "plot2d.title":           "2D Projections",
+  "plot2d.subtitle":        "Hansen convention (2·δD) · each chart has its own zoom (scroll / pinch).",
+  "plot2d.compatible":      "Compatible",
+  "plot2d.incompatible":    "Incompatible",
+  "plot2d.sphere":          "HSP sphere",
+  "plot2d.why2d":           "Why 2·δD?",
+  "plot2d.why2d.body1":     "In the Hansen model, the distance between two solvents in (δD, δP, δH) space is:",
+  "plot2d.why2d.formula":   "d² = 4·(ΔδD)² + (ΔδP)² + (ΔδH)²",
+  "plot2d.why2d.body2":     "The factor 4 on δD reflects the empirically larger weight of the dispersive component.",
+  "plot2d.why2d.body3":     "Plotting δD as-is makes the sphere appear as a flattened ellipsoid. Plotting 2·δD gives a true circle.",
+  "plot2d.why2d.footer":    "This is the historical convention used by Charles M. Hansen.",
+
+  // ── HSP — Plot3D ──────────────────────────────────────────────────────────
+  "plot3d.title":           "HSP Sphere 3D",
+  "plot3d.subtitle":        "Cubic box (aspectmode cube) · δD:δP:δH ranges in 1:2:2 ratio → the Hansen ellipsoid (semi-axes R/2, R, R) appears as a sphere.",
+  "plot3d.compatible":      "Compatible",
+  "plot3d.incompatible":    "Incompatible",
+  "plot3d.sphere":          "HSP sphere",
+  "plot3d.center":          "Centre",
+  "plot3d.loading":         "Loading 3D chart…",
+  "plot3d.error":           "Plotly load error: {msg}",
+}
+
+export default en

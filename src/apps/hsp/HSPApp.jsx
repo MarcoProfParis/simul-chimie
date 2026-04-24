@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { ArrowLeftIcon, PlayIcon, BookmarkIcon, ClockIcon, TrashIcon, ArrowPathIcon } from "@heroicons/react/24/outline"
 import { useAuth } from "../../AuthContext"
+import { useLang } from "../../i18n"
 import { HSPEstimator } from "./HSPEstimator.js"
 import CSVUpload from "./components/CSVUpload"
 import ResultsCard from "./components/ResultsCard"
@@ -53,6 +54,7 @@ function GhostButton({ children, onClick, icon: Icon }) {
 function SavedFitsDrawer({ open, onClose, onLoad }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState("")
+  const { t } = useLang()
 
   const refresh = useCallback(async () => {
     setError("")
@@ -70,12 +72,12 @@ function SavedFitsDrawer({ open, onClose, onLoad }) {
         padding: 20, overflowY: "auto",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "var(--text)" }}>Ajustements enregistrés</p>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{t("hsp.savedFits")}</p>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 18 }}>×</button>
         </div>
         {error && <p style={{ fontSize: 12, color: "#dc2626" }}>{error}</p>}
-        {items === null && !error && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Chargement…</p>}
-        {items && items.length === 0 && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Aucun ajustement enregistré.</p>}
+        {items === null && !error && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{t("hsp.loading")}</p>}
+        {items && items.length === 0 && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{t("hsp.noSavedFits")}</p>}
         {items && items.map(it => (
           <div key={it.id} style={{ border: "1px solid var(--border)", borderRadius: 8, padding: 12, marginBottom: 10, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -85,11 +87,11 @@ function SavedFitsDrawer({ open, onClose, onLoad }) {
             <button
               onClick={() => { onLoad(it); onClose() }}
               style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 6, background: `${ACCENT}15`, color: ACCENT, border: `1px solid ${ACCENT}40`, cursor: "pointer" }}
-            >Charger</button>
+            >{t("hsp.load")}</button>
             <button
-              onClick={async () => { if (confirm(`Supprimer "${it.name}" ?`)) { await deleteFit(it.id); refresh() } }}
+              onClick={async () => { if (confirm(t("hsp.deleteConfirm", { name: it.name }))) { await deleteFit(it.id); refresh() } }}
               style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", padding: 4 }}
-              aria-label="Supprimer"
+              aria-label={t("editor.delete")}
             ><TrashIcon style={{ width: 14, height: 14 }} /></button>
           </div>
         ))}
@@ -98,33 +100,32 @@ function SavedFitsDrawer({ open, onClose, onLoad }) {
   )
 }
 
-// Tiny badge shown in the header reporting which solvent-library source is active.
 function LibrarySourceBadge() {
   const { library, source, loading, refresh } = useSolventLibrary()
+  const { t } = useLang()
   const tone =
     source === "supabase" ? "#7c3aed" :
     source === "api"      ? "#16a34a" :
     source === "cache"    ? "#0891b2" :
-    /* bundled */           "#64748b"
+    "#64748b"
   const label =
-    source === "supabase" ? "DB" :
-    source === "api"      ? "API" :
-    source === "cache"    ? "cache" :
-    "local"
+    source === "supabase" ? t("hsp.source.db") :
+    source === "api"      ? t("hsp.source.api") :
+    source === "cache"    ? t("hsp.source.cache") :
+    t("hsp.source.local")
   return (
     <div
-      title={`${library.length} solvants dans la base (${source})`}
+      title={`${library.length} ${t("hsp.solvents", { n: "" }).trim()} (${source})`}
       style={{
         display: "inline-flex", alignItems: "center", gap: 6,
         padding: "4px 8px", fontSize: 11, fontWeight: 600, borderRadius: 6,
         background: `${tone}18`, border: `1px solid ${tone}40`, color: tone,
       }}
     >
-      <span>{library.length} solvants · {label}</span>
+      <span>{t("hsp.solvents", { n: library.length })} · {label}</span>
       <button
         onClick={refresh}
         disabled={loading}
-        title="Rafraîchir depuis l'API"
         style={{
           display: "inline-flex", alignItems: "center",
           background: "transparent", border: "none", cursor: loading ? "default" : "pointer",
@@ -140,6 +141,7 @@ function LibrarySourceBadge() {
 
 function HSPAppInner({ onBack }) {
   const { user } = useAuth()
+  const { t } = useLang()
   const [data, setData] = useState(null)
   const [fileName, setFileName] = useState("")
   const [result, setResult] = useState(null)
@@ -157,7 +159,7 @@ function HSPAppInner({ onBack }) {
 
   const handleBlank = () => {
     setData(SolventEditor.newBlank())
-    setFileName("Saisie vierge"); setResult(null); setError(""); setSaveStatus("")
+    setFileName(t("csv.blank")); setResult(null); setError(""); setSaveStatus("")
   }
 
   const handleReset = () => {
@@ -166,7 +168,7 @@ function HSPAppInner({ onBack }) {
 
   const handleDataEdit = (next) => {
     setData(next)
-    if (result) setResult(null)  // editing invalidates current fit
+    if (result) setResult(null)
   }
 
   const handleSolventEdit = useCallback((originalName, form) => {
@@ -187,9 +189,8 @@ function HSPAppInner({ onBack }) {
 
   const handleFit = async () => {
     if (!data) return
-    // Keep only rows with complete D/P/H triplets
     const usable = data.filter(r => r.D !== null && r.P !== null && r.H !== null && !isNaN(r.D) && !isNaN(r.P) && !isNaN(r.H))
-    if (usable.length === 0) { setError("Aucune ligne complète (δD, δP, δH requis)."); return }
+    if (usable.length === 0) { setError(t("hsp.noCompleteRows")); return }
     setRunning(true); setError(""); setResult(null)
     try {
       await new Promise(r => setTimeout(r, 0))
@@ -204,9 +205,9 @@ function HSPAppInner({ onBack }) {
   const handleSave = async () => {
     setSaveStatus("")
     try {
-      await saveFit({ name: saveName || fileName || "Ajustement", solvents: data, insideLimit, result })
-      setSaveStatus("Enregistré ✓"); setSaveName("")
-    } catch (e) { setSaveStatus(`Erreur : ${e.message}`) }
+      await saveFit({ name: saveName || fileName || t("hsp.fit"), solvents: data, insideLimit, result })
+      setSaveStatus(t("hsp.saved")); setSaveName("")
+    } catch (e) { setSaveStatus(t("hsp.saveError", { msg: e.message })) }
   }
 
   const loadSaved = (item) => {
@@ -215,6 +216,11 @@ function HSPAppInner({ onBack }) {
   }
 
   const labeledCount = data ? data.filter(r => r.score !== null && !isNaN(r.score)).length : 0
+
+  const viewTabs = [
+    { id: "2d", label: t("hsp.view2d") },
+    { id: "3d", label: t("hsp.view3d") },
+  ]
 
   return (
     <div style={{ background: "var(--bg)", minHeight: "calc(100vh - 56px)", padding: "clamp(16px, 3vw, 28px)" }}>
@@ -226,23 +232,23 @@ function HSPAppInner({ onBack }) {
             onClick={onBack}
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", background: "transparent", border: "1px solid var(--border)", borderRadius: 8, cursor: "pointer", color: "var(--text)", fontSize: 12 }}
           >
-            <ArrowLeftIcon style={{ width: 14, height: 14 }} /> Retour
+            <ArrowLeftIcon style={{ width: 14, height: 14 }} /> {t("hsp.back")}
           </button>
           <div style={{ flex: 1 }}>
             <h1 style={{ margin: 0, fontSize: "clamp(18px, 3vw, 22px)", fontWeight: 800, color: "var(--text)" }}>
-              Paramètres de Hansen (HSP)
+              {t("hsp.title")}
             </h1>
             <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--text-muted)" }}>
-              Ajustement d'une sphère de solubilité par la méthode classique (cube d'exploration)
+              {t("hsp.subtitle")}
             </p>
           </div>
           <LibrarySourceBadge />
           {user && (
-            <GhostButton onClick={() => setSavedOpen(true)} icon={ClockIcon}>Mes ajustements</GhostButton>
+            <GhostButton onClick={() => setSavedOpen(true)} icon={ClockIcon}>{t("hsp.myfits")}</GhostButton>
           )}
         </div>
 
-        {/* Upload (only when no data yet) + controls */}
+        {/* Upload + controls */}
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,260px)", gap: 14 }}>
           {data ? (
             <SolventEditor data={data} fileName={fileName} onChange={handleDataEdit} onReset={handleReset} />
@@ -255,7 +261,7 @@ function HSPAppInner({ onBack }) {
           }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".05em", color: "var(--text-muted)" }}>
-                SEUIL « BON SOLVANT » (score ≤ …)
+                {t("hsp.threshold")}
               </label>
               <input
                 type="number" step="0.1" min="0"
@@ -266,11 +272,11 @@ function HSPAppInner({ onBack }) {
             </div>
             <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
               {data
-                ? <>{data.length} solvants chargés, dont {labeledCount} étiquetés.</>
-                : "Chargez un CSV pour commencer."}
+                ? t("hsp.solventsLoaded", { n: data.length, labeled: labeledCount })
+                : t("hsp.loadCsv")}
             </div>
             <PrimaryButton onClick={handleFit} disabled={!data || running} icon={PlayIcon}>
-              {running ? "Ajustement…" : "Ajuster la sphère"}
+              {running ? t("hsp.fitting") : t("hsp.fit")}
             </PrimaryButton>
           </div>
         </div>
@@ -286,35 +292,34 @@ function HSPAppInner({ onBack }) {
           <>
             <ResultsCard result={result} />
 
-            {/* Save row */}
             {user && (
               <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 12, padding: 12, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <input
                   type="text"
-                  placeholder="Nom de l'ajustement"
+                  placeholder={t("hsp.saveName")}
                   value={saveName}
                   onChange={e => setSaveName(e.target.value)}
                   style={{ flex: "1 1 200px", padding: "7px 10px", fontSize: 12, border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-card)", color: "var(--text)" }}
                 />
-                <PrimaryButton onClick={handleSave} icon={BookmarkIcon}>Enregistrer</PrimaryButton>
-                {saveStatus && <span style={{ fontSize: 11, color: saveStatus.startsWith("Erreur") ? "#dc2626" : "#16a34a" }}>{saveStatus}</span>}
+                <PrimaryButton onClick={handleSave} icon={BookmarkIcon}>{t("hsp.save")}</PrimaryButton>
+                {saveStatus && <span style={{ fontSize: 11, color: saveStatus.includes("Erreur") || saveStatus.includes("Error") ? "#dc2626" : "#16a34a" }}>{saveStatus}</span>}
               </div>
             )}
 
             {/* Plot view switcher */}
             <div style={{ display: "flex", gap: 4, background: "#f4f4f5", padding: 3, borderRadius: 8, alignSelf: "flex-start" }}>
-              {[{ id: "2d", label: "Projections 2D" }, { id: "3d", label: "Ellipsoïde 3D" }].map(t => (
+              {viewTabs.map(tab => (
                 <button
-                  key={t.id}
-                  onClick={() => setView(t.id)}
+                  key={tab.id}
+                  onClick={() => setView(tab.id)}
                   style={{
                     fontSize: 11, fontWeight: 700, padding: "5px 14px", borderRadius: 6,
-                    background: view === t.id ? "#fff" : "transparent",
-                    color: view === t.id ? "#18181b" : "#737373",
+                    background: view === tab.id ? "#fff" : "transparent",
+                    color: view === tab.id ? "#18181b" : "#737373",
                     border: "none", cursor: "pointer",
-                    boxShadow: view === t.id ? "0 1px 3px rgba(0,0,0,0.10)" : "none",
+                    boxShadow: view === tab.id ? "0 1px 3px rgba(0,0,0,0.10)" : "none",
                   }}
-                >{t.label}</button>
+                >{tab.label}</button>
               ))}
             </div>
 

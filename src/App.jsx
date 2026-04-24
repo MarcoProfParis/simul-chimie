@@ -18,6 +18,7 @@ import {
 import { CATEGORIES } from "./config"
 import { useTheme } from "./ThemeContext"
 import { useAuth } from "./AuthContext"
+import { useLang } from "./i18n"
 import AuthModal from "./components/AuthModal"
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -103,6 +104,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
   const [showAuthModal, setShowAuthModal] = useState(false)
   const isMobile = useIsMobile()
   const { user, signOut } = useAuth()
+  const { lang, setLang, t } = useLang()
 
   useEffect(() => { if (!isMobile) setMobileOpen(false) }, [isMobile])
   useEffect(() => {
@@ -141,7 +143,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
             className="font-bold tracking-tight whitespace-nowrap text-sm"
             style={{ color: "var(--text)", letterSpacing: "-0.02em" }}
           >
-            Simulations MDC
+            {t("app.title")}
           </span>
         </button>
 
@@ -162,7 +164,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
                       onMouseEnter={e => { if (categoryId !== cat.id) e.currentTarget.style.color = cat.color }}
                       onMouseLeave={e => { if (categoryId !== cat.id) e.currentTarget.style.color = "var(--text)" }}
                     >
-                      {cat.label}
+                      {t(cat.labelKey)}
                       <ChevronDownIcon
                         className="w-3.5 h-3.5 ml-1 transition-transform duration-200"
                         style={{ transform: open ? "rotate(180deg)" : "none", opacity: 0.5, color: "var(--text)" }}
@@ -206,11 +208,11 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
                               >
                                 <div>
                                   <p className="text-[13px] leading-snug m-0" style={{ fontWeight: isActive ? 600 : 500, color: isActive ? cat.color : "var(--text)" }}>
-                                    {app.label}
+                                    {t(app.labelKey)}
                                   </p>
-                                  {app.description && (
+                                  {app.descriptionKey && (
                                     <p className="text-[11px] mt-0.5 m-0 leading-snug" style={{ color: "var(--text-muted)" }}>
-                                      {app.description}
+                                      {t(app.descriptionKey)}
                                     </p>
                                   )}
                                 </div>
@@ -234,8 +236,8 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
         {!isMobile && (
           <button
             onClick={() => setExpanded(e => !e)}
-            aria-label={expanded ? "Réduire la largeur" : "Étendre sur toute la largeur"}
-            title={expanded ? "Réduire la largeur" : "Étendre sur toute la largeur"}
+            aria-label={expanded ? t("nav.collapse") : t("nav.expand")}
+            title={expanded ? t("nav.collapse") : t("nav.expand")}
             className="flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all duration-200 shrink-0 ml-1"
             style={{
               background: expanded ? "var(--bg)" : "transparent",
@@ -270,20 +272,20 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
             </span>
             <button
               onClick={signOut}
-              aria-label="Se déconnecter"
-              title="Se déconnecter"
+              aria-label={t("nav.logout")}
+              title={t("nav.logout")}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
               style={{ background:"rgba(239,68,68,0.10)", border:"1px solid rgba(239,68,68,0.25)", color:"#ef4444" }}
             >
               <ArrowRightOnRectangleIcon className="w-4 h-4" />
-              {!isMobile && <span>Déconnexion</span>}
+              {!isMobile && <span>{t("nav.logout")}</span>}
             </button>
           </div>
         ) : (
           <button
             onClick={() => setShowAuthModal(true)}
-            aria-label="Se connecter"
-            title="Se connecter"
+            aria-label={t("nav.login")}
+            title={t("nav.login")}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
             style={{
               marginLeft: 8,
@@ -301,16 +303,37 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
             }}
           >
             <UserCircleIcon className="w-4 h-4" />
-            {!isMobile && <span>Connexion</span>}
+            {!isMobile && <span>{t("nav.login")}</span>}
           </button>
         )}
 
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
 
+        {/* ── Sélecteur de langue ── */}
+        <div style={{ display: "flex", marginLeft: 8, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)" }}>
+          {["fr", "en"].map(l => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              style={{
+                padding: "4px 9px",
+                fontSize: 11, fontWeight: 700,
+                background: lang === l ? "var(--text)" : "transparent",
+                color: lang === l ? "var(--bg-card)" : "var(--text-muted)",
+                border: "none", cursor: "pointer",
+                textTransform: "uppercase",
+                letterSpacing: ".06em",
+              }}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+
         {/* ── Bouton dark mode ── */}
         <button
           onClick={() => setDark(d => !d)}
-          aria-label={dark ? "Passer en mode clair" : "Passer en mode sombre"}
+          aria-label={dark ? t("nav.lightMode") : t("nav.darkMode")}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-200 shrink-0 text-[12px] font-semibold"
           style={{
             marginLeft: 8,
@@ -320,8 +343,8 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
           }}
         >
           {dark
-            ? <><SunIcon className="w-4 h-4" />{!isMobile && <span>Clair</span>}</>
-            : <><MoonIcon className="w-4 h-4" />{!isMobile && <span>Sombre</span>}</>
+            ? <><SunIcon className="w-4 h-4" />{!isMobile && <span>{t("nav.lightMode")}</span>}</>
+            : <><MoonIcon className="w-4 h-4" />{!isMobile && <span>{t("nav.darkMode")}</span>}</>
           }
         </button>
 
@@ -375,7 +398,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
               color: "var(--text)",
             }}
           >
-            Accueil
+            {t("nav.home")}
           </button>
 
           {CATEGORIES.map(cat => (
@@ -391,7 +414,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
                     }}
                   >
                     <span className="flex-1 text-[14px]" style={{ fontWeight: categoryId === cat.id ? 600 : 500, color: categoryId === cat.id ? cat.color : "var(--text)" }}>
-                      {cat.label}
+                      {t(cat.labelKey)}
                     </span>
                     <ChevronDownIcon className="w-4 h-4 transition-transform duration-200" style={{ transform: open ? "rotate(180deg)" : "none", color: "var(--text-muted)" }} />
                   </DisclosureButton>
@@ -418,11 +441,11 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
                           >
                             <div>
                               <p className="text-[13px] m-0" style={{ fontWeight: isActive ? 600 : 400, color: isActive ? cat.color : "var(--text)" }}>
-                                {app.label}
+                                {t(app.labelKey)}
                               </p>
-                              {app.description && (
+                              {app.descriptionKey && (
                                 <p className="text-[11px] mt-0.5 m-0" style={{ color: "var(--text-muted)" }}>
-                                  {app.description}
+                                  {t(app.descriptionKey)}
                                 </p>
                               )}
                             </div>
@@ -446,6 +469,7 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, dark, setDark, exp
 ───────────────────────────────────────────────────────────────────────────── */
 function AppCard({ item, accent, onClick }) {
   const [hovered, setHovered] = useState(false)
+  const { t } = useLang()
   return (
     <button
       onClick={onClick}
@@ -462,10 +486,10 @@ function AppCard({ item, accent, onClick }) {
     >
       <div className="w-8 h-1 rounded-full mb-4 transition-all duration-200" style={{ background: hovered ? accent : "var(--border)" }} />
       <p className="font-bold mb-1.5 m-0" style={{ fontSize: "clamp(13px, 3vw, 15px)", color: "var(--text)" }}>
-        {item.label}
+        {t(item.labelKey)}
       </p>
       <p className="m-0 leading-relaxed" style={{ fontSize: "clamp(11px, 2.5vw, 12px)", color: "var(--text-muted)" }}>
-        {item.description}
+        {t(item.descriptionKey)}
       </p>
     </button>
   )
@@ -499,6 +523,7 @@ export default function App() {
   const [appId, setAppId]           = useState(null)
   const { dark, setDark }           = useTheme()
   const [expanded, setExpanded]     = useExpanded()
+  const { t }                       = useLang()
 
   const nav = (
     <TopNav
@@ -541,10 +566,10 @@ export default function App() {
           <div className="text-center mb-10 w-full max-w-3xl">
             <div className="w-10 h-1 rounded-full mx-auto mb-4" style={{ background: cat.color }} />
             <h1 className="font-extrabold tracking-tight mt-0 mb-1" style={{ fontSize: "clamp(20px,4vw,26px)", color: "var(--text)" }}>
-              {cat.label}
+              {t(cat.labelKey)}
             </h1>
             <p className="m-0" style={{ fontSize: "clamp(12px,3vw,14px)", color: "var(--text-muted)" }}>
-              {cat.description}
+              {t(cat.descriptionKey)}
             </p>
           </div>
           <div className="flex flex-wrap gap-5 justify-center w-full max-w-3xl">
@@ -567,10 +592,10 @@ export default function App() {
       >
         <div className="text-center mb-10 w-full max-w-3xl">
           <h1 className="font-extrabold tracking-tight mt-0 mb-1" style={{ fontSize: "clamp(20px,4vw,26px)", color: "var(--text)" }}>
-            Simulations MDC
+            {t("app.title")}
           </h1>
           <p className="m-0" style={{ fontSize: "clamp(12px,3vw,14px)", color: "var(--text-muted)" }}>
-            BTS Métiers de la Chimie
+            {t("app.subtitle")}
           </p>
         </div>
         <div className="flex flex-wrap gap-5 justify-center w-full max-w-3xl">
