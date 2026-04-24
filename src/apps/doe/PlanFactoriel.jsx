@@ -81,6 +81,10 @@ function PlanFactorielInner() {
     return [{ id: 1, name: "Modèle 1", terms: [...def], preset: "default" }];
   });
   const [activeModelId, setActiveModelId] = useState(1);
+  const [sameModelForAll, setSameModelForAll] = useState(true);
+  // { [respId]: { models: Model[], activeModelId: number } }
+  const [modelsPerResponse, setModelsPerResponse] = useState({});
+  const [modelEditRespIdx, setModelEditRespIdx] = useState(0);
   const [part4Tab, setPart4Tab] = useState("coefficients");
   const [part4Response, setPart4Response] = useState(0); // index de la réponse active
   const [excludedPoints, setExcludedPoints] = useState(new Set()); // indices des points exclus
@@ -119,6 +123,7 @@ function PlanFactorielInner() {
       setModelDefault(md);
       setModels([{ id: 1, name: "Modèle 1", terms: [...md], preset: "default" }]);
       setActiveModelId(1);
+      setSameModelForAll(true); setModelsPerResponse({});
       setMatrix(m);
       setLoadedExampleId(ex.file);
       setSidebarOpen(false);
@@ -146,6 +151,7 @@ function PlanFactorielInner() {
     setModelDefault(def);
     setModels([{ id: 1, name: 'Modèle 1', terms: [...def], preset: 'default' }]);
     setActiveModelId(1);
+    setSameModelForAll(true); setModelsPerResponse({});
     setMatrix(null);
     setLoadedExampleId(null);
     setEditMode(false);
@@ -166,7 +172,7 @@ function PlanFactorielInner() {
       const { factors: f, responses: r, centerPoint: cp, modelDefault: md, matrix: m } = loadExampleData(data);
       setFactors(f); setResponses(r); setCenterPoint(cp); setModelDefault(md);
       setModels([{ id: 1, name: 'Modèle 1', terms: [...md], preset: 'default' }]);
-      setActiveModelId(1); setMatrix(m);
+      setActiveModelId(1); setSameModelForAll(true); setModelsPerResponse({}); setMatrix(m);
       setLoadedExampleId(data.meta?.id || 'import.json');
       setWelcomeModal(null); setPart(1);
     } catch (err) {
@@ -198,6 +204,7 @@ function PlanFactorielInner() {
     setModelDefault(def);
     setModels([{ id: 1, name: "Modèle 1", terms: [...def], preset: "default" }]);
     setActiveModelId(1);
+    setSameModelForAll(true); setModelsPerResponse({});
     setMatrix(null);
     setLoadedExampleId(null);
     setEditMode(false);
@@ -221,6 +228,7 @@ function PlanFactorielInner() {
       setModelDefault(md);
       setModels([{ id: 1, name: "Modèle 1", terms: [...md], preset: "default" }]);
       setActiveModelId(1);
+      setSameModelForAll(true); setModelsPerResponse({});
       setMatrix(m);
       setLoadedExampleId(ex.file);
       setEditMeta({
@@ -302,6 +310,7 @@ function PlanFactorielInner() {
         setModelDefault(md);
         setModels([{ id: 1, name: "Modèle 1", terms: [...md], preset: "default" }]);
         setActiveModelId(1);
+        setSameModelForAll(true); setModelsPerResponse({});
         setMatrix(m);
         setLoadedExampleId(file.name);
         setSidebarOpen(false);
@@ -458,6 +467,7 @@ function PlanFactorielInner() {
       setModelDefault(def);
       setModels([{ id: 1, name: 'Modèle 1', terms: [...def], preset: 'default' }]);
       setActiveModelId(1);
+      setSameModelForAll(true); setModelsPerResponse({});
       setMatrix(builtMatrix);
       setLoadedExampleId(file.name);
       setWelcomeModal(null);
@@ -648,6 +658,7 @@ function PlanFactorielInner() {
     setModelDefault(def);
     setModels([{ id: 1, name: "Modèle 1", terms: [...def], preset: "default" }]);
     setActiveModelId(1);
+    setSameModelForAll(true); setModelsPerResponse({});
     setPart(2);
   };
 
@@ -656,6 +667,7 @@ function PlanFactorielInner() {
     setModelDefault(def);
     setModels([{ id: 1, name: "Modèle 1", terms: [...def], preset: "default" }]);
     setActiveModelId(1);
+    setSameModelForAll(true); setModelsPerResponse({});
     setMatrix(null);
   };
 
@@ -1823,41 +1835,87 @@ function PlanFactorielInner() {
       {part === 4 && (() => {
         const nRuns = matrix ? matrix.length : 0;
         const maxTerms = nRuns - 1; // constante comprise = nRuns, donc termes hors constante = nRuns-1
-        const activeModel = models.find(m => m.id === activeModelId);
+
+        // ── Modèle par réponse ──────────────────────────────────────
+        const editRespId = sameModelForAll
+          ? null
+          : (responses[modelEditRespIdx]?.id ?? responses[0]?.id);
+        const editModels = sameModelForAll
+          ? models
+          : (modelsPerResponse[editRespId]?.models ?? models.map(m => ({ ...m, terms: [...m.terms] })));
+        const editActiveModelId = sameModelForAll
+          ? activeModelId
+          : (modelsPerResponse[editRespId]?.activeModelId ?? activeModelId);
+
+        const doSetModels = (updater) => {
+          if (sameModelForAll) {
+            setModels(updater);
+          } else {
+            setModelsPerResponse(prev => {
+              const cur = prev[editRespId] ?? { models: models.map(m => ({ ...m, terms: [...m.terms] })), activeModelId };
+              const next = typeof updater === 'function' ? updater(cur.models) : updater;
+              return { ...prev, [editRespId]: { ...cur, models: next } };
+            });
+          }
+        };
+        const doSetActiveModelId = (id) => {
+          if (sameModelForAll) {
+            setActiveModelId(id);
+          } else {
+            setModelsPerResponse(prev => {
+              const cur = prev[editRespId] ?? { models: models.map(m => ({ ...m, terms: [...m.terms] })), activeModelId };
+              return { ...prev, [editRespId]: { ...cur, activeModelId: id } };
+            });
+          }
+        };
+        const switchToPerResponse = () => {
+          const init = {};
+          responses.forEach(r => {
+            init[r.id] = {
+              models: models.map(m => ({ ...m, terms: [...m.terms] })),
+              activeModelId,
+            };
+          });
+          setModelsPerResponse(init);
+          setSameModelForAll(false);
+          setModelEditRespIdx(0);
+        };
+
+        const activeModel = editModels.find(m => m.id === editActiveModelId);
 
         const addModel = () => {
-          if (models.length >= 3) return;
-          const newId = Math.max(...models.map(m => m.id)) + 1;
-          setModels([...models, { id: newId, name: `Modèle ${newId}`, terms: [...modelDefault], preset: "default" }]);
-          setActiveModelId(newId);
+          if (editModels.length >= 3) return;
+          const newId = Math.max(...editModels.map(m => m.id)) + 1;
+          doSetModels([...editModels, { id: newId, name: `Modèle ${newId}`, terms: [...modelDefault], preset: "default" }]);
+          doSetActiveModelId(newId);
         };
 
         const deleteModel = (id) => {
-          if (models.length <= 1) return;
-          const remaining = models.filter(m => m.id !== id);
-          setModels(remaining);
-          if (activeModelId === id) setActiveModelId(remaining[0].id);
+          if (editModels.length <= 1) return;
+          const remaining = editModels.filter(m => m.id !== id);
+          doSetModels(remaining);
+          if (editActiveModelId === id) doSetActiveModelId(remaining[0].id);
         };
 
-        const renameModel = (id, name) => setModels(ms => ms.map(m => m.id === id ? { ...m, name } : m));
+        const renameModel = (id, name) => doSetModels(ms => ms.map(m => m.id === id ? { ...m, name } : m));
 
         const applyPresetTo = (id, p) => {
           if (p === "cubic" && factors.length < 3) { setShowCubicDialog(true); return; }
           const terms = computePresetModel(p, factors, modelDefault);
-          setModels(ms => ms.map(m => m.id === id ? { ...m, terms, preset: p } : m));
+          doSetModels(ms => ms.map(m => m.id === id ? { ...m, terms, preset: p } : m));
         };
 
         const toggleTermFor = (id, t) => {
-          const m = models.find(x => x.id === id);
+          const m = editModels.find(x => x.id === id);
           if (!m) return;
           const has = m.terms.includes(t);
           // Si on ajoute : vérifier contrainte
           if (!has && m.terms.length >= maxTerms) return;
           const terms = has ? m.terms.filter(x => x !== t) : [...m.terms, t];
-          setModels(ms => ms.map(x => x.id === id ? { ...x, terms, preset: "custom" } : x));
+          doSetModels(ms => ms.map(x => x.id === id ? { ...x, terms, preset: "custom" } : x));
         };
 
-        const resetModelTo = (id) => setModels(ms => ms.map(m => m.id === id ? { ...m, terms: [...modelDefault], preset: "default" } : m));
+        const resetModelTo = (id) => doSetModels(ms => ms.map(m => m.id === id ? { ...m, terms: [...modelDefault], preset: "default" } : m));
 
         const modelColors = [
           { border: "border-indigo-500", bg: "bg-indigo-50", text: "text-indigo-700", tab: "bg-indigo-600", dot: "bg-indigo-500", gradient: "linear-gradient(to right, #e0e7ff, #6366f1, #3730a3)", colorRamp: [[224,231,255],[55,48,163]] },
@@ -1882,13 +1940,43 @@ function PlanFactorielInner() {
               </div>
             </Dialog>
 
+            {/* Choix du mode modèle (uniquement si plusieurs réponses) */}
+            {responses.length > 1 && (
+              <div className="flex flex-wrap items-center gap-3 mb-5 px-4 py-3 bg-gray-50 rounded-xl border border-gray-200">
+                <span className="text-xs font-medium text-gray-500 shrink-0">Modèle :</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSameModelForAll(true)}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${sameModelForAll ? "bg-indigo-600 border-indigo-600 text-white" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                    Identique pour toutes les réponses
+                  </button>
+                  <button
+                    onClick={switchToPerResponse}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${!sameModelForAll ? "bg-indigo-600 border-indigo-600 text-white" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                    Différent par réponse
+                  </button>
+                </div>
+                {!sameModelForAll && (
+                  <div className="flex flex-wrap gap-2 pl-3 border-l border-gray-300">
+                    <span className="text-xs text-gray-400 self-center shrink-0">Configurer :</span>
+                    {responses.map((r, i) => (
+                      <button key={r.id} onClick={() => setModelEditRespIdx(i)}
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${i === modelEditRespIdx ? "bg-indigo-100 border-indigo-300 text-indigo-700" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}>
+                        {r.name || r.id}{r.unit ? ` (${r.unit})` : ""}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* En-tête : onglets modèles + bouton ajouter */}
             <div className="flex items-center gap-2 mb-4 flex-wrap">
-              {models.map((m, mi) => {
+              {editModels.map((m, mi) => {
                 const col = modelColors[mi % modelColors.length];
-                const isActive = m.id === activeModelId;
+                const isActive = m.id === editActiveModelId;
                 return (
-                  <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                  <button key={m.id} onClick={() => doSetActiveModelId(m.id)}
                     className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all ${isActive ? `${col.border} ${col.bg} ${col.text}` : "border-gray-200 text-gray-500 hover:border-gray-300"}`}>
                     <span className={`size-2 rounded-full ${col.dot}`} />
                     {m.name}
@@ -1896,7 +1984,7 @@ function PlanFactorielInner() {
                   </button>
                 );
               })}
-              {models.length < 3 && (
+              {editModels.length < 3 && (
                 <button onClick={addModel}
                   className="flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-3 py-2 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors">
                   <PlusIcon className="size-4" /> Ajouter un modèle
@@ -1906,7 +1994,7 @@ function PlanFactorielInner() {
 
             {/* Carte du modèle actif */}
             {activeModel && (() => {
-              const mi = models.findIndex(m => m.id === activeModelId);
+              const mi = editModels.findIndex(m => m.id === editActiveModelId);
               const col = modelColors[mi % modelColors.length];
               const isDefault = JSON.stringify([...activeModel.terms].sort()) === JSON.stringify([...modelDefault].sort());
               const atLimit = activeModel.terms.length >= maxTerms;
@@ -1924,9 +2012,9 @@ function PlanFactorielInner() {
                           <ArrowPathIcon className="size-3" /> Défaut
                         </button>
                       )}
-                      <button onClick={() => deleteModel(activeModel.id)} disabled={models.length <= 1}
+                      <button onClick={() => deleteModel(activeModel.id)} disabled={editModels.length <= 1}
                         className="p-1.5 rounded-md text-red-300 hover:text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        title={models.length <= 1 ? "Au moins un modèle requis" : "Supprimer ce modèle"}>
+                        title={editModels.length <= 1 ? "Au moins un modèle requis" : "Supprimer ce modèle"}>
                         <TrashIcon className="size-4" />
                       </button>
                     </div>
@@ -2011,8 +2099,8 @@ function PlanFactorielInner() {
             })()}
 
             {/* Équations de tous les modèles */}
-            <div className="grid gap-3 mb-4" style={{ gridTemplateColumns: `repeat(${models.length}, minmax(0, 1fr))` }}>
-              {models.map((m, mi) => {
+            <div className="grid gap-3 mb-4" style={{ gridTemplateColumns: `repeat(${editModels.length}, minmax(0, 1fr))` }}>
+              {editModels.map((m, mi) => {
                 const col = modelColors[mi % modelColors.length];
                 return (
                   <div key={m.id} className={`bg-gray-50 border ${col.border} rounded-xl p-4`}>
@@ -2044,7 +2132,7 @@ function PlanFactorielInner() {
                   </button>
                 )}
                 <button onClick={() => setPart(5)} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
-                  Continuer → ({models.length} modèle{models.length > 1 ? "s" : ""})
+                  Continuer → ({editModels.length} modèle{editModels.length > 1 ? "s" : ""})
                 </button>
               </div>
             </div>
@@ -2074,6 +2162,39 @@ function PlanFactorielInner() {
         ];
 
         const activeResp = responses[part4Response] || responses[0];
+
+        // Modèles actifs pour cette réponse
+        const respModels = sameModelForAll
+          ? models
+          : (modelsPerResponse[activeResp?.id]?.models ?? models);
+        const respActiveModelId = sameModelForAll
+          ? activeModelId
+          : (modelsPerResponse[activeResp?.id]?.activeModelId ?? activeModelId);
+
+        const doSetModels5 = (updater) => {
+          if (sameModelForAll) {
+            setModels(updater);
+          } else {
+            const rId = activeResp.id;
+            setModelsPerResponse(prev => {
+              const cur = prev[rId] ?? { models: respModels, activeModelId: respActiveModelId };
+              const next = typeof updater === 'function' ? updater(cur.models) : updater;
+              return { ...prev, [rId]: { ...cur, models: next } };
+            });
+          }
+        };
+        const doSetActiveModelId5 = (id) => {
+          if (sameModelForAll) {
+            setActiveModelId(id);
+          } else {
+            const rId = activeResp.id;
+            setModelsPerResponse(prev => {
+              const cur = prev[rId] ?? { models: respModels, activeModelId: respActiveModelId };
+              return { ...prev, [rId]: { ...cur, activeModelId: id } };
+            });
+          }
+        };
+
         const yValues = (matrix || []).map(row => {
           const v = row.responses[activeResp.id];
           return v === "" || v === null || v === undefined ? null : +v;
@@ -2094,7 +2215,7 @@ function PlanFactorielInner() {
               next.delete(globalIdx);
             } else {
               // Vérifier que le nombre de points restants sera suffisant pour le modèle le plus grand
-              const maxTerms = Math.max(...models.map(m => m.terms.length));
+              const maxTerms = Math.max(...respModels.map(m => m.terms.length));
               const wouldRemain = allValidRows.length - next.size - 1;
               if (wouldRemain < maxTerms + 2) return prev; // refus
               next.add(globalIdx);
@@ -2104,7 +2225,7 @@ function PlanFactorielInner() {
         };
 
         // Calcul OLS pour chaque modèle (sur points actifs)
-        const fits = models.map(m => {
+        const fits = respModels.map(m => {
           if (validRows.length < m.terms.length + 2) return null;
           return fitOLS(m.terms, validRows, validY, factors);
         });
@@ -2134,7 +2255,7 @@ function PlanFactorielInner() {
               </div>
               {/* Bouton PDF — discret, outline */}
               <button
-                onClick={() => exportPDF({ models, fits, factors, responses, activeResp, allValidRows, activeRows, excludedPoints, validY, modelDefault, matrix })}
+                onClick={() => exportPDF({ models: respModels, fits, factors, responses, activeResp, allValidRows, activeRows, excludedPoints, validY, modelDefault, matrix })}
                 title="Exporter rapport PDF"
                 className="flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-gray-400">
@@ -2173,14 +2294,14 @@ function PlanFactorielInner() {
             {part4Tab === "effets_calcul" && (
               <div className={cardSpace}>
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-3">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2191,8 +2312,8 @@ function PlanFactorielInner() {
                     })}
                   </div>
                 )}
-                {models.map((m, mi) => {
-                  if (m.id !== activeModelId) return null;
+                {respModels.map((m, mi) => {
+                  if (m.id !== respActiveModelId) return null;
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   return (
@@ -2229,14 +2350,14 @@ function PlanFactorielInner() {
                 </div>
 
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-3">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2247,8 +2368,8 @@ function PlanFactorielInner() {
                     })}
                   </div>
                 )}
-                {models.map((m, mi) => {
-                  if (m.id !== activeModelId) return null;
+                {respModels.map((m, mi) => {
+                  if (m.id !== respActiveModelId) return null;
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   const labels = allTermLabels(m.terms);
@@ -2326,14 +2447,14 @@ function PlanFactorielInner() {
                 )}
 
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-2">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2347,8 +2468,8 @@ function PlanFactorielInner() {
 
                 {/* Contenu pour le modèle actif */}
                 {(() => {
-                  const mi = models.findIndex(m => m.id === activeModelId);
-                  const m = models[mi];
+                  const mi = respModels.findIndex(m => m.id === respActiveModelId);
+                  const m = respModels[mi];
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   if (!fit) return (
@@ -2356,7 +2477,7 @@ function PlanFactorielInner() {
                       <p className="text-sm text-red-500">Calcul impossible — pas assez de points actifs ({validRows.length}) pour {m.terms.length + 1} paramètres.</p>
                     </div>
                   );
-                  const minRequired = Math.max(...models.map(x => x.terms.length)) + 2;
+                  const minRequired = Math.max(...respModels.map(x => x.terms.length)) + 2;
                   return (
                     <div className={`bg-white ${cardCls} ${col.border}`}>
                       <div className="flex items-center gap-2 mb-4">
@@ -2373,8 +2494,8 @@ function PlanFactorielInner() {
                         MSE={fit.MSE}
                         globalIndices={activeRows.map(x => x.i)}
                         allValidRows={activeRows}
-                        onExclude={(gIdx) => toggleExclude(gIdx, Math.max(...models.map(x => x.terms.length)))}
-                        onReinclude={(gIdx) => toggleExclude(gIdx, Math.max(...models.map(x => x.terms.length)))}
+                        onExclude={(gIdx) => toggleExclude(gIdx, Math.max(...respModels.map(x => x.terms.length)))}
+                        onReinclude={(gIdx) => toggleExclude(gIdx, Math.max(...respModels.map(x => x.terms.length)))}
                         excludedGlobalIndices={excludedPoints}
                         minRequired={minRequired}
                         color={col.dot}
@@ -2437,14 +2558,14 @@ function PlanFactorielInner() {
                 </div>
 
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-3">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2455,8 +2576,8 @@ function PlanFactorielInner() {
                     })}
                   </div>
                 )}
-                {models.map((m, mi) => {
-                  if (m.id !== activeModelId) return null;
+                {respModels.map((m, mi) => {
+                  if (m.id !== respActiveModelId) return null;
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   if (!fit) return <div key={m.id} className={`bg-white ${cardCls} ${col.border}`}><p className="text-sm text-red-500">Calcul impossible.</p></div>;
@@ -2600,14 +2721,14 @@ function PlanFactorielInner() {
                 </div>
 
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-3">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2618,8 +2739,8 @@ function PlanFactorielInner() {
                     })}
                   </div>
                 )}
-                {models.map((m, mi) => {
-                  if (m.id !== activeModelId) return null;
+                {respModels.map((m, mi) => {
+                  if (m.id !== respActiveModelId) return null;
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   if (!fit) return <div key={m.id} className={`bg-white ${cardCls} ${col.border}`}><p className="text-sm text-red-500">Calcul impossible.</p></div>;
@@ -2759,7 +2880,7 @@ function PlanFactorielInner() {
                                     className="shrink-0 size-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
                                     onClick={() => {
                                       const terms = m.terms.filter(t => t !== ef.term);
-                                      setModels(ms => ms.map(mx => mx.id === m.id ? { ...mx, terms, preset: "custom" } : mx));
+                                      doSetModels5(ms => ms.map(mx => mx.id === m.id ? { ...mx, terms, preset: "custom" } : mx));
                                     }}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3">
@@ -2802,7 +2923,7 @@ function PlanFactorielInner() {
                                           title={disabled ? "Limite atteinte" : `Ajouter ${tLabel} au modèle`}
                                           onClick={() => {
                                             if (disabled) return;
-                                            setModels(ms => ms.map(mx => mx.id === m.id ? { ...mx, terms: [...mx.terms, t], preset: "custom" } : mx));
+                                            doSetModels5(ms => ms.map(mx => mx.id === m.id ? { ...mx, terms: [...mx.terms, t], preset: "custom" } : mx));
                                           }}
                                           className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-mono transition-colors ${
                                             disabled
@@ -2857,14 +2978,14 @@ function PlanFactorielInner() {
                 </div>
 
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-3">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2875,8 +2996,8 @@ function PlanFactorielInner() {
                     })}
                   </div>
                 )}
-                {models.map((m, mi) => {
-                  if (m.id !== activeModelId) return null;
+                {respModels.map((m, mi) => {
+                  if (m.id !== respActiveModelId) return null;
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   if (!fit) return <div key={m.id} className={`bg-white ${cardCls} ${col.border}`}><p className="text-sm text-red-500">Calcul impossible.</p></div>;
@@ -2897,14 +3018,14 @@ function PlanFactorielInner() {
             {part4Tab === "iso3d" && has3D && (
               <div className={cardSpace}>
                 {/* ── Tabs par modèle ── */}
-                {models.length > 1 && (
+                {respModels.length > 1 && (
                   <div className="flex gap-1 flex-wrap mb-3">
-                    {models.map((m, mi) => {
+                    {respModels.map((m, mi) => {
                       const col = modelColors[mi % modelColors.length];
                       return (
-                        <button key={m.id} onClick={() => setActiveModelId(m.id)}
+                        <button key={m.id} onClick={() => doSetActiveModelId5(m.id)}
                           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
-                            m.id === activeModelId
+                            m.id === respActiveModelId
                               ? `${col.border} ${col.bg} ${col.text}`
                               : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}>
@@ -2915,8 +3036,8 @@ function PlanFactorielInner() {
                     })}
                   </div>
                 )}
-                {models.map((m, mi) => {
-                  if (m.id !== activeModelId) return null;
+                {respModels.map((m, mi) => {
+                  if (m.id !== respActiveModelId) return null;
                   const fit = fits[mi];
                   const col = modelColors[mi % modelColors.length];
                   return (
