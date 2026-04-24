@@ -52,23 +52,12 @@ export function Surface3DPanel({ model, fit, factors, col }) {
   const minZ = Math.min(...flat), maxZ = Math.max(...flat), rangeZ = maxZ - minZ || 1;
 
   const zColor = (z) => {
-    const t = (z - minZ) / rangeZ;
-    if (col.dot === "bg-indigo-500") {
-      const r = Math.round(224 + t * (55 - 224));
-      const g = Math.round(231 + t * (48 - 231));
-      const b = Math.round(255 + t * (163 - 255));
-      return `rgb(${r},${g},${b})`;
-    } else if (col.dot === "bg-emerald-500") {
-      const r = Math.round(209 + t * (5 - 209));
-      const g = Math.round(250 + t * (150 - 250));
-      const b = Math.round(229 + t * (105 - 229));
-      return `rgb(${r},${g},${b})`;
-    } else {
-      const r = Math.round(254 + t * (146 - 254));
-      const g = Math.round(243 + t * (64 - 243));
-      const b = Math.round(199 + t * (14 - 199));
-      return `rgb(${r},${g},${b})`;
-    }
+    const norm = (z - minZ) / rangeZ;
+    const [from, to] = col.colorRamp || [[224,231,255],[55,48,163]];
+    const r = Math.round(from[0] + norm * (to[0] - from[0]));
+    const g = Math.round(from[1] + norm * (to[1] - from[1]));
+    const b = Math.round(from[2] + norm * (to[2] - from[2]));
+    return `rgb(${r},${g},${b})`;
   };
 
   const W = 480, H = 380, CX = W / 2, CY = H / 2 - 20, SCALE = 120;
@@ -183,19 +172,13 @@ export function Surface3DPanel({ model, fit, factors, col }) {
         <text x={W - 100} y={34} fontSize="9" fill="#9ca3af">min Ŷ = {minZ.toFixed(3)}</text>
       </svg>
 
-      <div className="flex items-center gap-3 mt-3">
-        <div className="flex-1 h-3 rounded-full" style={{
-          background: col.dot === "bg-indigo-500"
-            ? "linear-gradient(to right, #e0e7ff, #6366f1, #3730a3)"
-            : col.dot === "bg-emerald-500"
-              ? "linear-gradient(to right, #d1fae5, #10b981, #065f46)"
-              : "linear-gradient(to right, #fef3c7, #f59e0b, #92400e)"
-        }} />
-        <div className="flex justify-between w-full text-[10px] font-mono text-gray-400 -mt-3">
+      <div className="mt-3">
+        <div className="flex justify-between text-[10px] font-mono text-gray-400 mb-1">
           <span>{minZ.toFixed(2)}</span>
           <span>{((minZ + maxZ) / 2).toFixed(2)}</span>
           <span>{maxZ.toFixed(2)}</span>
         </div>
+        <div className="h-3 rounded-full" style={{ background: col.gradient || "linear-gradient(to right, #e0e7ff, #6366f1, #3730a3)" }} />
       </div>
       <p className="text-[10px] text-gray-400 mt-2">{t("doe.surface.rotate")}</p>
     </div>
