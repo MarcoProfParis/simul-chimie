@@ -174,19 +174,30 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
     // → longueur physique identique pour les trois bras.
     // Convention couleur standard 3D : X=rouge, Y=vert, Z=bleu
     const AX_COLORS = { D: "#e11d48", P: "#16a34a", H: "#2563eb" }
-    const axisLine = (x, y, z, label, color) => ({
-      type: "scatter3d", mode: "lines+text",
+    // Ligne de l'axe (mode:lines) + label séparé (mode:text) au bout positif.
+    // On sépare les deux car scatter3d "lines+text" ne rend pas le texte
+    // de façon fiable dans toutes les versions de Plotly.
+    const axisLine = (x, y, z, color) => ({
+      type: "scatter3d", mode: "lines",
       showlegend: false, hoverinfo: "skip",
       x, y, z,
       line: { color, width: 6 },
-      text: ["", label],
+    })
+    const axisLabel = (lx, ly, lz, label, color) => ({
+      type: "scatter3d", mode: "text",
+      showlegend: false, hoverinfo: "skip",
+      x: [lx], y: [ly], z: [lz],
+      text: [label],
       textposition: "top center",
-      textfont: { color, size: 14, family: "system-ui, sans-serif" },
+      textfont: { color, size: 15, family: "system-ui, sans-serif", weight: "bold" },
     })
     const axisTraces = [
-      axisLine([cx - R,    cx + R   ], [cy,       cy      ], [cz,       cz       ], "δD", AX_COLORS.D),
-      axisLine([cx,        cx       ], [cy - 2*R, cy + 2*R], [cz,       cz       ], "δP", AX_COLORS.P),
-      axisLine([cx,        cx       ], [cy,       cy      ], [cz - 2*R, cz + 2*R], "δH", AX_COLORS.H),
+      axisLine([cx - R,    cx + R   ], [cy,       cy      ], [cz,       cz       ], AX_COLORS.D),
+      axisLabel(cx + R,    cy,         cz,                    "δD",                  AX_COLORS.D),
+      axisLine([cx,        cx       ], [cy - 2*R, cy + 2*R], [cz,       cz       ], AX_COLORS.P),
+      axisLabel(cx,        cy + 2*R,   cz,                    "δP",                  AX_COLORS.P),
+      axisLine([cx,        cx       ], [cy,       cy      ], [cz - 2*R, cz + 2*R], AX_COLORS.H),
+      axisLabel(cx,        cy,         cz + 2*R,              "δH",                  AX_COLORS.H),
     ]
 
     // ── 4b. Graduations sur les axes centrés ───────────────────────────────
