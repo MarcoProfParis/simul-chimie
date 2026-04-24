@@ -31,6 +31,7 @@ import {
   genMatrix, computeDefaultModel, quadPureTerm, isQuadPure, isInteraction,
   getAllPossibleTerms, computePresetModel,
   termOrder, formatTermDisplay, termSubScript, formatTermHTML,
+  formatTermDisplayNamed, formatTermHTMLNamed,
   getMissingRows, loadExampleData,
   fitOLS,
   sigStars, fmt, fmtP,
@@ -41,6 +42,7 @@ import { PredictionPanel } from "./PredictionPanel.jsx";
 import { ResidualPlot } from "./ResidualPlot.jsx";
 import { QQPlotSVG } from "./QQPlotSVG.jsx";
 import { IsoResponsePanel } from "./IsoResponsePanel.jsx";
+import { InteractionPlotsPanel } from "./InteractionPlotsPanel.jsx";
 import ExcelImportModal from "./ExcelImportModal.jsx";
 
 const DEFAULT_RESPONSES = [{ id: "Y1", name: "Réponse 1", unit: "" }];
@@ -49,7 +51,7 @@ function PlanFactorielInner() {
   const { t } = useLang();
   void ChevronDownIcon;
 
-  const [part, setPart] = useState(0); // 0=accueil, 1=facteurs, 2=matrice, 3=modèle, 4=résultats
+  const [part, setPart] = useState(0); // 0=accueil, 1=facteurs, 2=matrice, 3=interactions, 4=modèle, 5=résultats
   // ── États écran d'accueil ────────────────────────────────────────────────
   const [welcomeModal, setWelcomeModal] = useState(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
@@ -1191,10 +1193,11 @@ function PlanFactorielInner() {
       {part > 0 && <nav aria-label="Progression" className="mb-6">
         <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">
           {[
-            { n: 1, id: "01", l: `${t("doe.factors")} & ${t("doe.responses")}` },
+            { n: 1, id: "01", l: "Start" },
             { n: 2, id: "02", l: t("doe.matrix") },
-            { n: 3, id: "03", l: t("doe.model") },
-            { n: 4, id: "04", l: t("doe.effects") },
+            { n: 3, id: "03", l: t("doe.interactionGraphs") },
+            { n: 4, id: "04", l: t("doe.model") },
+            { n: 5, id: "05", l: t("doe.nav.validate") },
           ].map((s, i, arr) => {
             const status = part > s.n ? "complete" : part === s.n ? "current" : "upcoming";
             return (
@@ -1796,18 +1799,28 @@ function PlanFactorielInner() {
                   Exporter JSON
                 </button>
               )}
-              {hasMissing && <span className="text-xs text-red-500">Compléter les réponses pour continuer</span>}
-              <button onClick={() => { if (!hasMissing) goTo(3); }} disabled={hasMissing}
-                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                {t("doe.model")} →
+              <button onClick={() => goTo(3)}
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                {t("doe.interactionGraphs")} →
               </button>
             </div>
           </div>
         </>
       )}
 
-      {/* ══════════════════════════════════════════════════════ PARTIE 3 */}
-      {part === 3 && (() => {
+      {/* ══════════════════════════════════════════════════════ PARTIE 3 — Graphe d'interactions */}
+      {part === 3 && matrix && (
+        <InteractionPlotsPanel
+          factors={factors}
+          matrix={matrix}
+          responses={responses}
+          onBack={() => goTo(2)}
+          onNext={() => goTo(4)}
+        />
+      )}
+
+      {/* ══════════════════════════════════════════════════════ PARTIE 4 — Modèle */}
+      {part === 4 && (() => {
         const nRuns = matrix ? matrix.length : 0;
         const maxTerms = nRuns - 1; // constante comprise = nRuns, donc termes hors constante = nRuns-1
         const activeModel = models.find(m => m.id === activeModelId);
@@ -1975,7 +1988,7 @@ function PlanFactorielInner() {
                                     ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
                                     : "bg-gray-50 border-gray-200 text-gray-400 opacity-50 line-through hover:opacity-70"
                               }`}>
-                              {formatTermDisplay(t, factors)}
+                              {formatTermDisplayNamed(t, factors)}
                             </button>
                           );
                         })}
@@ -2007,7 +2020,7 @@ function PlanFactorielInner() {
                     <div className="font-mono text-xs text-gray-700 leading-loose">
                       <span>Ŷ = α₀</span>
                       {m.terms.map(t => (
-                        <span key={t}> + α<sub>{termSubScript(t, factors)}</sub>·<span dangerouslySetInnerHTML={{ __html: formatTermHTML(t, factors) }} /></span>
+                        <span key={t}> + α<sub>{termSubScript(t, factors)}</sub>·<span dangerouslySetInnerHTML={{ __html: formatTermHTMLNamed(t, factors) }} /></span>
                       ))}
                     </div>
                   </div>
@@ -2016,7 +2029,7 @@ function PlanFactorielInner() {
             </div>
 
             <div className="flex items-center justify-between mt-4">
-              <button onClick={() => goTo(2)}
+              <button onClick={() => goTo(3)}
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                 ← {t("common.back")}
               </button>
@@ -2030,7 +2043,7 @@ function PlanFactorielInner() {
                     Exporter JSON
                   </button>
                 )}
-                <button onClick={() => setPart(4)} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                <button onClick={() => setPart(5)} className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
                   Continuer → ({models.length} modèle{models.length > 1 ? "s" : ""})
                 </button>
               </div>
@@ -2039,8 +2052,8 @@ function PlanFactorielInner() {
         );
       })()}
 
-      {/* ══════════════════════════════════════════════════════ PARTIE 4 */}
-      {part === 4 && (() => {
+      {/* ══════════════════════════════════════════════════════ PARTIE 5 — Résultats */}
+      {part === 5 && (() => {
         const contFactors = factors.filter(f => f.continuous);
         const has3D = contFactors.length >= 2;
         // Mode compact : raccourcis pour les classes (isCompact vient du composant parent)
@@ -2097,7 +2110,7 @@ function PlanFactorielInner() {
         });
 
         // Noms des termes (constante + termes du modèle)
-        const termLabel = (t) => formatTermDisplay(t, factors);
+        const termLabel = (t) => formatTermDisplayNamed(t, factors);
         const allTermLabels = (terms) => ["α₀ (constante)", ...terms.map(t => `α${termSubScript(t, factors)} · ${termLabel(t)}`)];
 
         return (
@@ -2678,7 +2691,9 @@ function PlanFactorielInner() {
 
                               return (
                                 <div key={ef.term} className="flex items-center gap-2">
-                                  <span className={`text-[11px] font-mono w-20 truncate text-right shrink-0 ${
+                                  <span
+                                    title={ef.label}
+                                    className={`text-[11px] font-mono w-32 truncate text-right shrink-0 ${
                                     isSignif ? "text-gray-600" : "text-gray-400"
                                   }`}>
                                     {ef.label}
@@ -2909,7 +2924,7 @@ function PlanFactorielInner() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-6">
-              <button onClick={() => goTo(3)}
+              <button onClick={() => goTo(4)}
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                 ← {t("common.back")}
               </button>
