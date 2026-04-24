@@ -110,8 +110,8 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
     <div className="space-y-4">
 
       {/* ── Sélecteur de terme ── */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+      <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-3">
           {t("doe.selectTerm")}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -135,14 +135,14 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                 className={`flex flex-col items-start rounded-lg border px-3 py-1.5 text-xs font-mono transition-colors ${
                   isActive
                     ? "bg-indigo-600 text-white border-transparent"
-                    : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    : "border-gray-200 text-gray-600 hover:border-indigo-300 hover:bg-indigo-50"
                 }`}>
                 <span>{label}</span>
                 {bVal !== null && (
                   <span className={`text-[10px] font-semibold mt-0.5 ${
                     isActive ? "text-indigo-200"
-                    : bVal > 0.3 ? "text-emerald-600 dark:text-emerald-400"
-                    : bVal < -0.3 ? "text-red-600 dark:text-red-400"
+                    : bVal > 0.3 ? "text-emerald-600"
+                    : bVal < -0.3 ? "text-red-600"
                     : "text-gray-400"
                   }`}>
                     b = {bVal > 0 ? "+" : ""}{bVal.toFixed(3)}
@@ -170,21 +170,21 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
             return +(mid + c * half).toFixed(2);
           };
           return (
-            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="mt-3 pt-3 border-t border-gray-100">
               <div className="flex flex-wrap gap-4">
                 {selFactors.map(f => {
                   const levels = f.continuous ? [-1, 0, 1] : [-1, 1];
                   return (
                     <div key={f.id} className="flex flex-col gap-1.5">
-                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 font-mono">
+                      <span className="text-[10px] font-semibold text-indigo-600 font-mono">
                         {f.id} — {f.name}
                       </span>
                       <div className="flex items-center gap-1.5">
                         {levels.map(c => (
                           <span key={c} className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-mono font-semibold border ${
-                            c > 0  ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
-                            : c < 0 ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
-                                    : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400'
+                            c > 0  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                            : c < 0 ? 'bg-red-50 border-red-200 text-red-700'
+                                    : 'bg-gray-50 border-gray-200 text-gray-500'
                           }`}>
                             {c > 0 ? '+1' : c < 0 ? '−1' : '0'}
                             <span className="text-[10px] font-normal opacity-70">
@@ -206,15 +206,15 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
       {term && termFactors.length > 0 && (
         <div className="flex flex-col gap-4">
           {/* Matrice avec colonne active */}
-          <div className={`w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl ${compact ? "p-3" : "p-5"}`}>
+          <div className={`w-full bg-white border border-gray-200 rounded-xl ${compact ? "p-3" : "p-5"}`}>
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">
                 Matrice des essais · colonne {term}
               </p>
               {effet !== null && (
                 <button
                   onClick={() => setShowCalcPopup(true)}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-lg px-2.5 py-1 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg px-2.5 py-1 hover:bg-indigo-100 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3.5">
                     <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z" clipRule="evenodd" />
@@ -235,29 +235,29 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                 </colgroup>
                 <thead>
                   <tr>
-                    <th className="text-left px-2 py-1.5 border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 text-gray-400 font-medium text-[11px]">
+                    <th className="text-left px-2 py-1.5 border border-gray-100 bg-gray-50 text-gray-400 font-medium text-[11px]">
                       Essai
                     </th>
                     {factors.filter(f => f.continuous).map(f => (
                       <th key={f.id}
                         className={`px-3 py-2 border font-medium text-center ${
                           termFactors.some(tf => tf.id === f.id)
-                            ? "border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
-                            : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 text-gray-400"
+                            ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                            : "border-gray-100 bg-gray-50 text-gray-400"
                         }`}>
                         <span className="block truncate text-[11px]" title={f.id}>{f.id}</span>
                         <span className="block font-normal text-[10px] opacity-70 truncate" title={f.name}>{f.name}</span>
                       </th>
                     ))}
                     {isInteraction && (
-                      <th className="px-3 py-2 border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium text-center">
+                      <th className="px-3 py-2 border border-indigo-300 bg-indigo-50 text-indigo-700 font-medium text-center">
                         {term}
                         <span className="block font-normal text-[10px] opacity-70">
                           {termFactors.map(f => f.id).join("×")}
                         </span>
                       </th>
                     )}
-                    <th className="px-3 py-2 border border-gray-100 dark:border-gray-800 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-medium text-center">
+                    <th className="px-3 py-2 border border-gray-100 bg-amber-50 text-amber-700 font-medium text-center">
                       <span className="block truncate text-[10px]" title={`${activeResp?.name||"Y"} (${activeResp?.unit||""})`}>
                         {activeResp?.name || "Y"}{activeResp?.unit ? ` (${activeResp.unit})` : ""}
                       </span>
@@ -272,7 +272,7 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                     const contFactors = factors.filter(f => f.continuous);
                     return (
                       <tr key={ri}>
-                        <td className="px-1.5 py-1 border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-400 font-sans text-[11px]">
+                        <td className="px-1.5 py-1 border border-gray-100 text-gray-500 font-sans text-[11px]">
                           E{ri + 1}
                         </td>
                         {contFactors.map(f => {
@@ -282,10 +282,10 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                             <td key={f.id}
                               className={`px-1.5 py-1 border text-center font-semibold text-xs ${
                                 c > 0
-                                  ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/50"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                                   : c < 0
-                                  ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-100 dark:border-red-900/50"
-                                  : "border-gray-100 dark:border-gray-800 text-gray-400"
+                                  ? "bg-red-50 text-red-700 border-red-100"
+                                  : "border-gray-100 text-gray-400"
                               }`}>
                               {c > 0 ? "+1" : c < 0 ? "−1" : "0"}
                             </td>
@@ -294,16 +294,16 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                         {isInteraction && (
                           <td className={`px-1.5 py-1 border text-center font-bold text-xs ${
                             isPlus
-                              ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800"
-                              : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50"
+                              ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                              : "bg-red-50 text-red-600 border-red-100"
                           }`}>
                             {isPlus ? "+1" : "−1"}
                           </td>
                         )}
                         <td className={`px-1.5 py-1 border text-center font-semibold text-xs ${
                           isPlus
-                            ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50"
-                            : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900/50"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-red-50 text-red-700 border-red-100"
                         }`}>
                           {yVal.toFixed(2)}
                         </td>
@@ -313,7 +313,7 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                 </tbody>
               </table>
             </div>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2">
+            <p className="text-[10px] text-gray-400 mt-2">
               {isInteraction
                 ? `Colonne ${term} = produit des signes de ${termFactors.map(f => f.id).join(" et ")}. Cases indigo = +1 (contribuent à Moy(+1)).`
                 : `Cases vertes = essais où ${termFactors[0].id} est au niveau +1 · Cases rouges = niveau −1.`}
@@ -325,10 +325,10 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
           {effet !== null && (
             <div className={`rounded-xl px-4 py-3 border text-sm font-mono font-semibold flex items-center justify-between gap-3 ${
               Math.abs(effet) < 0.3
-                ? "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400"
+                ? "bg-gray-50 border-gray-200 text-gray-500"
                 : effet > 0
-                ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300"
-                : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                : "bg-red-50 border-red-200 text-red-700"
             }`}>
               <span>
                 b = {effet > 0 ? "+" : ""}{fmt(effet)}
@@ -349,10 +349,10 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
           {effet !== null && (
             <div className={`rounded-lg px-3 py-2 border-l-4 text-xs leading-relaxed ${
               Math.abs(effet) < 0.3
-                ? "bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
+                ? "bg-gray-50 border-gray-300 text-gray-500"
                 : effet > 0
-                ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-400 text-indigo-800 dark:text-indigo-300"
-                : "bg-red-50 dark:bg-red-900/20 border-red-400 text-red-800 dark:text-red-300"
+                ? "bg-indigo-50 border-indigo-400 text-indigo-800"
+                : "bg-red-50 border-red-400 text-red-800"
             }`}>
               {Math.abs(effet) < 0.3
                 ? `Effet très faible — peu d'influence sur ${activeResp?.name || "la réponse"}.`
@@ -368,12 +368,12 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
             <div
               ref={popupRef}
               style={{ position: 'fixed', left: popupPos.x, top: popupPos.y, zIndex: 100, width: 400, maxHeight: '85vh' }}
-              className="bg-white dark:bg-gray-950 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col"
+              className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
             >
               {/* Header — zone de drag */}
               <div
                 onMouseDown={onPopupMouseDown}
-                className="bg-indigo-50 dark:bg-indigo-950/60 border-b border-indigo-100 dark:border-indigo-900 px-4 py-3 flex items-center justify-between cursor-grab active:cursor-grabbing select-none"
+                className="bg-indigo-50 border-b border-indigo-100 px-4 py-3 flex items-center justify-between cursor-grab active:cursor-grabbing select-none"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   {/* Poignée visuelle */}
@@ -382,11 +382,11 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                   </svg>
                   <div className="min-w-0">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 mb-0.5 truncate">Détail du calcul — {term}</p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">b = {effet > 0 ? "+" : ""}{fmt(effet)}</p>
+                    <p className="text-sm font-semibold text-gray-900">b = {effet > 0 ? "+" : ""}{fmt(effet)}</p>
                   </div>
                 </div>
                 <button onClick={() => setShowCalcPopup(false)}
-                  className="size-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-white dark:hover:bg-gray-800 transition-colors shrink-0">
+                  className="size-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-white transition-colors shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -400,43 +400,43 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-3">Étape 2 — Moyennes par niveau</p>
                     <div className="flex flex-col gap-3">
-                      <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-2">
+                      <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 mb-2">
                           Moy(+1) — essais où {term} = +1
                         </p>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {plusRows.map((r, i) => {
                             const ri = validRows.indexOf(r);
                             return (
-                              <span key={i} className="inline-block bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-mono text-xs px-2 py-0.5 rounded">
+                              <span key={i} className="inline-block bg-emerald-100 text-emerald-800 font-mono text-xs px-2 py-0.5 rounded">
                                 E{ri + 1} = {(+r.responses[yKey]).toFixed(2)}
                               </span>
                             );
                           })}
                         </div>
-                        <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono">
+                        <p className="text-[11px] text-emerald-700 font-mono">
                           = ({plusRows.map(r => (+r.responses[yKey]).toFixed(2)).join(" + ")}) / {plusRows.length}
                         </p>
-                        <p className="text-lg font-semibold font-mono text-emerald-700 dark:text-emerald-300 mt-1">= {fmt2(moyPlus)}</p>
+                        <p className="text-lg font-semibold font-mono text-emerald-700 mt-1">= {fmt2(moyPlus)}</p>
                       </div>
-                      <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-red-700 dark:text-red-400 mb-2">
+                      <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-red-700 mb-2">
                           Moy(−1) — essais où {term} = −1
                         </p>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {minusRows.map((r, i) => {
                             const ri = validRows.indexOf(r);
                             return (
-                              <span key={i} className="inline-block bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 font-mono text-xs px-2 py-0.5 rounded">
+                              <span key={i} className="inline-block bg-red-100 text-red-800 font-mono text-xs px-2 py-0.5 rounded">
                                 E{ri + 1} = {(+r.responses[yKey]).toFixed(2)}
                               </span>
                             );
                           })}
                         </div>
-                        <p className="text-[11px] text-red-700 dark:text-red-400 font-mono">
+                        <p className="text-[11px] text-red-700 font-mono">
                           = ({minusRows.map(r => (+r.responses[yKey]).toFixed(2)).join(" + ")}) / {minusRows.length}
                         </p>
-                        <p className="text-lg font-semibold font-mono text-red-700 dark:text-red-300 mt-1">= {fmt2(moyMinus)}</p>
+                        <p className="text-lg font-semibold font-mono text-red-700 mt-1">= {fmt2(moyMinus)}</p>
                       </div>
                     </div>
                   </div>
@@ -444,26 +444,26 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                   {/* Étape 3 — Formule */}
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-3">Étape 3 — Calcul de l'effet = coefficient b</p>
-                    <div className="flex items-center flex-wrap gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg font-mono text-sm">
-                      <span className="text-gray-600 dark:text-gray-300">b =</span>
+                    <div className="flex items-center flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg font-mono text-sm">
+                      <span className="text-gray-600">b =</span>
                       <div className="flex flex-col items-center">
-                        <span className="border-b border-gray-400 dark:border-gray-500 px-2 pb-0.5 text-[11px]">
-                          <span className="text-emerald-700 dark:text-emerald-300">Moy(+1)</span> − <span className="text-red-600 dark:text-red-400">Moy(−1)</span>
+                        <span className="border-b border-gray-400 px-2 pb-0.5 text-[11px]">
+                          <span className="text-emerald-700">Moy(+1)</span> − <span className="text-red-600">Moy(−1)</span>
                         </span>
                         <span className="pt-0.5 text-gray-500 text-[11px]">2</span>
                       </div>
                       <span className="text-gray-500">=</span>
                       <div className="flex flex-col items-center">
-                        <span className="border-b border-gray-400 dark:border-gray-500 px-2 pb-0.5 text-[11px]">
-                          <span className="text-emerald-700 dark:text-emerald-300">{fmt2(moyPlus)}</span> − <span className="text-red-600 dark:text-red-400">{fmt2(moyMinus)}</span>
+                        <span className="border-b border-gray-400 px-2 pb-0.5 text-[11px]">
+                          <span className="text-emerald-700">{fmt2(moyPlus)}</span> − <span className="text-red-600">{fmt2(moyMinus)}</span>
                         </span>
                         <span className="pt-0.5 text-gray-500 text-[11px]">2</span>
                       </div>
                       <span className="text-gray-500">=</span>
                       <span className={`font-semibold text-base px-3 py-0.5 rounded-lg border ${
-                        effet > 0.3 ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
-                        : effet < -0.3 ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700"
-                        : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+                        effet > 0.3 ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                        : effet < -0.3 ? "bg-red-50 text-red-700 border-red-300"
+                        : "bg-gray-50 text-gray-600 border-gray-200"
                       }`}>
                         {effet > 0 ? "+" : ""}{fmt(effet)}
                       </span>
@@ -475,7 +475,7 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                       const bFromFit = fit.coeffs[termIdx + 1];
                       const diff = Math.abs(bFromFit - effet);
                       return (
-                        <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2 text-[11px] text-amber-700 dark:text-amber-300">
+                        <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-[11px] text-amber-700">
                           <span className="font-semibold">Vérification :</span> coefficient moindres carrés = {bFromFit.toFixed(3)}.
                           {diff < 0.01 ? " ✓ Même résultat (plan orthogonal)." : ` Δ = ${diff.toFixed(3)} (points centraux présents).`}
                         </div>
@@ -491,54 +491,54 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
           <div className="hidden">
           {/* Étape 2 — Moyennes */}
           {moyPlus !== null && (
-            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-3">
                 Étape 2 — Moyennes par niveau
               </p>
               <div className="flex flex-col gap-3">
 
                 {/* Moy(+1) */}
-                <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-2">
+                <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 mb-2">
                     Moy(+1) — essais où {term} = +1
                   </p>
                   <div className="flex flex-wrap gap-1 mb-2">
                     {plusRows.map((r, i) => {
                       const ri = validRows.indexOf(r);
                       return (
-                        <span key={i} className="inline-block bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-mono text-xs px-2 py-0.5 rounded">
+                        <span key={i} className="inline-block bg-emerald-100 text-emerald-800 font-mono text-xs px-2 py-0.5 rounded">
                           E{ri + 1} = {(+r.responses[yKey]).toFixed(2)}
                         </span>
                       );
                     })}
                   </div>
-                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono">
+                  <p className="text-[11px] text-emerald-700 font-mono">
                     = ({plusRows.map(r => (+r.responses[yKey]).toFixed(2)).join(" + ")}) / {plusRows.length}
                   </p>
-                  <p className="text-lg font-semibold font-mono text-emerald-700 dark:text-emerald-300 mt-1">
+                  <p className="text-lg font-semibold font-mono text-emerald-700 mt-1">
                     = {fmt2(moyPlus)}
                   </p>
                 </div>
 
                 {/* Moy(-1) */}
-                <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-red-700 dark:text-red-400 mb-2">
+                <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-red-700 mb-2">
                     Moy(−1) — essais où {term} = −1
                   </p>
                   <div className="flex flex-wrap gap-1 mb-2">
                     {minusRows.map((r, i) => {
                       const ri = validRows.indexOf(r);
                       return (
-                        <span key={i} className="inline-block bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 font-mono text-xs px-2 py-0.5 rounded">
+                        <span key={i} className="inline-block bg-red-100 text-red-800 font-mono text-xs px-2 py-0.5 rounded">
                           E{ri + 1} = {(+r.responses[yKey]).toFixed(2)}
                         </span>
                       );
                     })}
                   </div>
-                  <p className="text-[11px] text-red-700 dark:text-red-400 font-mono">
+                  <p className="text-[11px] text-red-700 font-mono">
                     = ({minusRows.map(r => (+r.responses[yKey]).toFixed(2)).join(" + ")}) / {minusRows.length}
                   </p>
-                  <p className="text-lg font-semibold font-mono text-red-700 dark:text-red-300 mt-1">
+                  <p className="text-lg font-semibold font-mono text-red-700 mt-1">
                     = {fmt2(moyMinus)}
                   </p>
                 </div>
@@ -548,39 +548,39 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
 
           {/* Étape 3 — Formule et résultat */}
           {effet !== null && (
-            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-3">
                 Étape 3 — Calcul de l'effet = coefficient b
               </p>
 
               {/* Formule */}
-              <div className="flex items-center flex-wrap gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <span className="text-sm font-mono text-gray-600 dark:text-gray-300">
+              <div className="flex items-center flex-wrap gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm font-mono text-gray-600">
                   b<sub>{termFactors.map((f,i) => String(i+1 + (termFactors.indexOf(f) > 0 ? termFactors.length : 0))).join("")}</sub> =
                 </span>
                 {/* Fraction */}
                 <div className="flex flex-col items-center text-sm font-mono">
-                  <span className="border-b border-gray-400 dark:border-gray-500 px-3 pb-0.5 text-emerald-700 dark:text-emerald-300">
+                  <span className="border-b border-gray-400 px-3 pb-0.5 text-emerald-700">
                     Moy(+1) − Moy(−1)
                   </span>
                   <span className="pt-0.5 text-gray-500">2</span>
                 </div>
                 <span className="text-sm font-mono text-gray-500">=</span>
                 <div className="flex flex-col items-center text-sm font-mono">
-                  <span className="border-b border-gray-400 dark:border-gray-500 px-3 pb-0.5">
-                    <span className="text-emerald-700 dark:text-emerald-300">{fmt2(moyPlus)}</span>
+                  <span className="border-b border-gray-400 px-3 pb-0.5">
+                    <span className="text-emerald-700">{fmt2(moyPlus)}</span>
                     {" − "}
-                    <span className="text-red-600 dark:text-red-400">{fmt2(moyMinus)}</span>
+                    <span className="text-red-600">{fmt2(moyMinus)}</span>
                   </span>
                   <span className="pt-0.5 text-gray-500">2</span>
                 </div>
                 <span className="text-sm font-mono text-gray-500">=</span>
                 <span className={`inline-block font-mono font-semibold text-base px-4 py-1 rounded-lg border ${
                   effet > 0.5
-                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700"
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-300"
                     : effet < -0.5
-                    ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700"
-                    : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+                    ? "bg-red-50 text-red-700 border-red-300"
+                    : "bg-gray-50 text-gray-600 border-gray-200"
                 }`}>
                   {effet > 0 ? "+" : ""}{fmt(effet)}
                 </span>
@@ -589,10 +589,10 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
               {/* Interprétation */}
               <div className={`rounded-lg px-4 py-3 border-l-4 text-xs leading-relaxed ${
                 Math.abs(effet) < 0.3
-                  ? "bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
+                  ? "bg-gray-50 border-gray-300 text-gray-500"
                   : effet > 0
-                  ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-400 text-indigo-800 dark:text-indigo-300"
-                  : "bg-red-50 dark:bg-red-900/20 border-red-400 text-red-800 dark:text-red-300"
+                  ? "bg-indigo-50 border-indigo-400 text-indigo-800"
+                  : "bg-red-50 border-red-400 text-red-800"
               }`}>
                 {Math.abs(effet) < 0.3 ? (
                   <p>Effet très faible ({fmt(effet)}) → {termFactors.map(f => f.name).join(" × ")} a peu d'influence sur {activeResp?.name || "la réponse"}.</p>
@@ -623,7 +623,7 @@ export default function EffetsPanel({ model, fit, matrix, factors, responses, ac
                 const bFromFit = fit.coeffs[termIdx + 1];
                 const diff = Math.abs(bFromFit - effet);
                 return (
-                  <div className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+                  <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
                     <span className="font-semibold">Vérification :</span> coefficient estimé par moindres carrés = {bFromFit.toFixed(3)}.
                     {diff < 0.01
                       ? " ✓ Les deux méthodes donnent le même résultat (plan orthogonal)."

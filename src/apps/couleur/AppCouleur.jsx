@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
-import { useTheme } from "../../ThemeContext";
 import { useLang } from "../../i18n";
 import { SPECTRUM_LOCUS } from "./spectrumLocus";
 
@@ -68,39 +67,36 @@ const PAD = { l: 48, r: 28, t: 28, b: 48 };
 const PW = W - PAD.l - PAD.r;
 const PH = H - PAD.t - PAD.b;
 
-function useCanvasColors(dark) {
-  return {
-    ink:        dark ? "rgba(240,240,240,0.90)" : "rgba(20,20,20,0.85)",
-    inkStrong:  dark ? "rgba(255,255,255,0.95)" : "rgba(10,10,10,0.90)",
-    inkMid:     dark ? "rgba(200,200,200,0.70)" : "rgba(30,30,30,0.55)",
-    inkLight:   dark ? "rgba(180,180,180,0.45)" : "rgba(0,0,0,0.35)",
-    dotFill:    dark ? "rgba(220,220,220,0.88)" : "rgba(20,20,20,0.85)",
-    dotStroke:  dark ? "#1e293b"                : "white",
-    gridMajor:  dark ? "rgba(255,255,255,0.20)" : "rgba(0,0,0,0.35)",
-    gridMinor:  dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.18)",
-    locus:      dark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.60)",
-    labelBg:    dark ? "rgba(15,23,42,0.85)"    : "rgba(20,20,20,0.82)",
-    labelFg:    dark ? "#e2e8f0"                : "white",
-    planck:     dark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.85)",
-    planckTick: dark ? "rgba(200,200,200,0.40)" : "rgba(0,0,0,0.40)",
-    satLine:    dark ? "rgba(160,160,160,0.55)" : "rgba(20,20,20,0.55)",
-    satDot:     dark ? "rgba(180,180,180,0.75)" : "rgba(20,20,20,0.70)",
-    purpleLine: dark ? "rgba(180,120,210,0.55)" : "rgba(140,100,160,0.50)",
-    macadam:    dark ? "rgba(200,200,200,0.75)" : "rgba(20,20,20,0.80)",
-    wlLabel:    dark ? "rgba(220,220,220,0.88)" : "rgba(20,20,20,0.85)",
-    wlLabelC:   dark ? "rgba(230,160,80,0.90)"  : "rgba(140,60,0,0.85)",
-    reticle:    dark ? "rgba(200,200,200,0.40)" : "rgba(20,20,20,0.45)",
-    reticleDot: dark ? "rgba(180,180,180,0.65)" : "rgba(20,20,20,0.70)",
-    axis:       dark ? "rgba(210,210,210,0.85)" : "rgba(30,30,30,0.90)",
-  };
-}
+const CANVAS_COLORS = {
+  ink:        "rgba(20,20,20,0.85)",
+  inkStrong:  "rgba(10,10,10,0.90)",
+  inkMid:     "rgba(30,30,30,0.55)",
+  inkLight:   "rgba(0,0,0,0.35)",
+  dotFill:    "rgba(20,20,20,0.85)",
+  dotStroke:  "white",
+  gridMajor:  "rgba(0,0,0,0.35)",
+  gridMinor:  "rgba(0,0,0,0.18)",
+  locus:      "rgba(0,0,0,0.60)",
+  labelBg:    "rgba(20,20,20,0.82)",
+  labelFg:    "white",
+  planck:     "rgba(0,0,0,0.85)",
+  planckTick: "rgba(0,0,0,0.40)",
+  satLine:    "rgba(20,20,20,0.55)",
+  satDot:     "rgba(20,20,20,0.70)",
+  purpleLine: "rgba(140,100,160,0.50)",
+  macadam:    "rgba(20,20,20,0.80)",
+  wlLabel:    "rgba(20,20,20,0.85)",
+  wlLabelC:   "rgba(140,60,0,0.85)",
+  reticle:    "rgba(20,20,20,0.45)",
+  reticleDot: "rgba(20,20,20,0.70)",
+  axis:       "rgba(30,30,30,0.90)",
+};
 
 const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant, onHover, userPoints = [], onAddPoint, onMovePoint, showReticle = true, onToggleReticle, showPlanckian = false, onTogglePlanckian, macadamFactor = 0, onSetMacadam, showColorFill = true, onToggleColorFill, onDblClickPoint, onClickPoint, onToggleAllSat, allSatOn = false, annotations = [], onAnnotationsChange }, ref) {
   const canvasRef = useRef(null);
   const [hovered, setHovered] = useState(null);
-  const { dark } = useTheme();
   const { t } = useLang();
-  const C = useCanvasColors(dark);
+  const C = CANVAS_COLORS;
 
   useImperativeHandle(ref, () => ({ getCanvas: () => canvasRef.current }));
   const [view, setView] = useState([0, 0, 0.85, 0.85]);
@@ -844,8 +840,8 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
   };
   const btnActive = {
     ...btnBase,
-    background: dark ? "rgba(255,255,255,0.12)" : "rgba(20,20,20,0.10)",
-    border: `1.5px solid ${dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)"}`,
+    background: "rgba(20,20,20,0.10)",
+    border: "1.5px solid rgba(0,0,0,0.35)",
   };
 
   const [showInfo, setShowInfo] = useState(false);
@@ -890,7 +886,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
         <button
           title={showPlanckian ? "Masquer le locus des corps noirs" : "Afficher le locus des corps noirs (K)"}
           onClick={() => onTogglePlanckian && onTogglePlanckian()}
-          style={{ ...(showPlanckian ? { ...btnActive, border: "1.5px solid rgba(180,80,0,0.6)", background: dark ? "rgba(180,80,0,0.25)" : "rgba(180,80,0,0.12)" } : btnBase), flexDirection: "column", height: 56, gap: 2 }}
+          style={{ ...(showPlanckian ? { ...btnActive, border: "1.5px solid rgba(180,80,0,0.6)", background: "rgba(180,80,0,0.12)" } : btnBase), flexDirection: "column", height: 56, gap: 2 }}
         >
           <svg width="26" height="20" viewBox="0 0 16 16" fill="none">
             <path d="M2 13 Q4 10 6 8 Q9 5 14 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -905,7 +901,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
           onClick={() => onToggleColorFill && onToggleColorFill()}
           style={showColorFill
             ? { ...btnBase, background: "transparent", border: `1px solid var(--border)`, overflow: "hidden" }
-            : { ...btnBase, background: dark ? "rgba(255,255,255,0.07)" : "rgba(200,200,200,0.3)" }}
+            : { ...btnBase, background: "rgba(200,200,200,0.3)" }}
         >
           {showColorFill ? (
             <svg width="50" height="50" viewBox="0 0 28 28" fill="none" style={{ margin: "-6px" }}>
@@ -1034,7 +1030,7 @@ const ChromaticityDiagram = forwardRef(function ChromaticityDiagram({ illuminant
             width={W} height={H}
             style={{
               width: "100%", height: "auto", borderRadius: "0 0 8px 8px", display: "block",
-              background: dark ? "#0f172a" : "#ffffff",
+              background: "#ffffff",
               cursor: panStartRef.current ? "grabbing" : modeRef.current === "draw" ? "crosshair" : modeRef.current === "text" ? "text" : (dragPointRef.current ? "grabbing" : nearPoint ? "grab" : "default"),
             }}
             onMouseMove={handleMouseMove}

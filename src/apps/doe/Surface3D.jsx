@@ -362,7 +362,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
             <div key={lbl} className="flex items-center gap-2">
               <label className="text-xs text-gray-500">{lbl} :</label>
               <select value={val} onChange={e=>set(+e.target.value)}
-                className="text-xs rounded border border-gray-200 dark:border-gray-700 px-2 py-1 bg-white dark:bg-gray-900">
+                className="text-xs rounded border border-gray-200 px-2 py-1 bg-white">
                 {contFactors.map((f,i)=><option key={f.id} value={i}>{f.name||f.id}</option>)}
               </select>
             </div>
@@ -386,7 +386,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
 
       {/* Canvas */}
       <div ref={wrapRef}
-           className="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+           className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50"
            style={{aspectRatio:"4/3",minHeight:"240px"}}>
         <canvas
           ref={canvasRef}
@@ -402,27 +402,27 @@ export default function Surface3D({ model, fit, factors, col, response }) {
         {/* Boutons superposés */}
         <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-10">
           <button onClick={reset} title="Réinitialiser"
-            className="size-7 rounded-md bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-600
-                       flex items-center justify-center text-gray-500 dark:text-gray-300
-                       hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-colors">
+            className="size-7 rounded-md bg-white/80 border border-gray-200
+                       flex items-center justify-center text-gray-500
+                       hover:bg-white shadow-sm transition-colors">
             <ArrowPathIcon className="size-3.5"/>
           </button>
           <button onClick={zoomIn} title="Zoom +"
-            className="size-7 rounded-md bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-600
-                       flex items-center justify-center text-gray-500 dark:text-gray-300
-                       hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-colors">
+            className="size-7 rounded-md bg-white/80 border border-gray-200
+                       flex items-center justify-center text-gray-500
+                       hover:bg-white shadow-sm transition-colors">
             <PlusIcon className="size-3.5"/>
           </button>
           <button onClick={zoomOut} title="Zoom −"
-            className="size-7 rounded-md bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-600
-                       flex items-center justify-center text-gray-500 dark:text-gray-300
-                       hover:bg-white dark:hover:bg-gray-700 shadow-sm transition-colors">
+            className="size-7 rounded-md bg-white/80 border border-gray-200
+                       flex items-center justify-center text-gray-500
+                       hover:bg-white shadow-sm transition-colors">
             <MinusIcon className="size-3.5"/>
           </button>
         </div>
 
         <div className="absolute bottom-2 left-2 text-[9px] text-gray-400
-                        bg-white/75 dark:bg-gray-900/80 rounded px-2 py-1 leading-4 z-10">
+                        bg-white/75 rounded px-2 py-1 leading-4 z-10">
           🖱 Gauche = rotation · Droit = déplacer · Molette = zoom<br/>
           📱 1 doigt = rotation · 2 doigts = zoom &amp; déplacer
         </div>
@@ -430,53 +430,53 @@ export default function Surface3D({ model, fit, factors, col, response }) {
 
       {/* ── Point sélectionné au clic ── */}
       {pickedPoint ? (
-        <div className="rounded-xl border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 px-4 py-3">
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3">
           <div className="flex items-start justify-between gap-3">
             <div className="grid grid-cols-3 gap-x-6 gap-y-1 text-xs flex-1">
               <div>
-                <span className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                <span className="text-[10px] uppercase tracking-wide text-gray-400">
                   {fa.name||fa.id}
                 </span>
-                <p className="font-mono font-semibold text-indigo-700 dark:text-indigo-300">
+                <p className="font-mono font-semibold text-indigo-700">
                   {pickedPoint.realX}{fa.unit?` ${fa.unit}`:""}
                   <span className="font-normal text-gray-400 ml-1">({pickedPoint.c1.toFixed(2)})</span>
                 </p>
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                <span className="text-[10px] uppercase tracking-wide text-gray-400">
                   {fb.name||fb.id}
                 </span>
-                <p className="font-mono font-semibold text-indigo-700 dark:text-indigo-300">
+                <p className="font-mono font-semibold text-indigo-700">
                   {pickedPoint.realY}{fb.unit?` ${fb.unit}`:""}
                   <span className="font-normal text-gray-400 ml-1">({pickedPoint.c2.toFixed(2)})</span>
                 </p>
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                <span className="text-[10px] uppercase tracking-wide text-gray-400">
                   {response?.name||"Y"} prédit
                 </span>
-                <p className="font-mono font-semibold text-amber-600 dark:text-amber-400">
+                <p className="font-mono font-semibold text-amber-600">
                   {pickedPoint.z.toFixed(2)}{response?.unit?` ${response.unit}`:""}
                 </p>
               </div>
             </div>
             <button onClick={()=>setPickedPoint(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors mt-0.5 shrink-0">
+              className="text-gray-400 hover:text-gray-600 transition-colors mt-0.5 shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
                 <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
               </svg>
             </button>
           </div>
-          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5">
+          <p className="text-[10px] text-gray-400 mt-1.5">
             Cliquez n'importe où sur la surface pour lire les coordonnées
           </p>
         </div>
       ) : (
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center">
+        <p className="text-[10px] text-gray-400 text-center">
           👆 Cliquez sur la surface pour obtenir les coordonnées d'un point
         </p>
       )}
-      <div className="flex flex-wrap gap-4 text-[11px] text-gray-500 dark:text-gray-400">
+      <div className="flex flex-wrap gap-4 text-[11px] text-gray-500">
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-4 h-0.5 bg-indigo-500 rounded"/>
           X : {fa.name||fa.id} [{toReal(fa,-1)} → {toReal(fa,1)}{fa.unit?` ${fa.unit}`:""}]

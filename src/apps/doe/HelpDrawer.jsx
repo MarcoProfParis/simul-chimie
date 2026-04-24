@@ -70,7 +70,7 @@ export function HelpButton({ topic, label, size = "sm", className = "" }) {
       onClick={(e) => { e.stopPropagation(); ctx.openHelp(topic); }}
       title={`${t("doe.help")} : ${topicTitle}`}
       className={`inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-600
-        dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors ${className}`}
+        transition-colors ${className}`}
     >
       <QuestionMarkCircleIcon className={sizeCls} />
       {label && <span className={`${sizeCls} font-medium`}>{label}</span>}
@@ -82,14 +82,14 @@ export function HelpButton({ topic, label, size = "sm", className = "" }) {
 function Section({ icon: Icon, title, color = "indigo", children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   const colors = {
-    indigo: "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20",
-    emerald: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20",
-    amber: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20",
-    rose: "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20",
-    blue: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20",
+    indigo: "text-indigo-600 bg-indigo-50",
+    emerald: "text-emerald-600 bg-emerald-50",
+    amber: "text-amber-600 bg-amber-50",
+    rose: "text-rose-600 bg-rose-50",
+    blue: "text-blue-600 bg-blue-50",
   };
   return (
-    <div className="border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden mb-3">
+    <div className="border border-gray-100 rounded-xl overflow-hidden mb-3">
       <button
         onClick={() => setOpen(v => !v)}
         className={`w-full flex items-center gap-2 px-4 py-3 text-left text-sm font-semibold
@@ -102,7 +102,7 @@ function Section({ icon: Icon, title, color = "indigo", children, defaultOpen = 
           : <ChevronRightIcon className="size-4 shrink-0" />}
       </button>
       {open && (
-        <div className="px-4 py-3 bg-white dark:bg-gray-900 text-sm text-gray-700 dark:text-gray-300 space-y-2">
+        <div className="px-4 py-3 bg-white text-sm text-gray-700 space-y-2">
           {children}
         </div>
       )}
@@ -113,9 +113,9 @@ function Section({ icon: Icon, title, color = "indigo", children, defaultOpen = 
 // ─── Bloc formule ─────────────────────────────────────────────────────────────
 function Formula({ children, label }) {
   return (
-    <div className="my-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-2">
+    <div className="my-2 rounded-lg bg-gray-50 border border-gray-200 px-4 py-2">
       {label && <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">{label}</p>}
-      <p className="font-mono text-sm text-indigo-700 dark:text-indigo-300 leading-relaxed">{children}</p>
+      <p className="font-mono text-sm text-indigo-700 leading-relaxed">{children}</p>
     </div>
   );
 }
@@ -123,8 +123,8 @@ function Formula({ children, label }) {
 // ─── Bloc exemple numérique ───────────────────────────────────────────────────
 function NumExample({ title, children }) {
   return (
-    <div className="rounded-lg border-l-4 border-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-xs">
-      <p className="font-semibold text-amber-700 dark:text-amber-300 mb-1">📊 {title}</p>
+    <div className="rounded-lg border-l-4 border-amber-400 bg-amber-50 px-3 py-2 text-xs">
+      <p className="font-semibold text-amber-700 mb-1">📊 {title}</p>
       {children}
     </div>
   );
@@ -135,8 +135,8 @@ function Verdict({ ok, children }) {
   return (
     <div className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs
       ${ok
-        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300"
-        : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300"}`}>
+        ? "bg-emerald-50 text-emerald-800"
+        : "bg-red-50 text-red-800"}`}>
       {ok
         ? <CheckCircleIcon className="size-4 shrink-0 mt-0.5" />
         : <ExclamationTriangleIcon className="size-4 shrink-0 mt-0.5" />}
@@ -155,7 +155,7 @@ const HELP_CONTENT = {
     render: () => (
       <div className="space-y-1">
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           L'ANOVA décompose la variabilité totale des mesures en deux parties :
           ce qui est expliqué par le modèle (régression) et ce qui ne l'est pas (résidus).
         </p>
@@ -165,22 +165,22 @@ const HELP_CONTENT = {
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="bg-indigo-50 dark:bg-indigo-900/30">
+                <tr className="bg-indigo-50">
                   <th className="text-left px-2 py-1.5 font-semibold">Ligne</th>
                   <th className="text-left px-2 py-1.5 font-semibold">Signification</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-gray-100">
                 <tr>
-                  <td className="px-2 py-2 font-semibold text-indigo-600 dark:text-indigo-300 whitespace-nowrap">Régression</td>
+                  <td className="px-2 py-2 font-semibold text-indigo-600 whitespace-nowrap">Régression</td>
                   <td className="px-2 py-2">Variabilité <strong>expliquée</strong> par le modèle — ce que les facteurs parviennent à prédire.</td>
                 </tr>
                 <tr>
-                  <td className="px-2 py-2 font-semibold text-rose-600 dark:text-rose-300 whitespace-nowrap">Résidus</td>
+                  <td className="px-2 py-2 font-semibold text-rose-600 whitespace-nowrap">Résidus</td>
                   <td className="px-2 py-2">Variabilité <strong>inexpliquée</strong> — erreur expérimentale + manque d'ajustement du modèle.</td>
                 </tr>
                 <tr>
-                  <td className="px-2 py-2 font-semibold text-gray-600 dark:text-gray-300 whitespace-nowrap">Total</td>
+                  <td className="px-2 py-2 font-semibold text-gray-600 whitespace-nowrap">Total</td>
                   <td className="px-2 py-2">Variabilité totale = Régression + Résidus. Toujours : SC<sub>T</sub> = SC<sub>R</sub> + SC<sub>E</sub>.</td>
                 </tr>
               </tbody>
@@ -267,7 +267,7 @@ const HELP_CONTENT = {
           </div>
           <NumExample title="Exemple de votre tableau">
             <p>Prob &gt; F = 0.878 → 87.8% de probabilité que ces résultats soient dus au hasard.</p>
-            <p className="mt-1 font-semibold text-red-700 dark:text-red-400">
+            <p className="mt-1 font-semibold text-red-700">
               Conclusion : ce modèle à 5 termes avec seulement 7 essais est sur-paramétré.
               Il n'est pas statistiquement valide.
             </p>
@@ -292,9 +292,9 @@ const HELP_CONTENT = {
         </Section>
 
         {/* Conseil global */}
-        <div className="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 px-4 py-3 text-xs">
-          <p className="font-semibold text-indigo-700 dark:text-indigo-300 mb-1">🎯 Règle de décision globale</p>
-          <ol className="list-decimal list-inside space-y-1 text-gray-700 dark:text-gray-300">
+        <div className="rounded-xl bg-indigo-50 border border-indigo-200 px-4 py-3 text-xs">
+          <p className="font-semibold text-indigo-700 mb-1">🎯 Règle de décision globale</p>
+          <ol className="list-decimal list-inside space-y-1 text-gray-700">
             <li>Vérifier que <strong>Prob&gt;F &lt; 0.05</strong> (modèle significatif)</li>
             <li>Vérifier que <strong>R² ajusté ≥ 0.80</strong> (bon ajustement)</li>
             <li>Vérifier que les <strong>résidus sont bien répartis</strong> (pas de structure)</li>
@@ -311,7 +311,7 @@ const HELP_CONTENT = {
     icon: BeakerIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Un résidu est l'écart entre la valeur mesurée et la valeur prédite par le modèle.
           Leur analyse permet de valider les hypothèses du modèle.
         </p>
@@ -335,7 +335,7 @@ const HELP_CONTENT = {
             <p>SC_E = 83.79 · dl_E = 1 (n=7, p=5)</p>
             <p>CM_E = 83.79 / 1 = 83.79</p>
             <p>s = √83.79 ≈ 9.15</p>
-            <p className="mt-1 text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-gray-600">
               Interprétation : le modèle se trompe en moyenne de ±9.15 unités.
               Un résidu normé |e*| = |e| / 9.15 &gt; 2 signale un point aberrant.
             </p>
@@ -347,13 +347,13 @@ const HELP_CONTENT = {
         </Section>
 
         <Section icon={LightBulbIcon} title="Lecture du graphe Résidus vs Ŷ" color="blue" defaultOpen>
-          <p className="font-semibold text-emerald-700 dark:text-emerald-400">✓ Bon modèle :</p>
+          <p className="font-semibold text-emerald-700">✓ Bon modèle :</p>
           <ul className="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
             <li>Points dispersés <strong>aléatoirement</strong> autour de zéro</li>
             <li>Aucune tendance (pas de courbe, pas de cône)</li>
             <li>Tous les résidus normés entre −2 et +2</li>
           </ul>
-          <p className="font-semibold text-red-700 dark:text-red-400 mt-2">✗ Problèmes :</p>
+          <p className="font-semibold text-red-700 mt-2">✗ Problèmes :</p>
           <ul className="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
             <li><strong>Tendance courbe</strong> → modèle linéaire insuffisant, ajouter des termes quadratiques</li>
             <li><strong>Cône (variance croissante)</strong> → transformer la réponse (ex: logarithme)</li>
@@ -375,11 +375,11 @@ const HELP_CONTENT = {
 
         <Section icon={LightBulbIcon} title="Validation mathématique vs statistique" color="amber">
           <div className="space-y-2 text-xs">
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-2">
+            <div className="bg-blue-50 rounded p-2">
               <p className="font-semibold">Validation mathématique</p>
               <p>Résidus répartis de manière homogène autour de zéro (graphique).</p>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-900/20 rounded p-2">
+            <div className="bg-purple-50 rounded p-2">
               <p className="font-semibold">Validation statistique</p>
               <p>R² ajusté élevé + Prob&gt;F faible (tableau ANOVA).</p>
             </div>
@@ -396,7 +396,7 @@ const HELP_CONTENT = {
     icon: BookOpenIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Le diagramme de Pareto classe les effets par ordre d'importance absolue,
           et distingue les effets significatifs des effets négligeables.
         </p>
@@ -411,7 +411,7 @@ const HELP_CONTENT = {
           </ul>
 
           {/* Schéma explicatif de la ligne rouge */}
-          <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
             <svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg" className="w-full">
               {/* Fond */}
               <rect width="280" height="130" fill="#f8fafc"/>
@@ -466,13 +466,13 @@ const HELP_CONTENT = {
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="bg-amber-50 dark:bg-amber-900/30">
+                <tr className="bg-amber-50">
                   <th className="text-left px-2 py-1.5">Terme</th>
                   <th className="text-left px-2 py-1.5">Type</th>
                   <th className="text-left px-2 py-1.5">Signification</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-gray-100">
                 <tr>
                   <td className="px-2 py-1.5 font-mono">b₀</td>
                   <td className="px-2 py-1.5">Constante</td>
@@ -516,7 +516,7 @@ const HELP_CONTENT = {
     icon: BookOpenIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Les courbes isoréponses (ou courbes de niveau) représentent graphiquement
           les valeurs prédites par le modèle en fonction de deux facteurs simultanément.
         </p>
@@ -546,15 +546,15 @@ const HELP_CONTENT = {
 
         <Section icon={CalculatorIcon} title="Interprétation de la forme des courbes" color="amber">
           <div className="space-y-2 text-xs">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded p-2">
+            <div className="bg-gray-50 rounded p-2">
               <p className="font-semibold">Courbes parallèles (droites)</p>
               <p>→ Modèle linéaire sans interaction. Les deux facteurs agissent indépendamment.</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded p-2">
+            <div className="bg-gray-50 rounded p-2">
               <p className="font-semibold">Courbes inclinées non parallèles</p>
               <p>→ Interaction entre les facteurs. L'effet de l'un dépend du niveau de l'autre.</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded p-2">
+            <div className="bg-gray-50 rounded p-2">
               <p className="font-semibold">Courbes concentriques / elliptiques</p>
               <p>→ Effets quadratiques. Il existe un optimum (maximum ou minimum) dans le domaine.</p>
             </div>
@@ -581,7 +581,7 @@ const HELP_CONTENT = {
     icon: CalculatorIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Le modèle polynomial relie la réponse Y aux facteurs via des coefficients estimés
           par la méthode des moindres carrés.
         </p>
@@ -626,7 +626,7 @@ const HELP_CONTENT = {
     icon: BeakerIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Les facteurs sont les variables que l'on fait varier dans l'expérience.
           Bien les définir est la première étape cruciale d'un plan d'expériences.
         </p>
@@ -645,11 +645,11 @@ const HELP_CONTENT = {
           <Formula label="Nombre d'essais">N = 2ⁿ  (n = nombre de facteurs)</Formula>
           <div className="overflow-x-auto mt-2">
             <table className="text-xs w-full border-collapse">
-              <thead><tr className="bg-blue-50 dark:bg-blue-900/30">
+              <thead><tr className="bg-blue-50">
                 <th className="px-2 py-1">Facteurs (n)</th>
                 <th className="px-2 py-1">Essais (2ⁿ)</th>
               </tr></thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-gray-100">
                 {[[2,4],[3,8],[4,16],[5,32]].map(([n,e]) => (
                   <tr key={n}><td className="px-2 py-1 text-center">{n}</td><td className="px-2 py-1 text-center">{e}</td></tr>
                 ))}
@@ -667,7 +667,7 @@ const HELP_CONTENT = {
     icon: CalculatorIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Le modèle définit la forme de l'équation qui relie les facteurs à la réponse.
           Choisir un modèle trop simple ou trop complexe nuit à la qualité de l'analyse.
         </p>
@@ -680,9 +680,9 @@ const HELP_CONTENT = {
               { name: "Quadratique", eq: "Ŷ = b₀ + b₁X₁ + b₂X₂ + b₁₂X₁X₂ + b₁₁X₁²", note: "Ajoute la courbure. Nécessite des points centraux." },
               { name: "Cubique", eq: "+ termes x³", note: "Très complexe. Nécessite beaucoup d'essais." },
             ].map(m => (
-              <div key={m.name} className="bg-gray-50 dark:bg-gray-800 rounded p-2">
-                <p className="font-semibold text-indigo-700 dark:text-indigo-300">{m.name}</p>
-                <p className="font-mono text-indigo-600 dark:text-indigo-400 text-[11px] my-0.5">{m.eq}</p>
+              <div key={m.name} className="bg-gray-50 rounded p-2">
+                <p className="font-semibold text-indigo-700">{m.name}</p>
+                <p className="font-mono text-indigo-600 text-[11px] my-0.5">{m.eq}</p>
                 <p className="text-gray-500">{m.note}</p>
               </div>
             ))}
@@ -710,7 +710,7 @@ const HELP_CONTENT = {
     icon: CalculatorIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Les coefficients bᵢ du modèle s'obtiennent en calculant l'effet de chaque
           facteur ou interaction sur la réponse.
         </p>
@@ -733,7 +733,7 @@ const HELP_CONTENT = {
           <Formula label="Signe de l'interaction X₁·X₂">
             {"signe(X₁·X₂) = signe(X₁) × signe(X₂)"}
           </Formula>
-          <div className="mt-2 text-xs font-mono bg-gray-50 dark:bg-gray-800 rounded p-2 space-y-0.5">
+          <div className="mt-2 text-xs font-mono bg-gray-50 rounded p-2 space-y-0.5">
             <p>(+1) × (+1) = +1</p>
             <p>(+1) × (−1) = −1</p>
             <p>(−1) × (+1) = −1</p>
@@ -763,7 +763,7 @@ const HELP_CONTENT = {
     icon: BeakerIcon,
     render: () => (
       <div className="space-y-1">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        <p className="text-xs text-gray-500 mb-3">
           Le graphique Q-Q (Quantile-Quantile) permet de vérifier que les résidus
           suivent une loi normale, hypothèse nécessaire pour que les tests
           statistiques (Student, Fisher) soient valides.
@@ -786,20 +786,20 @@ const HELP_CONTENT = {
 
         <Section icon={LightBulbIcon} title="Lecture du graphique" color="blue" defaultOpen>
           <div className="space-y-2 text-xs">
-            <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded p-2">
-              <p className="font-semibold text-emerald-700 dark:text-emerald-400">✓ Normalité respectée</p>
+            <div className="bg-emerald-50 rounded p-2">
+              <p className="font-semibold text-emerald-700">✓ Normalité respectée</p>
               <p>Les points s'alignent sur la droite rouge (y = x). Légères déviations aux extrêmes sont normales.</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded p-2">
+            <div className="bg-gray-50 rounded p-2">
               <p className="font-semibold">Forme en S (queues épaisses)</p>
               <p>Distribution leptokurtique — valeurs extrêmes plus fréquentes que prévu. Souvent sans conséquence grave.</p>
             </div>
-            <div className="bg-amber-50 dark:bg-amber-900/20 rounded p-2">
-              <p className="font-semibold text-amber-700 dark:text-amber-400">△ Courbe asymétrique</p>
+            <div className="bg-amber-50 rounded p-2">
+              <p className="font-semibold text-amber-700">△ Courbe asymétrique</p>
               <p>Distribution asymétrique. Peut nécessiter une transformation de la réponse (log, racine carrée...).</p>
             </div>
-            <div className="bg-red-50 dark:bg-red-900/20 rounded p-2">
-              <p className="font-semibold text-red-700 dark:text-red-400">✗ Points très isolés (en rouge)</p>
+            <div className="bg-red-50 rounded p-2">
+              <p className="font-semibold text-red-700">✗ Points très isolés (en rouge)</p>
               <p>Valeurs aberrantes (outliers). Vérifier l'expérience correspondante pour une erreur de saisie ou de manipulation.</p>
             </div>
           </div>
@@ -817,7 +817,7 @@ const HELP_CONTENT = {
               ["É", "Égalité des variances", "Résidus vs Ŷ sans cône"],
             ].map(([letter, name, desc]) => (
               <div key={letter} className="flex gap-2">
-                <span className="font-bold w-4 shrink-0 text-indigo-600 dark:text-indigo-400">{letter}</span>
+                <span className="font-bold w-4 shrink-0 text-indigo-600">{letter}</span>
                 <span><strong>{name}</strong> — {desc}</span>
               </div>
             ))}
@@ -847,7 +847,7 @@ function HelpDrawer({ open, topic, onClose }) {
       {/* Backdrop */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40 backdrop-blur-[1px]"
+          className="fixed inset-0 bg-black/20 z-40 backdrop-blur-[1px]"
           onClick={onClose}
         />
       )}
@@ -855,24 +855,24 @@ function HelpDrawer({ open, topic, onClose }) {
       {/* Panneau */}
       <div
         className={`fixed top-0 right-0 h-full w-full sm:w-[420px] max-w-[100vw] z-50
-          bg-white dark:bg-gray-950 shadow-2xl border-l border-gray-200 dark:border-gray-800
+          bg-white shadow-2xl border-l border-gray-200
           flex flex-col transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Header */}
-        <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800 bg-indigo-50 dark:bg-indigo-950/40">
-          <div className="size-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
-            <Icon className="size-5 text-indigo-600 dark:text-indigo-400" />
+        <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 bg-indigo-50">
+          <div className="size-9 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
+            <Icon className="size-5 text-indigo-600" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 mb-0.5">{t("doe.help")}</p>
-            <h2 className="text-sm font-bold text-gray-900 dark:text-white leading-snug">
+            <h2 className="text-sm font-bold text-gray-900 leading-snug">
               {titleText}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="size-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
+            className="size-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0"
           >
             <XMarkIcon className="size-5" />
           </button>
@@ -886,7 +886,7 @@ function HelpDrawer({ open, topic, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
           <p className="text-[10px] text-gray-400 text-center">
             Basé sur le référentiel BTS Métiers de la Chimie · Plans d'expériences
           </p>
