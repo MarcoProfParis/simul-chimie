@@ -1193,11 +1193,11 @@ function PlanFactorielInner() {
       {part > 0 && <nav aria-label="Progression" className="mb-6">
         <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">
           {[
-            { n: 1, id: "01", l: `${t("doe.factors")} & ${t("doe.responses")}` },
+            { n: 1, id: "01", l: "Start" },
             { n: 2, id: "02", l: t("doe.matrix") },
             { n: 3, id: "03", l: t("doe.interactionGraphs") },
             { n: 4, id: "04", l: t("doe.model") },
-            { n: 5, id: "05", l: t("doe.effects") },
+            { n: 5, id: "05", l: t("doe.nav.validate") },
           ].map((s, i, arr) => {
             const status = part > s.n ? "complete" : part === s.n ? "current" : "upcoming";
             return (
