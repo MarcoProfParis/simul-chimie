@@ -1847,9 +1847,9 @@ function PlanFactorielInner() {
         const resetModelTo = (id) => setModels(ms => ms.map(m => m.id === id ? { ...m, terms: [...modelDefault], preset: "default" } : m));
 
         const modelColors = [
-          { border: "border-indigo-500", bg: "bg-indigo-50", text: "text-indigo-700", tab: "bg-indigo-600", dot: "bg-indigo-500" },
-          { border: "border-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", tab: "bg-emerald-600", dot: "bg-emerald-500" },
-          { border: "border-amber-500", bg: "bg-amber-50", text: "text-amber-700", tab: "bg-amber-500", dot: "bg-amber-500" },
+          { border: "border-indigo-500", bg: "bg-indigo-50", text: "text-indigo-700", tab: "bg-indigo-600", dot: "bg-indigo-500", gradient: "linear-gradient(to right, #e0e7ff, #6366f1, #3730a3)", colorRamp: [[224,231,255],[55,48,163]] },
+          { border: "border-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", tab: "bg-emerald-600", dot: "bg-emerald-500", gradient: "linear-gradient(to right, #d1fae5, #10b981, #065f46)", colorRamp: [[209,250,229],[5,150,105]] },
+          { border: "border-amber-500", bg: "bg-amber-50", text: "text-amber-700", tab: "bg-amber-500", dot: "bg-amber-500", gradient: "linear-gradient(to right, #fef3c7, #f59e0b, #92400e)", colorRamp: [[254,243,199],[146,64,14]] },
         ];
 
         return (
@@ -2055,9 +2055,9 @@ function PlanFactorielInner() {
         ];
 
         const modelColors = [
-          { border: "border-indigo-500", bg: "bg-indigo-50", text: "text-indigo-600", badge: "bg-indigo-100 text-indigo-700", dot: "bg-indigo-500" },
-          { border: "border-emerald-500", bg: "bg-emerald-50", text: "text-emerald-600", badge: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500" },
-          { border: "border-amber-500", bg: "bg-amber-50", text: "text-amber-600", badge: "bg-amber-100 text-amber-700", dot: "bg-amber-500" },
+          { border: "border-indigo-500", bg: "bg-indigo-50", text: "text-indigo-600", badge: "bg-indigo-100 text-indigo-700", dot: "bg-indigo-500", gradient: "linear-gradient(to right, #e0e7ff, #6366f1, #3730a3)", colorRamp: [[224,231,255],[55,48,163]] },
+          { border: "border-emerald-500", bg: "bg-emerald-50", text: "text-emerald-600", badge: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500", gradient: "linear-gradient(to right, #d1fae5, #10b981, #065f46)", colorRamp: [[209,250,229],[5,150,105]] },
+          { border: "border-amber-500", bg: "bg-amber-50", text: "text-amber-600", badge: "bg-amber-100 text-amber-700", dot: "bg-amber-500", gradient: "linear-gradient(to right, #fef3c7, #f59e0b, #92400e)", colorRamp: [[254,243,199],[146,64,14]] },
         ];
 
         const activeResp = responses[part4Response] || responses[0];

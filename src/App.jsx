@@ -327,7 +327,19 @@ function TopNav({ categoryId, appId, setCategoryId, setAppId, expanded, setExpan
           ))}
         </div>
 
-{/* ── Hamburger mobile ── */}
+{/* ── Badge branche Git (masqué sur main) ── */}
+        {__GIT_BRANCH__ !== "main" && (
+          <div style={{
+            marginLeft: 8, padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap",
+            background: "rgba(234,179,8,0.12)", border: "1px solid rgba(234,179,8,0.35)",
+            color: "#ca8a04", fontSize: 10, fontWeight: 700,
+            fontFamily: "monospace", letterSpacing: "0.02em",
+          }}>
+            ⎇ {__GIT_BRANCH__}
+          </div>
+        )}
+
+        {/* ── Hamburger mobile ── */}
         {isMobile && (
           <button
             onClick={() => setMobileOpen(o => !o)}

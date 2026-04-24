@@ -4,6 +4,8 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { ArrowPathIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
+import { useLang } from "../../i18n";
+import { isQuadPure, quadPureTerm } from "./modelUtils.js";
 
 function getColor(t) {
   const stops = [[0,[30,80,160]],[0.25,[30,180,180]],[0.5,[50,180,60]],[0.75,[220,200,30]],[1,[210,50,30]]];
@@ -27,6 +29,7 @@ function project(x, y, z, rotX, rotY, zoom, cx, cy, panX, panY) {
 const INIT = { rotX:0.42, rotY:0.58, zoom:1.0, panX:0, panY:0 };
 
 export default function Surface3D({ model, fit, factors, col, response }) {
+  const { t } = useLang();
   const canvasRef = useRef(null);
   const wrapRef   = useRef(null);
   const stateRef  = useRef({ ...INIT, dragging:false, panning:false, lastX:0, lastY:0, lastDist:null, lastMidX:0, lastMidY:0 });
@@ -50,8 +53,8 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     let y = fit.coeffs[0];
     model.terms.forEach((t, i) => {
       let val;
-      // Terme quadratique pur : encodé id + "2" (ex: "X12" = X1²)
-      const quadFactor = factors.find(fac => t === fac.id + "2");
+      // Terme quadratique pur — même logique que modelUtils.isQuadPure / quadPureTerm
+      const quadFactor = isQuadPure(t, factors) ? factors.find(fac => t === quadPureTerm(fac.id)) : null;
       if (quadFactor) {
         val = (coded[quadFactor.id] ?? 0) ** 2;
       } else {
@@ -99,7 +102,8 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     const zR=zMax-zMin||1;
     // Mémoriser la grille pour le hit-test au clic
     gridRef.current = { grid, zMin, zR, GRID, rotX, rotY, zoom, panX, panY, W, H };
-    const toW=(i,j)=>({x:-1+2*i/GRID, y:-((grid[i][j]-zMin)/zR-0.5), z:-1+2*j/GRID});
+    // zMin → y=+0.5 (plancher), zMax → y=−1.45 (pointe de la flèche Z)
+    const toW=(i,j)=>({x:-1+2*i/GRID, y:0.5-((grid[i][j]-zMin)/zR)*1.95, z:-1+2*j/GRID});
 
     // Grilles des 3 plans — même N subdivisions, même pas 2/N dans les 3 directions
     // Sol XZ : X∈[−1,+1] × Z∈[−1,+1] → N×N cases, pas = 2/N
@@ -183,7 +187,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     // Graduations Z — réparties sur [+0.5, −0.5] (zone de la surface)
     ctx.strokeStyle="rgba(100,120,160,0.4)";ctx.lineWidth=0.7;
     [0,0.25,0.5,0.75,1].forEach(t=>{
-      const p=proj(-1,-(t-0.5),-1);
+      const p=proj(-1,0.5-t*1.95,-1);
       ctx.fillStyle="#8899bb";ctx.font="9px monospace";ctx.textAlign="right";
       ctx.fillText((zMin+t*zR).toFixed(1),p.sx-6,p.sy+3);
       gl(-1,-(t-0.5),-1,-1.07,-(t-0.5),-1);
@@ -325,7 +329,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     for (let i = 0; i <= GRID; i++) {
       for (let j = 0; j <= GRID; j++) {
         const xw = -1 + 2*i/GRID;
-        const yw = -((grid[i][j]-zMin)/zR - 0.5);
+        const yw = 0.5 - ((grid[i][j]-zMin)/zR) * 1.95;
         const zw = -1 + 2*j/GRID;
         const p = project(xw, yw, zw, rotX, rotY, zoom, cx, cy, panX, panY);
         const dist = (p.sx - clickX)**2 + (p.sy - clickY)**2;
@@ -345,7 +349,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
   };
 
   if(!fa||!fb||!fit) return(
-    <div className="text-sm text-gray-400 p-4">Besoin d'au moins 2 facteurs continus et un modèle calculé.</div>
+    <div className="text-sm text-gray-400 p-4">{t("doe.surface.needFactors")}</div>
   );
 
   const toReal=(f,v)=>{
@@ -358,7 +362,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
       {/* Sélecteurs si > 2 facteurs */}
       {contFactors.length>2&&(
         <div className="flex flex-wrap gap-3">
-          {[["Axe X",f1Idx,setF1Idx],["Axe Y",f2Idx,setF2Idx]].map(([lbl,val,set])=>(
+          {[[t("doe.surface.xAxis"),f1Idx,setF1Idx],[t("doe.surface.yAxis"),f2Idx,setF2Idx]].map(([lbl,val,set])=>(
             <div key={lbl} className="flex items-center gap-2">
               <label className="text-xs text-gray-500">{lbl} :</label>
               <select value={val} onChange={e=>set(+e.target.value)}
@@ -373,7 +377,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
       {/* Facteurs fixes */}
       {contFactors.filter(f=>f.id!==fa.id&&f.id!==fb.id).map(f=>(
         <div key={f.id} className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 w-24 truncate">{f.name||f.id} fixé :</span>
+          <span className="text-xs text-gray-500 w-24 truncate">{f.name||f.id} {t("doe.surface.fixedAt")} :</span>
           <input type="range" min="-1" max="1" step="0.1"
             value={fixedVals[f.id]??0}
             onChange={e=>setFixedVals(v=>({...v,[f.id]:+e.target.value}))}
@@ -423,8 +427,8 @@ export default function Surface3D({ model, fit, factors, col, response }) {
 
         <div className="absolute bottom-2 left-2 text-[9px] text-gray-400
                         bg-white/75 rounded px-2 py-1 leading-4 z-10">
-          🖱 Gauche = rotation · Droit = déplacer · Molette = zoom<br/>
-          📱 1 doigt = rotation · 2 doigts = zoom &amp; déplacer
+          {t("doe.surface.hintMouse")}<br/>
+          {t("doe.surface.hintTouch")}
         </div>
       </div>
 
@@ -453,7 +457,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
               </div>
               <div>
                 <span className="text-[10px] uppercase tracking-wide text-gray-400">
-                  {response?.name||"Y"} prédit
+                  {response?.name||"Y"} {t("doe.surface.predicted")}
                 </span>
                 <p className="font-mono font-semibold text-amber-600">
                   {pickedPoint.z.toFixed(2)}{response?.unit?` ${response.unit}`:""}
@@ -468,12 +472,12 @@ export default function Surface3D({ model, fit, factors, col, response }) {
             </button>
           </div>
           <p className="text-[10px] text-gray-400 mt-1.5">
-            Cliquez n'importe où sur la surface pour lire les coordonnées
+            {t("doe.surface.clickToRead")}
           </p>
         </div>
       ) : (
         <p className="text-[10px] text-gray-400 text-center">
-          👆 Cliquez sur la surface pour obtenir les coordonnées d'un point
+          {t("doe.surface.clickHint")}
         </p>
       )}
       <div className="flex flex-wrap gap-4 text-[11px] text-gray-500">
