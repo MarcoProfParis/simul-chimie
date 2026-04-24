@@ -102,7 +102,8 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     const zR=zMax-zMin||1;
     // Mémoriser la grille pour le hit-test au clic
     gridRef.current = { grid, zMin, zR, GRID, rotX, rotY, zoom, panX, panY, W, H };
-    const toW=(i,j)=>({x:-1+2*i/GRID, y:-((grid[i][j]-zMin)/zR-0.5), z:-1+2*j/GRID});
+    // zMin → y=+0.5 (plancher), zMax → y=−1.45 (pointe de la flèche Z)
+    const toW=(i,j)=>({x:-1+2*i/GRID, y:0.5-((grid[i][j]-zMin)/zR)*1.95, z:-1+2*j/GRID});
 
     // Grilles des 3 plans — même N subdivisions, même pas 2/N dans les 3 directions
     // Sol XZ : X∈[−1,+1] × Z∈[−1,+1] → N×N cases, pas = 2/N
@@ -186,7 +187,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     // Graduations Z — réparties sur [+0.5, −0.5] (zone de la surface)
     ctx.strokeStyle="rgba(100,120,160,0.4)";ctx.lineWidth=0.7;
     [0,0.25,0.5,0.75,1].forEach(t=>{
-      const p=proj(-1,-(t-0.5),-1);
+      const p=proj(-1,0.5-t*1.95,-1);
       ctx.fillStyle="#8899bb";ctx.font="9px monospace";ctx.textAlign="right";
       ctx.fillText((zMin+t*zR).toFixed(1),p.sx-6,p.sy+3);
       gl(-1,-(t-0.5),-1,-1.07,-(t-0.5),-1);
@@ -328,7 +329,7 @@ export default function Surface3D({ model, fit, factors, col, response }) {
     for (let i = 0; i <= GRID; i++) {
       for (let j = 0; j <= GRID; j++) {
         const xw = -1 + 2*i/GRID;
-        const yw = -((grid[i][j]-zMin)/zR - 0.5);
+        const yw = 0.5 - ((grid[i][j]-zMin)/zR) * 1.95;
         const zw = -1 + 2*j/GRID;
         const p = project(xw, yw, zw, rotX, rotY, zoom, cx, cy, panX, panY);
         const dist = (p.sx - clickX)**2 + (p.sy - clickY)**2;
