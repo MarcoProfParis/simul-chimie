@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useTheme } from "../../ThemeContext";
 import { useLang } from "../../i18n";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { EXAMPLE_FILES } from "./exampleFiles";
@@ -47,7 +46,6 @@ import ExcelImportModal from "./ExcelImportModal.jsx";
 const DEFAULT_RESPONSES = [{ id: "Y1", name: "Réponse 1", unit: "" }];
 
 function PlanFactorielInner() {
-  const { theme } = useTheme();
   const { t } = useLang();
   void ChevronDownIcon;
 
