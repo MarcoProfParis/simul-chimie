@@ -138,6 +138,39 @@ export function formatTermHTML(t, factors) {
   return s;
 }
 
+// ─── Formatage avec noms de facteurs ─────────────────────────────────────────
+// Variantes qui ajoutent "(Nom du facteur)" après la notation Xi
+
+export function formatTermDisplayNamed(t, factors) {
+  for (let i = 0; i < factors.length; i++) {
+    if (t === quadPureTerm(factors[i].id)) {
+      const name = factors[i].name || factors[i].id;
+      return `X${i + 1}² (${name})`;
+    }
+  }
+  const xi = formatTermDisplay(t, factors);
+  const involved = factors.filter(f => t.includes(f.id));
+  if (involved.length === 0) return xi;
+  if (involved.length === 1) return `${xi} (${involved[0].name || involved[0].id})`;
+  const names = involved.map(f => f.name || f.id).join(" × ");
+  return `${xi} (${names})`;
+}
+
+export function formatTermHTMLNamed(t, factors) {
+  for (let i = 0; i < factors.length; i++) {
+    if (t === quadPureTerm(factors[i].id)) {
+      const name = factors[i].name || factors[i].id;
+      return `X<sub>${i + 1}</sub><sup>2</sup> (${name})`;
+    }
+  }
+  const html = formatTermHTML(t, factors);
+  const involved = factors.filter(f => t.includes(f.id));
+  if (involved.length === 0) return html;
+  if (involved.length === 1) return `${html} (${involved[0].name || involved[0].id})`;
+  const names = involved.map(f => f.name || f.id).join(" × ");
+  return `${html} (${names})`;
+}
+
 // ─── Données manquantes et exemples ──────────────────────────────────────────
 
 export function getMissingRows(matrix, responses) {

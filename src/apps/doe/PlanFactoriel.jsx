@@ -31,6 +31,7 @@ import {
   genMatrix, computeDefaultModel, quadPureTerm, isQuadPure, isInteraction,
   getAllPossibleTerms, computePresetModel,
   termOrder, formatTermDisplay, termSubScript, formatTermHTML,
+  formatTermDisplayNamed, formatTermHTMLNamed,
   getMissingRows, loadExampleData,
   fitOLS,
   sigStars, fmt, fmtP,
@@ -1987,7 +1988,7 @@ function PlanFactorielInner() {
                                     ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
                                     : "bg-gray-50 border-gray-200 text-gray-400 opacity-50 line-through hover:opacity-70"
                               }`}>
-                              {formatTermDisplay(t, factors)}
+                              {formatTermDisplayNamed(t, factors)}
                             </button>
                           );
                         })}
@@ -2019,7 +2020,7 @@ function PlanFactorielInner() {
                     <div className="font-mono text-xs text-gray-700 leading-loose">
                       <span>Ŷ = α₀</span>
                       {m.terms.map(t => (
-                        <span key={t}> + α<sub>{termSubScript(t, factors)}</sub>·<span dangerouslySetInnerHTML={{ __html: formatTermHTML(t, factors) }} /></span>
+                        <span key={t}> + α<sub>{termSubScript(t, factors)}</sub>·<span dangerouslySetInnerHTML={{ __html: formatTermHTMLNamed(t, factors) }} /></span>
                       ))}
                     </div>
                   </div>
@@ -2109,7 +2110,7 @@ function PlanFactorielInner() {
         });
 
         // Noms des termes (constante + termes du modèle)
-        const termLabel = (t) => formatTermDisplay(t, factors);
+        const termLabel = (t) => formatTermDisplayNamed(t, factors);
         const allTermLabels = (terms) => ["α₀ (constante)", ...terms.map(t => `α${termSubScript(t, factors)} · ${termLabel(t)}`)];
 
         return (
@@ -2690,7 +2691,9 @@ function PlanFactorielInner() {
 
                               return (
                                 <div key={ef.term} className="flex items-center gap-2">
-                                  <span className={`text-[11px] font-mono w-20 truncate text-right shrink-0 ${
+                                  <span
+                                    title={ef.label}
+                                    className={`text-[11px] font-mono w-32 truncate text-right shrink-0 ${
                                     isSignif ? "text-gray-600" : "text-gray-400"
                                   }`}>
                                     {ef.label}
