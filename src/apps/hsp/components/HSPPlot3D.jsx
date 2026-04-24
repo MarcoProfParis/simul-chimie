@@ -184,12 +184,13 @@ export default function HSPPlot3D({ data, result, insideLimit = 1, onEditSolvent
       line: { color, width: 6 },
     })
     const axisLabel = (lx, ly, lz, label, color) => ({
-      type: "scatter3d", mode: "text",
+      type: "scatter3d", mode: "markers+text",
       showlegend: false, hoverinfo: "skip",
       x: [lx], y: [ly], z: [lz],
       text: [label],
       textposition: "top center",
-      textfont: { color, size: 15, family: "system-ui, sans-serif", weight: "bold" },
+      textfont: { color, size: 15, family: "system-ui, sans-serif" },
+      marker: { size: 1, opacity: 0, color },
     })
     const axisTraces = [
       axisLine([cx - R,    cx + R   ], [cy,       cy      ], [cz,       cz       ], AX_COLORS.D),
