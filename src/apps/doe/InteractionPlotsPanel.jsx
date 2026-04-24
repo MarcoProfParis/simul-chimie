@@ -11,8 +11,10 @@ import { useCompact } from "./CompactContext";
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 function cellVals(matrix, factorId, codedVal, responseId) {
+  // Note: no !r.center filter — center points (coded=0) are naturally excluded
+  // for codedVal=−1/+1 queries and naturally included for codedVal=0 queries.
   return (matrix || [])
-    .filter(r => !r.center && +r.coded[factorId] === codedVal)
+    .filter(r => +r.coded[factorId] === codedVal)
     .map(r => r.responses?.[responseId])
     .filter(v => v !== "" && v !== null && v !== undefined && !isNaN(+v))
     .map(Number);
@@ -30,13 +32,14 @@ function realLabel(val, decimals = 1) {
 // ─── Main Effect Plot (SVG) ───────────────────────────────────────────────────
 
 function MainEffectPlot({ factor, responseId, matrix }) {
-  const mLow  = avg(cellVals(matrix, factor.id, -1, responseId));
-  const mHigh = avg(cellVals(matrix, factor.id, +1, responseId));
+  const mLow    = avg(cellVals(matrix, factor.id, -1, responseId));
+  const mCenter = avg(cellVals(matrix, factor.id,  0, responseId)); // null if no center points
+  const mHigh   = avg(cellVals(matrix, factor.id, +1, responseId));
 
   const W = 200, H = 128, ML = 44, MR = 8, MT = 18, MB = 28;
   const pw = W - ML - MR, ph = H - MT - MB;
 
-  const vals = [mLow, mHigh].filter(v => v !== null);
+  const vals = [mLow, mCenter, mHigh].filter(v => v !== null);
   if (!vals.length) return (
     <div className="flex items-center justify-center h-16 text-[10px] text-gray-300">—</div>
   );
@@ -48,13 +51,29 @@ function MainEffectPlot({ factor, responseId, matrix }) {
   const sx = (coded) => ML + ((coded + 1) / 2) * pw;
   const sy = (v)     => v !== null ? MT + ph - ((v - yLo) / yr) * ph : null;
 
-  const x1 = sx(-1), x2 = sx(+1);
-  const y1 = sy(mLow), y2 = sy(mHigh);
+  const x1 = sx(-1), x0 = sx(0), x2 = sx(+1);
+  const y1 = sy(mLow), y0 = sy(mCenter), y2 = sy(mHigh);
   const COL = "#6366f1";
+  const COL_CTR = "#f59e0b"; // amber for center point
+
+  // Build path through available points in order: low → center → high
+  const pts = [
+    mLow    !== null ? [x1, y1] : null,
+    mCenter !== null ? [x0, y0] : null,
+    mHigh   !== null ? [x2, y2] : null,
+  ].filter(Boolean);
+  const linePath = pts.length >= 2
+    ? `M ${pts[0][0]} ${pts[0][1]} ` + pts.slice(1).map(p => `L ${p[0]} ${p[1]}`).join(" ")
+    : null;
+
+  // Middle real value (center point label on X axis)
+  const midReal = (factor.low?.real != null && factor.high?.real != null)
+    ? ((+factor.low.real + +factor.high.real) / 2)
+    : null;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
-      {/* grid lines */}
+      {/* horizontal grid lines */}
       {[0, 0.5, 1].map(t => {
         const yv = yLo + t * yr;
         const yp = sy(yv);
@@ -69,11 +88,9 @@ function MainEffectPlot({ factor, responseId, matrix }) {
       {/* axes */}
       <line x1={ML} y1={MT} x2={ML} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
       <line x1={ML} y1={MT + ph} x2={ML + pw} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
-      {/* connecting line */}
-      {y1 !== null && y2 !== null && (
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={COL} strokeWidth="2.2" />
-      )}
-      {/* dots + value labels */}
+      {/* connecting path */}
+      {linePath && <path d={linePath} stroke={COL} strokeWidth="2.2" fill="none" />}
+      {/* ±1 dots + value labels */}
       {y1 !== null && (
         <>
           <circle cx={x1} cy={y1} r="4" fill={COL} />
@@ -90,13 +107,27 @@ function MainEffectPlot({ factor, responseId, matrix }) {
           </text>
         </>
       )}
-      {/* X axis labels (real values) */}
+      {/* center point dot (amber) + value label */}
+      {y0 !== null && (
+        <>
+          <circle cx={x0} cy={y0} r="4" fill={COL_CTR} />
+          <text x={x0} y={y0 - 7} fontSize="7.5" fill={COL_CTR} textAnchor="middle" fontWeight="600">
+            {mCenter.toFixed(2)}
+          </text>
+        </>
+      )}
+      {/* X axis labels */}
       <text x={x1} y={H - 14} fontSize="7.5" fill="#6b7280" textAnchor="middle">
         {realLabel(factor.low?.real, 2)}
       </text>
       <text x={x2} y={H - 14} fontSize="7.5" fill="#6b7280" textAnchor="middle">
         {realLabel(factor.high?.real, 2)}
       </text>
+      {y0 !== null && midReal !== null && (
+        <text x={x0} y={H - 14} fontSize="7.5" fill={COL_CTR} textAnchor="middle">
+          {midReal.toFixed(2)}
+        </text>
+      )}
       {factor.unit && (
         <text x={ML + pw / 2} y={H - 4} fontSize="6" fill="#d1d5db" textAnchor="middle">
           {factor.unit}
@@ -109,7 +140,7 @@ function MainEffectPlot({ factor, responseId, matrix }) {
 // ─── Interaction Plot (SVG) ───────────────────────────────────────────────────
 
 function InteractionPlot({ fa, fb, responseId, matrix }) {
-  const rows = (matrix || []).filter(r => !r.center);
+  const rows = matrix || [];
   const cellMean = (va, vb) => {
     const vals = rows
       .filter(r => +r.coded[fa.id] === va && +r.coded[fb.id] === vb)
@@ -119,12 +150,13 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
     return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : null;
   };
 
-  // fb low (−1) : line 1 — solid indigo
-  // fb high (+1): line 2 — dashed emerald
-  const ll = cellMean(-1, -1), hl = cellMean(+1, -1);
-  const lh = cellMean(-1, +1), hh = cellMean(+1, +1);
+  // Corner cells (±1 levels)
+  const ll = cellMean(-1, -1), hl = cellMean(+1, -1); // fb = −1 (low)
+  const lh = cellMean(-1, +1), hh = cellMean(+1, +1); // fb = +1 (high)
+  // Center point — both factors at 0 (null if no center points in matrix)
+  const cc = cellMean(0, 0);
 
-  const allVals = [ll, hl, lh, hh].filter(v => v !== null);
+  const allVals = [ll, hl, lh, hh, cc].filter(v => v !== null);
   if (!allVals.length) return (
     <div className="flex items-center justify-center h-16 text-[10px] text-gray-300">—</div>
   );
@@ -157,8 +189,16 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
     );
   };
 
+  const COL_CTR = "#f59e0b"; // amber for center point
   const legY = H - 10;
   const midX = ML + pw / 2 + 4;
+  const xCenter = sx(0); // X screen position for coded=0
+  const yCenter = cc !== null ? sy(cc) : null;
+
+  // Middle real value of fa for the center X label
+  const faMidReal = (fa.low?.real != null && fa.high?.real != null)
+    ? ((+fa.low.real + +fa.high.real) / 2)
+    : null;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
@@ -177,9 +217,24 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
       {/* axes */}
       <line x1={ML} y1={MT} x2={ML} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
       <line x1={ML} y1={MT + ph} x2={ML + pw} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
-      {/* lines */}
+      {/* center X tick */}
+      {yCenter !== null && (
+        <line x1={xCenter} y1={MT + ph} x2={xCenter} y2={MT + ph + 4} stroke="#e5e7eb" strokeWidth="1" />
+      )}
+      {/* corner lines (±1 levels only) */}
       {renderLine(ll, hl, COL_LOW)}
       {renderLine(lh, hh, COL_HIGH, "5 3")}
+      {/* center point (0,0) — amber diamond */}
+      {yCenter !== null && (
+        <>
+          <polygon
+            points={`${xCenter},${yCenter - 5} ${xCenter + 4},${yCenter} ${xCenter},${yCenter + 5} ${xCenter - 4},${yCenter}`}
+            fill={COL_CTR} />
+          <text x={xCenter} y={yCenter - 9} fontSize="7" fill={COL_CTR} textAnchor="middle" fontWeight="600">
+            {cc.toFixed(2)}
+          </text>
+        </>
+      )}
       {/* X labels (fa real values) */}
       <text x={x1} y={MT + ph + 12} fontSize="7.5" fill="#6b7280" textAnchor="middle">
         {realLabel(fa.low?.real, 1)}
@@ -187,6 +242,11 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
       <text x={x2} y={MT + ph + 12} fontSize="7.5" fill="#6b7280" textAnchor="middle">
         {realLabel(fa.high?.real, 1)}
       </text>
+      {yCenter !== null && faMidReal !== null && (
+        <text x={xCenter} y={MT + ph + 12} fontSize="7" fill={COL_CTR} textAnchor="middle">
+          {faMidReal.toFixed(1)}
+        </text>
+      )}
       {fa.unit && (
         <text x={ML + pw / 2} y={MT + ph + 21} fontSize="6" fill="#d1d5db" textAnchor="middle">
           {fa.unit}
