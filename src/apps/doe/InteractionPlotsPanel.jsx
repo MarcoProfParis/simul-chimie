@@ -30,14 +30,62 @@ function realLabel(val, decimals = 1) {
   return typeof val === "number" ? val.toFixed(decimals) : String(val);
 }
 
+// ─── shared crosshair helper ──────────────────────────────────────────────────
+
+function Crosshair({ ch, W, ML, MR, MT, ph, pw, yr, yLo, xToReal, respLabel }) {
+  if (!ch) return null;
+  const { svgX, svgY } = ch;
+  // clamp to plot area
+  const cx = Math.max(ML, Math.min(ML + pw, svgX));
+  const cy = Math.max(MT, Math.min(MT + ph, svgY));
+
+  const xReal = xToReal(cx);
+  const yVal  = yLo + (1 - (cy - MT) / ph) * yr;
+
+  const tipW = 130, tipH = 28, tipR = 5;
+  const tipX = cx > ML + pw / 2 ? cx - tipW - 8 : cx + 10;
+  const tipY = cy > MT + ph / 2 ? cy - tipH - 6 : cy + 6;
+
+  return (
+    <g style={{ pointerEvents: "none" }}>
+      {/* vertical line */}
+      <line x1={cx} y1={MT} x2={cx} y2={MT + ph}
+            stroke="#6b7280" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.55" />
+      {/* horizontal line */}
+      <line x1={ML} y1={cy} x2={ML + pw} y2={cy}
+            stroke="#6b7280" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.55" />
+      {/* crosshair centre dot */}
+      <circle cx={cx} cy={cy} r="3" fill="none" stroke="#6b7280" strokeWidth="1.2" opacity="0.7" />
+      {/* tooltip */}
+      <rect x={tipX} y={tipY} width={tipW} height={tipH} rx={tipR}
+            fill="white" stroke="#e5e7eb" strokeWidth="0.8"
+            style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.12))" }} />
+      <text x={tipX + 8} y={tipY + 11} fontSize="8.5" fill="#374151" fontWeight="600">
+        {xReal}
+      </text>
+      <text x={tipX + 8} y={tipY + 22} fontSize="8.5" fill="#6b7280">
+        {respLabel} : {yVal.toFixed(3)}
+      </text>
+    </g>
+  );
+}
+
 // ─── Main Effect Plot (SVG) ───────────────────────────────────────────────────
 
-function MainEffectPlot({ factor, responseId, matrix }) {
+function MainEffectPlot({ factor, responseId, responseLabel, matrix, large = false }) {
+  const [ch, setCh] = useState(null); // crosshair SVG coords
+
   const mLow    = avg(cellVals(matrix, factor.id, -1, responseId));
-  const mCenter = avg(cellVals(matrix, factor.id,  0, responseId)); // null if no center points
+  const mCenter = avg(cellVals(matrix, factor.id,  0, responseId));
   const mHigh   = avg(cellVals(matrix, factor.id, +1, responseId));
 
-  const W = 200, H = 128, ML = 44, MR = 8, MT = 18, MB = 28;
+  // Dimensions — larger in popup mode
+  const W  = large ? 440 : 200;
+  const H  = large ? 290 : 128;
+  const ML = large ?  60 : 44;
+  const MR = large ?  22 : 8;
+  const MT = large ?  28 : 18;
+  const MB = large ?  52 : 28;
   const pw = W - ML - MR, ph = H - MT - MB;
 
   const vals = [mLow, mCenter, mHigh].filter(v => v !== null);
@@ -54,15 +102,13 @@ function MainEffectPlot({ factor, responseId, matrix }) {
 
   const x1 = sx(-1), x0 = sx(0), x2 = sx(+1);
   const y1 = sy(mLow), y0 = sy(mCenter), y2 = sy(mHigh);
-  const COL = "#6366f1";
-  const COL_CTR = "#f59e0b"; // amber for center point
+  const COL = "#6366f1", COL_CTR = "#f59e0b";
+  const fs  = large ? 10 : 7.5; // font size scale
 
-  // Build path through available points: low → center → high
-  // When all 3 points exist, use a quadratic Bézier that passes exactly through
-  // the center point. Control point formula: cx=x0, cy=2·y0 − 0.5·y1 − 0.5·y2
+  // Quadratic Bézier through 3 points / polyline fallback
   let linePath = null;
   if (y1 !== null && y0 !== null && y2 !== null) {
-    const bcy = 2 * y0 - 0.5 * y1 - 0.5 * y2; // bezier control-point Y
+    const bcy = 2 * y0 - 0.5 * y1 - 0.5 * y2;
     linePath = `M ${x1} ${y1} Q ${x0} ${bcy} ${x2} ${y2}`;
   } else {
     const pts = [
@@ -74,72 +120,93 @@ function MainEffectPlot({ factor, responseId, matrix }) {
       linePath = `M ${pts[0][0]} ${pts[0][1]} ` + pts.slice(1).map(p => `L ${p[0]} ${p[1]}`).join(" ");
   }
 
-  // Middle real value (center point label on X axis)
   const midReal = (factor.low?.real != null && factor.high?.real != null)
-    ? ((+factor.low.real + +factor.high.real) / 2)
-    : null;
+    ? (+factor.low.real + +factor.high.real) / 2 : null;
+
+  // Crosshair coordinate converter: SVG-X → real factor value
+  const faLowR  = factor.low?.real  != null ? +factor.low.real  : -1;
+  const faHighR = factor.high?.real != null ? +factor.high.real : +1;
+  const faMid   = (faLowR + faHighR) / 2, faHalf = (faHighR - faLowR) / 2;
+  const xToReal = (svgX) => {
+    const coded = (svgX - ML) / pw * 2 - 1;
+    const real  = faMid + coded * faHalf;
+    return `${real.toFixed(2)}${factor.unit ? ` ${factor.unit}` : ""}`;
+  };
+
+  const onMouseMove = large ? (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setCh({
+      svgX: (e.clientX - rect.left)  * (W / rect.width),
+      svgY: (e.clientY - rect.top)   * (H / rect.height),
+    });
+  } : undefined;
+
+  const dotR = large ? 5.5 : 4;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block", cursor: large ? "crosshair" : "default" }}
+         onMouseMove={onMouseMove} onMouseLeave={large ? () => setCh(null) : undefined}>
+      {/* Y axis label (large only) */}
+      {large && (
+        <text transform={`translate(14, ${MT + ph / 2}) rotate(-90)`}
+              textAnchor="middle" fontSize="10" fill="#6b7280">
+          {responseLabel || responseId}
+        </text>
+      )}
       {/* horizontal grid lines */}
       {[0, 0.5, 1].map(t => {
-        const yv = yLo + t * yr;
-        const yp = sy(yv);
+        const yv = yLo + t * yr, yp = sy(yv);
         return (
           <g key={t}>
             <line x1={ML} y1={yp} x2={ML + pw} y2={yp} stroke="#f3f4f6" strokeWidth="1" />
             <line x1={ML - 3} y1={yp} x2={ML} y2={yp} stroke="#e5e7eb" strokeWidth="0.8" />
-            <text x={ML - 5} y={yp + 3} fontSize="7" fill="#9ca3af" textAnchor="end">{yv.toFixed(1)}</text>
+            <text x={ML - 5} y={yp + 3} fontSize={large ? 9 : 7} fill="#9ca3af" textAnchor="end">{yv.toFixed(1)}</text>
           </g>
         );
       })}
       {/* axes */}
       <line x1={ML} y1={MT} x2={ML} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
       <line x1={ML} y1={MT + ph} x2={ML + pw} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
-      {/* connecting path */}
-      {linePath && <path d={linePath} stroke={COL} strokeWidth="2.2" fill="none" />}
-      {/* ±1 dots + value labels */}
+      {/* curve / line */}
+      {linePath && <path d={linePath} stroke={COL} strokeWidth={large ? 2.8 : 2.2} fill="none" />}
+      {/* ±1 dots */}
       {y1 !== null && (
         <>
-          <circle cx={x1} cy={y1} r="4" fill={COL} />
-          <text x={x1} y={y1 - 7} fontSize="7.5" fill={COL} textAnchor="middle" fontWeight="600">
-            {mLow.toFixed(2)}
-          </text>
+          <circle cx={x1} cy={y1} r={dotR} fill={COL} />
+          <text x={x1} y={y1 - dotR - 3} fontSize={fs} fill={COL} textAnchor="middle" fontWeight="600">{mLow.toFixed(2)}</text>
         </>
       )}
       {y2 !== null && (
         <>
-          <circle cx={x2} cy={y2} r="4" fill={COL} />
-          <text x={x2} y={y2 - 7} fontSize="7.5" fill={COL} textAnchor="middle" fontWeight="600">
-            {mHigh.toFixed(2)}
-          </text>
+          <circle cx={x2} cy={y2} r={dotR} fill={COL} />
+          <text x={x2} y={y2 - dotR - 3} fontSize={fs} fill={COL} textAnchor="middle" fontWeight="600">{mHigh.toFixed(2)}</text>
         </>
       )}
-      {/* center point dot (amber) + value label */}
+      {/* center point (amber) */}
       {y0 !== null && (
         <>
-          <circle cx={x0} cy={y0} r="4" fill={COL_CTR} />
-          <text x={x0} y={y0 - 7} fontSize="7.5" fill={COL_CTR} textAnchor="middle" fontWeight="600">
-            {mCenter.toFixed(2)}
-          </text>
+          <circle cx={x0} cy={y0} r={dotR} fill={COL_CTR} />
+          <text x={x0} y={y0 - dotR - 3} fontSize={fs} fill={COL_CTR} textAnchor="middle" fontWeight="600">{mCenter.toFixed(2)}</text>
         </>
       )}
-      {/* X axis labels */}
-      <text x={x1} y={H - 14} fontSize="7.5" fill="#6b7280" textAnchor="middle">
-        {realLabel(factor.low?.real, 2)}
-      </text>
-      <text x={x2} y={H - 14} fontSize="7.5" fill="#6b7280" textAnchor="middle">
-        {realLabel(factor.high?.real, 2)}
-      </text>
+      {/* X tick labels */}
+      <text x={x1} y={H - MB + 14} fontSize={large ? 9 : 7.5} fill="#6b7280" textAnchor="middle">{realLabel(factor.low?.real, 2)}</text>
+      <text x={x2} y={H - MB + 14} fontSize={large ? 9 : 7.5} fill="#6b7280" textAnchor="middle">{realLabel(factor.high?.real, 2)}</text>
       {y0 !== null && midReal !== null && (
-        <text x={x0} y={H - 14} fontSize="7.5" fill={COL_CTR} textAnchor="middle">
-          {midReal.toFixed(2)}
-        </text>
+        <text x={x0} y={H - MB + 14} fontSize={large ? 9 : 7.5} fill={COL_CTR} textAnchor="middle">{midReal.toFixed(2)}</text>
       )}
-      {factor.unit && (
-        <text x={ML + pw / 2} y={H - 4} fontSize="6" fill="#d1d5db" textAnchor="middle">
-          {factor.unit}
-        </text>
+      {/* X axis name (large only) */}
+      {large
+        ? <text x={ML + pw / 2} y={H - 8} fontSize="11" fill="#6b7280" textAnchor="middle" fontWeight="500">
+            {factor.name || factor.id}{factor.unit ? ` (${factor.unit})` : ""}
+          </text>
+        : factor.unit && <text x={ML + pw / 2} y={H - 4} fontSize="6" fill="#d1d5db" textAnchor="middle">{factor.unit}</text>
+      }
+      {/* Crosshair (large only) */}
+      {large && (
+        <Crosshair ch={ch} W={W} ML={ML} MR={MR} MT={MT} ph={ph} pw={pw}
+                   yr={yr} yLo={yLo} xToReal={xToReal}
+                   respLabel={responseLabel || responseId} />
       )}
     </svg>
   );
@@ -147,7 +214,9 @@ function MainEffectPlot({ factor, responseId, matrix }) {
 
 // ─── Interaction Plot (SVG) ───────────────────────────────────────────────────
 
-function InteractionPlot({ fa, fb, responseId, matrix }) {
+function InteractionPlot({ fa, fb, responseId, responseLabel, matrix, large = false }) {
+  const [ch, setCh] = useState(null);
+
   const rows = matrix || [];
   const cellMean = (va, vb) => {
     const vals = rows
@@ -158,10 +227,8 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
     return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : null;
   };
 
-  // Corner cells (±1 levels)
-  const ll = cellMean(-1, -1), hl = cellMean(+1, -1); // fb = −1 (low)
-  const lh = cellMean(-1, +1), hh = cellMean(+1, +1); // fb = +1 (high)
-  // Center point — both factors at 0 (null if no center points in matrix)
+  const ll = cellMean(-1, -1), hl = cellMean(+1, -1);
+  const lh = cellMean(-1, +1), hh = cellMean(+1, +1);
   const cc = cellMean(0, 0);
 
   const allVals = [ll, hl, lh, hh, cc].filter(v => v !== null);
@@ -169,7 +236,12 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
     <div className="flex items-center justify-center h-16 text-[10px] text-gray-300">—</div>
   );
 
-  const W = 220, H = 150, ML = 44, MR = 8, MT = 18, MB = 34;
+  const W  = large ? 440 : 220;
+  const H  = large ? 310 : 150;
+  const ML = large ?  60 : 44;
+  const MR = large ?  22 : 8;
+  const MT = large ?  28 : 18;
+  const MB = large ?  52 : 34;
   const pw = W - ML - MR, ph = H - MT - MB;
 
   const yMin = Math.min(...allVals), yMax = Math.max(...allVals);
@@ -180,8 +252,14 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
   const sy = (v)     => v !== null ? MT + ph - ((v - yLo) / yr) * ph : null;
 
   const x1 = sx(-1), x2 = sx(+1);
-  const COL_LOW  = "#6366f1";
-  const COL_HIGH = "#10b981";
+  const COL_LOW = "#6366f1", COL_HIGH = "#10b981", COL_CTR = "#f59e0b";
+  const legY = H - (large ? 18 : 10);
+  const midX = ML + pw / 2 + 4;
+  const xCenter = sx(0);
+  const yCenter = cc !== null ? sy(cc) : null;
+
+  const faMidReal = (fa.low?.real != null && fa.high?.real != null)
+    ? (+fa.low.real + +fa.high.real) / 2 : null;
 
   const renderLine = (v1, v2, color, dash = "") => {
     const sy1 = sy(v1), sy2 = sy(v2);
@@ -189,88 +267,101 @@ function InteractionPlot({ fa, fb, responseId, matrix }) {
     return (
       <g>
         {sy1 !== null && sy2 !== null && (
-          <line x1={x1} y1={sy1} x2={x2} y2={sy2} stroke={color} strokeWidth="2" strokeDasharray={dash} />
+          <line x1={x1} y1={sy1} x2={x2} y2={sy2} stroke={color} strokeWidth={large ? 2.5 : 2} strokeDasharray={dash} />
         )}
-        {sy1 !== null && <circle cx={x1} cy={sy1} r="3.5" fill={color} />}
-        {sy2 !== null && <circle cx={x2} cy={sy2} r="3.5" fill={color} />}
+        {sy1 !== null && <circle cx={x1} cy={sy1} r={large ? 4.5 : 3.5} fill={color} />}
+        {sy2 !== null && <circle cx={x2} cy={sy2} r={large ? 4.5 : 3.5} fill={color} />}
       </g>
     );
   };
 
-  const COL_CTR = "#f59e0b"; // amber for center point
-  const legY = H - 10;
-  const midX = ML + pw / 2 + 4;
-  const xCenter = sx(0); // X screen position for coded=0
-  const yCenter = cc !== null ? sy(cc) : null;
+  // Crosshair: X maps to fa coded → real
+  const faLowR  = fa.low?.real  != null ? +fa.low.real  : -1;
+  const faHighR = fa.high?.real != null ? +fa.high.real : +1;
+  const faMidV  = (faLowR + faHighR) / 2, faHalfV = (faHighR - faLowR) / 2;
+  const xToReal = (svgX) => {
+    const coded = (svgX - ML) / pw * 2 - 1;
+    const real  = faMidV + coded * faHalfV;
+    return `${fa.name || fa.id} = ${real.toFixed(2)}${fa.unit ? ` ${fa.unit}` : ""}`;
+  };
 
-  // Middle real value of fa for the center X label
-  const faMidReal = (fa.low?.real != null && fa.high?.real != null)
-    ? ((+fa.low.real + +fa.high.real) / 2)
-    : null;
+  const onMouseMove = large ? (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setCh({
+      svgX: (e.clientX - rect.left) * (W / rect.width),
+      svgY: (e.clientY - rect.top)  * (H / rect.height),
+    });
+  } : undefined;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
-      {/* grid lines */}
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block", cursor: large ? "crosshair" : "default" }}
+         onMouseMove={onMouseMove} onMouseLeave={large ? () => setCh(null) : undefined}>
+      {/* Y axis label (large only) */}
+      {large && (
+        <text transform={`translate(14, ${MT + ph / 2}) rotate(-90)`}
+              textAnchor="middle" fontSize="10" fill="#6b7280">
+          {responseLabel || responseId}
+        </text>
+      )}
+      {/* grid */}
       {[0, 0.5, 1].map(t => {
-        const yv = yLo + t * yr;
-        const yp = sy(yv);
+        const yv = yLo + t * yr, yp = sy(yv);
         return (
           <g key={t}>
             <line x1={ML} y1={yp} x2={ML + pw} y2={yp} stroke="#f3f4f6" strokeWidth="1" />
             <line x1={ML - 3} y1={yp} x2={ML} y2={yp} stroke="#e5e7eb" strokeWidth="0.8" />
-            <text x={ML - 5} y={yp + 3} fontSize="7" fill="#9ca3af" textAnchor="end">{yv.toFixed(1)}</text>
+            <text x={ML - 5} y={yp + 3} fontSize={large ? 9 : 7} fill="#9ca3af" textAnchor="end">{yv.toFixed(1)}</text>
           </g>
         );
       })}
       {/* axes */}
       <line x1={ML} y1={MT} x2={ML} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
       <line x1={ML} y1={MT + ph} x2={ML + pw} y2={MT + ph} stroke="#e5e7eb" strokeWidth="1" />
-      {/* center X tick */}
       {yCenter !== null && (
         <line x1={xCenter} y1={MT + ph} x2={xCenter} y2={MT + ph + 4} stroke="#e5e7eb" strokeWidth="1" />
       )}
-      {/* corner lines (±1 levels only) */}
       {renderLine(ll, hl, COL_LOW)}
       {renderLine(lh, hh, COL_HIGH, "5 3")}
-      {/* center point (0,0) — amber diamond */}
       {yCenter !== null && (
         <>
           <polygon
-            points={`${xCenter},${yCenter - 5} ${xCenter + 4},${yCenter} ${xCenter},${yCenter + 5} ${xCenter - 4},${yCenter}`}
+            points={`${xCenter},${yCenter - (large?7:5)} ${xCenter + (large?5:4)},${yCenter} ${xCenter},${yCenter + (large?7:5)} ${xCenter - (large?5:4)},${yCenter}`}
             fill={COL_CTR} />
-          <text x={xCenter} y={yCenter - 9} fontSize="7" fill={COL_CTR} textAnchor="middle" fontWeight="600">
+          <text x={xCenter} y={yCenter - (large?12:9)} fontSize={large ? 9 : 7} fill={COL_CTR} textAnchor="middle" fontWeight="600">
             {cc.toFixed(2)}
           </text>
         </>
       )}
-      {/* X labels (fa real values) */}
-      <text x={x1} y={MT + ph + 12} fontSize="7.5" fill="#6b7280" textAnchor="middle">
-        {realLabel(fa.low?.real, 1)}
-      </text>
-      <text x={x2} y={MT + ph + 12} fontSize="7.5" fill="#6b7280" textAnchor="middle">
-        {realLabel(fa.high?.real, 1)}
-      </text>
+      {/* X tick labels */}
+      <text x={x1} y={MT + ph + (large?16:12)} fontSize={large ? 9.5 : 7.5} fill="#6b7280" textAnchor="middle">{realLabel(fa.low?.real, 1)}</text>
+      <text x={x2} y={MT + ph + (large?16:12)} fontSize={large ? 9.5 : 7.5} fill="#6b7280" textAnchor="middle">{realLabel(fa.high?.real, 1)}</text>
       {yCenter !== null && faMidReal !== null && (
-        <text x={xCenter} y={MT + ph + 12} fontSize="7" fill={COL_CTR} textAnchor="middle">
-          {faMidReal.toFixed(1)}
-        </text>
+        <text x={xCenter} y={MT + ph + (large?16:12)} fontSize={large ? 9 : 7} fill={COL_CTR} textAnchor="middle">{faMidReal.toFixed(1)}</text>
       )}
-      {fa.unit && (
-        <text x={ML + pw / 2} y={MT + ph + 21} fontSize="6" fill="#d1d5db" textAnchor="middle">
-          {fa.unit}
-        </text>
+      {/* X axis name */}
+      {large
+        ? <text x={ML + pw / 2} y={H - MB + 34} fontSize="11" fill="#6b7280" textAnchor="middle" fontWeight="500">
+            {fa.name || fa.id}{fa.unit ? ` (${fa.unit})` : ""}
+          </text>
+        : fa.unit && <text x={ML + pw / 2} y={MT + ph + 21} fontSize="6" fill="#d1d5db" textAnchor="middle">{fa.unit}</text>
+      }
+      {/* Legend */}
+      <line x1={ML} y1={legY} x2={ML + 14} y2={legY} stroke={COL_LOW} strokeWidth={large ? 2.5 : 2} />
+      <circle cx={ML + 7} cy={legY} r={large ? 3 : 2.5} fill={COL_LOW} />
+      <text x={ML + 18} y={legY + 3} fontSize={large ? 9 : 7} fill="#6b7280">
+        {fb.name || fb.id} = {realLabel(fb.low?.real, 1)}
+      </text>
+      <line x1={midX} y1={legY} x2={midX + 14} y2={legY} stroke={COL_HIGH} strokeWidth={large ? 2.5 : 2} strokeDasharray="5 3" />
+      <circle cx={midX + 7} cy={legY} r={large ? 3 : 2.5} fill={COL_HIGH} />
+      <text x={midX + 18} y={legY + 3} fontSize={large ? 9 : 7} fill="#6b7280">
+        {fb.name || fb.id} = {realLabel(fb.high?.real, 1)}
+      </text>
+      {/* Crosshair (large only) */}
+      {large && (
+        <Crosshair ch={ch} W={W} ML={ML} MR={MR} MT={MT} ph={ph} pw={pw}
+                   yr={yr} yLo={yLo} xToReal={xToReal}
+                   respLabel={responseLabel || responseId} />
       )}
-      {/* Legend — fb low | fb high */}
-      <line x1={ML}      y1={legY} x2={ML + 14}      y2={legY} stroke={COL_LOW}  strokeWidth="2" />
-      <circle cx={ML + 7}     cy={legY} r="2.5" fill={COL_LOW} />
-      <text x={ML + 17}  y={legY + 3} fontSize="7" fill="#6b7280">
-        {fb.name || fb.id}={realLabel(fb.low?.real, 1)}
-      </text>
-      <line x1={midX}    y1={legY} x2={midX + 14}    y2={legY} stroke={COL_HIGH} strokeWidth="2" strokeDasharray="5 3" />
-      <circle cx={midX + 7}   cy={legY} r="2.5" fill={COL_HIGH} />
-      <text x={midX + 17} y={legY + 3} fontSize="7" fill="#6b7280">
-        {fb.name || fb.id}={realLabel(fb.high?.real, 1)}
-      </text>
     </svg>
   );
 }
@@ -538,7 +629,9 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                       onToggle={toggle}
                       onExpand={() => setPopup({
                         title: `${f.name || f.id}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`,
-                        content: <MainEffectPlot factor={f} responseId={resp.id} matrix={matrix} />,
+                        content: <MainEffectPlot factor={f} responseId={resp.id}
+                          responseLabel={`${resp.name || resp.id}${resp.unit ? ` (${resp.unit})` : ""}`}
+                          matrix={matrix} large />,
                       })}
                       isCompact={isCompact}
                     >
@@ -568,7 +661,9 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                         onToggle={toggle}
                         onExpand={() => setPopup({
                           title: `${title}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`,
-                          content: <InteractionPlot fa={fa} fb={fb} responseId={resp.id} matrix={matrix} />,
+                          content: <InteractionPlot fa={fa} fb={fb} responseId={resp.id}
+                            responseLabel={`${resp.name || resp.id}${resp.unit ? ` (${resp.unit})` : ""}`}
+                            matrix={matrix} large />,
                         })}
                         isCompact={isCompact}
                       >
