@@ -5,6 +5,7 @@ import AppCouleur from "./apps/couleur/AppCouleur.jsx"
 import CIELABExplorer from "./apps/couleur/CIELABExplorer"
 import PlanFactoriel from "./apps/doe/PlanFactoriel"
 import HSPApp from "./apps/hsp/HSPApp"
+import SolventMixtureApp from "./apps/hsp/SolventMixtureApp"
 
 // Les champs label/description sont des clés i18n (ex. "cat.couleur.label").
 // App.jsx les résout via t(key) depuis le contexte de langue.
@@ -91,6 +92,13 @@ export const CATEGORIES = [
         descriptionKey: "app.hsp.description",
         emoji: "🔶",
         component: HSPApp,
+      },
+      {
+        id: "solvent-mixture",
+        labelKey: "app.solvent-mixture.label",
+        descriptionKey: "app.solvent-mixture.description",
+        emoji: "🧴",
+        component: SolventMixtureApp,
       },
     ],
   },
