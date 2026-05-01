@@ -3,7 +3,7 @@
 // solvants, et l'app calcule la combinaison volumique qui approche le mieux
 // un point Hansen cible. Visualisations 2D (3 projections) et 3D.
 
-import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useLang } from "../../i18n";
 import { SolventLibraryProvider, useSolventLibrary } from "./SolventLibraryContext";
 import { bestMixOnSegment, bestMixOnTriangle, findBestMixtures } from "./math/mixture";
@@ -47,6 +47,7 @@ function SolventMixtureAppInner() {
   const [showLib, setShowLib] = useState(true);
   const [showDistCalc, setShowDistCalc] = useState(false);
   const [showDistModal, setShowDistModal] = useState(false);
+  const [manualFractionB, setManualFractionB] = useState(null); // null = optimal
 
   const handlePickFromGraph = (name) => {
     if (!name) return;
@@ -76,6 +77,9 @@ function SolventMixtureAppInner() {
     });
   }, [library]);
 
+  // Reset slider override when solvents or mode change
+  useEffect(() => { setManualFractionB(null); }, [picks[0], picks[1], picks[2], mode]);
+
   const solvA = findSolventByName(picks[0]);
   const solvB = findSolventByName(picks[1]);
   const solvC = mode === 3 ? findSolventByName(picks[2]) : null;
@@ -103,6 +107,21 @@ function SolventMixtureAppInner() {
     const C = [solvC.D, solvC.P, solvC.H];
     return bestMixOnTriangle(A, B, C, T);
   }, [solvA, solvB, solvC, mode, target]);
+
+  // Résultat à afficher : optimal ou fraction manuelle (slider)
+  const displayResult = useMemo(() => {
+    if (mode !== 2 || manualFractionB === null || !solvA || !solvB) return result;
+    const fB = manualFractionB, fA = 1 - fB;
+    const point = [
+      solvA.D * fA + solvB.D * fB,
+      solvA.P * fA + solvB.P * fB,
+      solvA.H * fA + solvB.H * fB,
+    ];
+    const distance = Math.sqrt(
+      4*(point[0]-target.D)**2 + (point[1]-target.P)**2 + (point[2]-target.H)**2
+    );
+    return { fractionA: fA, fractionB: fB, fractionC: 0, point, distance, interior: true };
+  }, [mode, manualFractionB, solvA, solvB, target, result]);
 
   // Suggestions auto (paires triées par distance) — utile pour cliquer-charger
   const suggestions = useMemo(() => {
@@ -174,30 +193,60 @@ function SolventMixtureAppInner() {
 
       {/* ── Résultat compact ── */}
       <Panel accent>
-        {!result ? (
+        {!displayResult ? (
           <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Sélectionne tous les solvants.</p>
+        ) : mode === 2 ? (
+          /* ── Slider binaire interactif ── */
+          <div>
+            <MixSlider
+              solvA={solvA} solvB={solvB}
+              fractionB={manualFractionB ?? displayResult.fractionB}
+              optimalFractionB={result?.fractionB ?? 0.5}
+              onChange={setManualFractionB}
+              onReset={() => setManualFractionB(null)}
+              isManual={manualFractionB !== null}
+            />
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
+              {[["δD", 0], ["δP", 1], ["δH", 2]].map(([lbl, idx]) => (
+                <span key={lbl} style={{ fontSize: 12 }}>
+                  <span style={{ color: "var(--text-muted)" }}>{lbl} </span>
+                  <strong style={{ color: "var(--text)", fontVariantNumeric: "tabular-nums" }}>
+                    {fmt(displayResult.point[idx])}
+                  </strong>
+                </span>
+              ))}
+              <span style={{
+                padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 700,
+                background: displayResult.distance <= R0 ? "#dcfce7" : "#fee2e2",
+                color: displayResult.distance <= R0 ? "#166534" : "#991b1b",
+              }}>
+                d={fmt(displayResult.distance, 3)} {displayResult.distance <= R0 ? `≤ R₀=${fmt(R0, 1)} ✓` : `> R₀=${fmt(R0, 1)} ✗`}
+              </span>
+            </div>
+          </div>
         ) : (
+          /* ── Mini-barres ternaires ── */
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
             <div style={{ flex: "1 1 180px" }}>
-              <MiniBar label={solvA?.name} value={result.fractionA} color="#3b82f6" />
-              <MiniBar label={solvB?.name} value={result.fractionB} color="#10b981" />
-              {mode === 3 && <MiniBar label={solvC?.name} value={result.fractionC} color="#f59e0b" />}
+              <MiniBar label={solvA?.name} value={displayResult.fractionA} color="#3b82f6" />
+              <MiniBar label={solvB?.name} value={displayResult.fractionB} color="#10b981" />
+              <MiniBar label={solvC?.name} value={displayResult.fractionC} color="#f59e0b" />
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               {[["δD", 0], ["δP", 1], ["δH", 2]].map(([lbl, idx]) => (
                 <span key={lbl} style={{ fontSize: 12 }}>
                   <span style={{ color: "var(--text-muted)" }}>{lbl} </span>
                   <strong style={{ color: "var(--text)", fontVariantNumeric: "tabular-nums" }}>
-                    {fmt(result.point[idx])}
+                    {fmt(displayResult.point[idx])}
                   </strong>
                 </span>
               ))}
               <span style={{
                 padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 700,
-                background: result.distance <= R0 ? "#dcfce7" : "#fee2e2",
-                color: result.distance <= R0 ? "#166534" : "#991b1b",
+                background: displayResult.distance <= R0 ? "#dcfce7" : "#fee2e2",
+                color: displayResult.distance <= R0 ? "#166534" : "#991b1b",
               }}>
-                d={fmt(result.distance, 3)} {result.distance <= R0 ? `≤ R₀=${fmt(R0, 1)} ✓` : `> R₀=${fmt(R0, 1)} ✗`}
+                d={fmt(displayResult.distance, 3)} {displayResult.distance <= R0 ? `≤ R₀=${fmt(R0, 1)} ✓` : `> R₀=${fmt(R0, 1)} ✗`}
               </span>
             </div>
           </div>
@@ -237,7 +286,7 @@ function SolventMixtureAppInner() {
                   title={label}
                   target={target} R0={R0} proj={id}
                   solvA={solvA} solvB={solvB} solvC={solvC}
-                  mode={mode} mixture={result} library={library}
+                  mode={mode} mixture={displayResult} library={library}
                   showLib={showLib} showDistCalc={showDistCalc}
                   onPickSolvent={handlePickFromGraph}
                 />
@@ -246,7 +295,7 @@ function SolventMixtureAppInner() {
           </div>
         ) : (
           <Suspense fallback={<div style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>Chargement 3D…</div>}>
-            <Plot3D target={target} R0={R0} solvA={solvA} solvB={solvB} solvC={solvC} mode={mode} mixture={result} showLib={showLib} onPickSolvent={handlePickFromGraph} />
+            <Plot3D target={target} R0={R0} solvA={solvA} solvB={solvB} solvC={solvC} mode={mode} mixture={displayResult} showLib={showLib} onPickSolvent={handlePickFromGraph} />
           </Suspense>
         )}
       </Panel>
@@ -305,6 +354,106 @@ function Panel({ accent, children }) {
       borderRadius: 10,
     }}>
       {children}
+    </div>
+  );
+}
+
+function MixSlider({ solvA, solvB, fractionB, optimalFractionB, onChange, onReset, isManual }) {
+  const barRef = useRef(null);
+  const dragging = useRef(false);
+
+  const updateFromX = (clientX) => {
+    if (!barRef.current) return;
+    const rect = barRef.current.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const raw = (clientX - rect.left) / rect.width;
+    if (!isFinite(raw)) return;
+    onChange(Math.max(0, Math.min(1, raw)));
+  };
+
+  const onMouseDown = (e) => {
+    dragging.current = true;
+    updateFromX(e.clientX);
+    e.preventDefault();
+  };
+  const onTouchStart = (e) => {
+    dragging.current = true;
+    updateFromX(e.touches[0].clientX);
+  };
+
+  useEffect(() => {
+    const onMove  = (e) => { if (dragging.current) updateFromX(e.clientX); };
+    const onTMove = (e) => { if (dragging.current) updateFromX(e.touches[0].clientX); };
+    const onUp    = () => { dragging.current = false; };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup",   onUp);
+    document.addEventListener("touchmove", onTMove, { passive: true });
+    document.addEventListener("touchend",  onUp);
+    return () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup",   onUp);
+      document.removeEventListener("touchmove", onTMove);
+      document.removeEventListener("touchend",  onUp);
+    };
+  }, []);
+
+  const pctA = ((1 - fractionB) * 100).toFixed(1);
+  const pctB = (fractionB * 100).toFixed(1);
+  const optPct = optimalFractionB * 100;
+
+  return (
+    <div style={{ userSelect: "none" }}>
+      {/* Barre */}
+      <div ref={barRef} onMouseDown={onMouseDown} onTouchStart={onTouchStart}
+        style={{ position: "relative", height: 14, borderRadius: 7, cursor: "ew-resize",
+          background: `linear-gradient(to right, #3b82f6, #10b981)` }}>
+        {/* Marqueur position optimale */}
+        <div style={{
+          position: "absolute", top: 0, bottom: 0, left: `${optPct}%`,
+          width: 2, background: "rgba(255,255,255,0.55)", transform: "translateX(-50%)",
+          pointerEvents: "none",
+        }} title="Position optimale" />
+        {/* Thumb */}
+        <div style={{
+          position: "absolute", top: "50%", left: `${fractionB * 100}%`,
+          transform: "translate(-50%, -50%)",
+          width: 22, height: 22, borderRadius: "50%",
+          background: "#fff",
+          border: `2.5px solid ${isManual ? ACCENT : "#475569"}`,
+          boxShadow: "0 1px 5px rgba(0,0,0,0.22)",
+          cursor: "ew-resize", zIndex: 1,
+        }} />
+      </div>
+      {/* Labels dessous */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, gap: 8 }}>
+        <div style={{ textAlign: "left", minWidth: 0 }}>
+          <div style={{ fontSize: 11, color: "#3b82f6", fontWeight: 700,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {solvA.name}
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: "tabular-nums", color: "#3b82f6" }}>
+            {pctA} %
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          {isManual && (
+            <button onClick={onReset} title="Revenir au mélange optimal"
+              style={{ fontSize: 10, padding: "2px 8px", borderRadius: 5, border: `1px solid ${ACCENT}`,
+                background: "transparent", color: ACCENT, cursor: "pointer", fontWeight: 700, whiteSpace: "nowrap" }}>
+              ↩ optimal
+            </button>
+          )}
+        </div>
+        <div style={{ textAlign: "right", minWidth: 0 }}>
+          <div style={{ fontSize: 11, color: "#10b981", fontWeight: 700,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {solvB.name}
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: "tabular-nums", color: "#10b981" }}>
+            {pctB} %
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
