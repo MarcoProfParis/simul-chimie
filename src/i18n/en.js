@@ -256,7 +256,7 @@ const en = {
   // ── DoE — Factorial design ────────────────────────────────────────────────
   "doe.title":              "Design of Experiments",
   "doe.back":               "Back",
-  "doe.matrix":             "Test matrix",
+  "doe.matrix":             "Design Matrix",
   "doe.interactionGraphs":  "Effect analysis",
   "doe.effects":            "Effects",
   "doe.nav.validate":       "Validate",

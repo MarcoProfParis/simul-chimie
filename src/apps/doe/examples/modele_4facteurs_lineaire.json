@@ -1,0 +1,440 @@
+{
+  "meta": {
+    "id": "≈",
+    "title": "modèle linéaire — 4 facteurs",
+    "context": "Dans ce plan factoriel complet à 4 facteurs, nous avons étudié l'effet de la pression, de l'ouverture, du type de colorant et de la quantité de colorant sur la couleur obtenue. Les données sont simulées pour illustrer un exemple d'analyse de plan factoriel.",
+    "difficulty": "débutant",
+    "real_data": false,
+    "source": "https://philomatica.org/wp-content/uploads/2023/03/Cours-Plans-dexperiences-LMR-V2-GSI.pdf"
+  },
+  "factors": [
+    {
+      "id": "X1",
+      "name": "Pression",
+      "unit": "bar",
+      "continuous": true,
+      "low": {
+        "real": 1,
+        "coded": -1
+      },
+      "high": {
+        "real": 3,
+        "coded": 1
+      }
+    },
+    {
+      "id": "X2",
+      "name": "Ouverture",
+      "unit": "%",
+      "continuous": true,
+      "low": {
+        "real": 0,
+        "coded": -1
+      },
+      "high": {
+        "real": 5,
+        "coded": 1
+      }
+    },
+    {
+      "id": "X3",
+      "name": "Type colorant",
+      "unit": null,
+      "continuous": false,
+      "low": {
+        "label": "Type A",
+        "coded": -1
+      },
+      "high": {
+        "label": "Type B",
+        "coded": 1
+      }
+    },
+    {
+      "id": "X4",
+      "name": "Quantité colorant",
+      "unit": "%",
+      "continuous": true,
+      "low": {
+        "real": 25,
+        "coded": -1
+      },
+      "high": {
+        "real": 35,
+        "coded": 1
+      }
+    }
+  ],
+  "responses": [
+    {
+      "id": "Y1",
+      "name": "couleur",
+      "unit": null
+    }
+  ],
+  "center_point": {
+    "present": false,
+    "replicates": 1
+  },
+  "model_default": [
+    "X1",
+    "X2",
+    "X3",
+    "X4",
+    "X1X2"
+  ],
+  "runs": [
+    {
+      "id": 1,
+      "coded": {
+        "X1": -1,
+        "X2": -1,
+        "X3": -1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 0,
+        "X3": "Type A",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 30.5
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "coded": {
+        "X1": -1,
+        "X2": -1,
+        "X3": -1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 0,
+        "X3": "Type A",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 38
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "coded": {
+        "X1": -1,
+        "X2": -1,
+        "X3": 1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 0,
+        "X3": "Type B",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 30
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "coded": {
+        "X1": -1,
+        "X2": -1,
+        "X3": 1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 0,
+        "X3": "Type B",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 36
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "coded": {
+        "X1": -1,
+        "X2": 1,
+        "X3": -1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 5,
+        "X3": "Type A",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 20.5
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "coded": {
+        "X1": -1,
+        "X2": 1,
+        "X3": -1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 5,
+        "X3": "Type A",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 27
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "coded": {
+        "X1": -1,
+        "X2": 1,
+        "X3": 1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 5,
+        "X3": "Type B",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 18
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "coded": {
+        "X1": -1,
+        "X2": 1,
+        "X3": 1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 1,
+        "X2": 5,
+        "X3": "Type B",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 25.5
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "coded": {
+        "X1": 1,
+        "X2": -1,
+        "X3": -1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 0,
+        "X3": "Type A",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 35.5
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "coded": {
+        "X1": 1,
+        "X2": -1,
+        "X3": -1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 0,
+        "X3": "Type A",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 42
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "coded": {
+        "X1": 1,
+        "X2": -1,
+        "X3": 1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 0,
+        "X3": "Type B",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 32.5
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "coded": {
+        "X1": 1,
+        "X2": -1,
+        "X3": 1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 0,
+        "X3": "Type B",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 39
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "coded": {
+        "X1": 1,
+        "X2": 1,
+        "X3": -1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 5,
+        "X3": "Type A",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 24.5
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "coded": {
+        "X1": 1,
+        "X2": 1,
+        "X3": -1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 5,
+        "X3": "Type A",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 32
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "coded": {
+        "X1": 1,
+        "X2": 1,
+        "X3": 1,
+        "X4": -1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 5,
+        "X3": "Type B",
+        "X4": 25
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 23
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "coded": {
+        "X1": 1,
+        "X2": 1,
+        "X3": 1,
+        "X4": 1
+      },
+      "real": {
+        "X1": 3,
+        "X2": 5,
+        "X3": "Type B",
+        "X4": 35
+      },
+      "center": false,
+      "replicates": [
+        {
+          "rep": 1,
+          "Y1": 29.5
+        }
+      ]
+    }
+  ]
+}

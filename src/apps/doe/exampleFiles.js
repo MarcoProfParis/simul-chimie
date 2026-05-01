@@ -8,6 +8,7 @@ import exExtraction from "./examples/ex_extraction.json";
 import exRevetement from "./examples/ex_revetement.json";
 import exOptimisationReaction from "./examples/ex_optimisation_reaction.json";
 import exOptimisationAvance from "./examples/ex_optimisation_avance.json";
+import modele4facteurslineaire from "./examples/modele_4facteurs_lineaire.json";
 
 export const EXAMPLE_FILES = [
   {
@@ -64,6 +65,14 @@ export const EXAMPLE_FILES = [
     title: "Optimisation d'une réaction enzymatique",
     context: "2 facteurs · CCF 20 essais · Maximum très marqué · Q-Q plot fiable",
     difficulty: "avancé",
+    real_data: false,
+  },
+  {
+    file: "modele_4facteurs_lineaire.json",
+    _data: modele4facteurslineaire,
+    title: "modèle linéaire — 4 facteurs",
+    context: "Dans ce plan factoriel complet à 4 facteurs, nous avons étudié l'effet de la pression, de l'ouverture, du type de colorant et de la quantité de colorant sur la couleur obtenue. Les données sont simulées pour illustrer un exemple d'analyse de plan factoriel",
+    difficulty: "débutant",
     real_data: false,
   },
 ];
