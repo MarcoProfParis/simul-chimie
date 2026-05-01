@@ -36,6 +36,8 @@ const en = {
   "app.plan-factoriel.description": "2ⁿ designs, main effects and interactions",
   "app.hsp.label":                  "Find Hansen Solubility Parameters (HSP)",
   "app.hsp.description":            "Fit an HSP sphere from solvent data",
+  "app.solvent-mixture.label":      "Find a solvent mixture",
+  "app.solvent-mixture.description":"Binary mix that lies inside a target Hansen sphere",
 
   // ── Common ─────────────────────────────────────────────────────────────────
   "common.back":          "Back",

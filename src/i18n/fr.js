@@ -36,6 +36,8 @@ const fr = {
   "app.plan-factoriel.description": "Plans 2ⁿ, effets principaux et interactions",
   "app.hsp.label":                  "Méthode de recherche des Paramètres de Hansen (HSP)",
   "app.hsp.description":            "Ajuster une sphère HSP à partir de données de solvants",
+  "app.solvent-mixture.label":      "Trouver un mélange de solvants",
+  "app.solvent-mixture.description":"Mélange binaire qui s'inscrit dans une sphère Hansen cible",
 
   // ── Commun ─────────────────────────────────────────────────────────────────
   "common.back":          "Retour",
