@@ -471,12 +471,15 @@ function DraggablePopup({ title, onClose, children }) {
 
 // ─── PlotCard ─────────────────────────────────────────────────────────────────
 
-function PlotCard({ title, plotKey, onToggle, onExpand, isCompact, children }) {
+function PlotCard({ title, code, plotKey, onToggle, onExpand, isCompact, children }) {
   const cardCls = isCompact ? "border rounded-lg p-2.5" : "border rounded-xl p-3";
   return (
     <div className={`bg-white ${cardCls} border-gray-200 flex flex-col`}>
-      <div className="flex items-center justify-between mb-1.5 gap-1">
-        <span className="text-[11px] font-semibold text-gray-700 truncate">{title}</span>
+      <div className="flex items-start justify-between mb-1.5 gap-1">
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className="text-[11px] font-semibold text-gray-700 truncate">{title}</span>
+          {code && <span className="text-[10px] font-mono text-gray-400 leading-tight">{code}</span>}
+        </div>
         <div className="flex items-center gap-0.5 shrink-0">
           <button
             onClick={onExpand}
@@ -504,7 +507,7 @@ function PlotCard({ title, plotKey, onToggle, onExpand, isCompact, children }) {
 
 // ─── InteractionPlotsPanel (exported) ─────────────────────────────────────────
 
-export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNext }) {
+export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNext, hideNav = false }) {
   const { t } = useLang();
   const { compact: isCompact } = useCompact();
 
@@ -617,7 +620,7 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
               <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">
                 {t("doe.interactions.mainEffects")}
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {factors.map(f => {
                   const key = `main_${resp.id}_${f.id}`;
                   if (hidden.has(key)) return null;
@@ -625,6 +628,7 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                     <PlotCard
                       key={key}
                       title={`${f.name || f.id}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`}
+                      code={f.id}
                       plotKey={key}
                       onToggle={toggle}
                       onExpand={() => setPopup({
@@ -648,7 +652,7 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">
                   {t("doe.interactions.interactions")}
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {pairs.map(([fa, fb]) => {
                     const key = `int_${resp.id}_${fa.id}_${fb.id}`;
                     if (hidden.has(key)) return null;
@@ -657,6 +661,7 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
                       <PlotCard
                         key={key}
                         title={`${title}${responses.length > 1 ? ` — ${resp.name || resp.id}` : ""}`}
+                        code={`${fa.id}${fb.id}`}
                         plotKey={key}
                         onToggle={toggle}
                         onExpand={() => setPopup({
@@ -679,20 +684,22 @@ export function InteractionPlotsPanel({ factors, matrix, responses, onBack, onNe
       )}
 
       {/* ── Navigation ── */}
-      <div className="flex items-center justify-between mt-2">
-        <button
-          onClick={onBack}
-          className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          ← {t("common.back")}
-        </button>
-        <button
-          onClick={onNext}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
-        >
-          {t("doe.model")} →
-        </button>
-      </div>
+      {!hideNav && (
+        <div className="flex items-center justify-between mt-2">
+          <button
+            onClick={onBack}
+            className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            ← {t("common.back")}
+          </button>
+          <button
+            onClick={onNext}
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
+          >
+            {t("doe.model")} →
+          </button>
+        </div>
+      )}
 
       {/* ── Popup agrandi (draggable) ── */}
       {popup && (

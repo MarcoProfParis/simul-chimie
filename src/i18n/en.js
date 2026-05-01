@@ -34,7 +34,7 @@ const en = {
   "app.zisman.description":         "Critical surface tension, surface energy",
   "app.plan-factoriel.label":       "Factorial Design",
   "app.plan-factoriel.description": "2ⁿ designs, main effects and interactions",
-  "app.hsp.label":                  "Hansen Solubility Parameters (HSP)",
+  "app.hsp.label":                  "Find Hansen Solubility Parameters (HSP)",
   "app.hsp.description":            "Fit an HSP sphere from solvent data",
 
   // ── Common ─────────────────────────────────────────────────────────────────

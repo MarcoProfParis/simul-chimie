@@ -14,7 +14,7 @@ const fr = {
   // ── Config — catégories ────────────────────────────────────────────────────
   "cat.couleur.label":         "Couleur",
   "cat.couleur.description":   "Colorimétrie et espaces colorimétriques",
-  "cat.rheologie.label":       "Rhéologie & Mouillage",
+  "cat.rheologie.label":       "Rhéologie",
   "cat.rheologie.description": "Comportement des fluides et interfaces",
   "cat.doe.label":             "Plans d'expériences",
   "cat.doe.description":       "Méthodologie des plans factoriels",
@@ -34,7 +34,7 @@ const fr = {
   "app.zisman.description":         "Tension critique, énergie de surface",
   "app.plan-factoriel.label":       "Plan factoriel",
   "app.plan-factoriel.description": "Plans 2ⁿ, effets principaux et interactions",
-  "app.hsp.label":                  "Paramètres de Hansen (HSP)",
+  "app.hsp.label":                  "Méthode de recherche des Paramètres de Hansen (HSP)",
   "app.hsp.description":            "Ajuster une sphère HSP à partir de données de solvants",
 
   // ── Commun ─────────────────────────────────────────────────────────────────

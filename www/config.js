@@ -1,4 +1,5 @@
 import RheogrammeSimulateur from "./apps/rheologie/RheogrammeSimulateur"
+import CosINGApp from "./apps/cosing/CosINGApp"
 import GouttteMouillage from "./apps/rheologie/GouttteMouillage"
 import ZismanApp from "./apps/rheologie/ZismanApp"
 import AppCouleur from "./apps/couleur/AppCouleur.jsx"
@@ -31,7 +32,7 @@ export const CATEGORIES = [
   },
   {
     id: "rheologie",
-    label: "Rhéologie & Mouillage",
+    label: "Rhéologie",
     emoji: "💧",
     description: "Comportement des fluides et interfaces",
     color: "#0891b2",
@@ -56,6 +57,22 @@ export const CATEGORIES = [
         description: "Tension critique, énergie de surface",
         emoji: "📐",
         component: ZismanApp,
+      },
+    ],
+  },
+  {
+    id: "cosing",
+    label: "COSING",
+    emoji: "🧴",
+    description: "Inventaire des ingrédients cosmétiques (UE)",
+    color: "#0891b2",
+    apps: [
+      {
+        id: "recherche",
+        label: "Recherche COSING",
+        description: "Recherche par nom INCI ou par fonction cosmétique",
+        emoji: "🔍",
+        component: CosINGApp,
       },
     ],
   },

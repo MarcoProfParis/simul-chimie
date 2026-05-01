@@ -43,6 +43,7 @@ import { ResidualPlot } from "./ResidualPlot.jsx";
 import { QQPlotSVG } from "./QQPlotSVG.jsx";
 import { IsoResponsePanel } from "./IsoResponsePanel.jsx";
 import { InteractionPlotsPanel } from "./InteractionPlotsPanel.jsx";
+import ParetoPanel from "./ParetoPanel.jsx";
 import ExcelImportModal from "./ExcelImportModal.jsx";
 
 const DEFAULT_RESPONSES = [{ id: "Y1", name: "Réponse 1", unit: "" }];
@@ -97,6 +98,7 @@ function PlanFactorielInner() {
   const [showRandomDialog, setShowRandomDialog] = useState(false);
   const [showRandomDone, setShowRandomDone] = useState(false);
   const [showCubicDialog, setShowCubicDialog] = useState(false);
+  const [showNoCenterFor, setShowNoCenterFor] = useState(null); // "quadratic" | "cubic" | null
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadedExampleId, setLoadedExampleId] = useState(null);
   const [loadError, setLoadError] = useState(null);
@@ -763,6 +765,9 @@ function PlanFactorielInner() {
   };
   const applyPreset = (p) => {
     if (p === "cubic" && factors.length < 3) { setShowCubicDialog(true); return; }
+    if ((p === "quadratic" || p === "cubic") && !(matrix && matrix.some(r => r.center))) {
+      setShowNoCenterFor(p); return;
+    }
     setModelPreset(p);
     setModelActive(computePresetModel(p, factors, modelDefault));
   };
@@ -1820,15 +1825,36 @@ function PlanFactorielInner() {
         </>
       )}
 
-      {/* ══════════════════════════════════════════════════════ PARTIE 3 — Graphe d'interactions */}
+      {/* ══════════════════════════════════════════════════════ PARTIE 3 — Analyse des effets + Pareto */}
       {part === 3 && matrix && (
-        <InteractionPlotsPanel
-          factors={factors}
-          matrix={matrix}
-          responses={responses}
-          onBack={() => goTo(2)}
-          onNext={() => goTo(4)}
-        />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+          <div className="space-y-4">
+            <InteractionPlotsPanel
+              factors={factors}
+              matrix={matrix}
+              responses={responses}
+              hideNav
+            />
+            <button onClick={() => goTo(2)}
+              className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+              ← {t("common.back")}
+            </button>
+          </div>
+          <div className="space-y-4">
+            <ParetoPanel
+              factors={factors}
+              matrix={matrix}
+              responses={responses}
+              hideNav
+            />
+            <div className="flex justify-end">
+              <button onClick={() => goTo(4)}
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                {t("doe.model")} →
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════════════ PARTIE 4 — Modèle */}
@@ -1901,6 +1927,9 @@ function PlanFactorielInner() {
 
         const applyPresetTo = (id, p) => {
           if (p === "cubic" && factors.length < 3) { setShowCubicDialog(true); return; }
+          if ((p === "quadratic" || p === "cubic") && !(matrix && matrix.some(r => r.center))) {
+            setShowNoCenterFor(p); return;
+          }
           const terms = computePresetModel(p, factors, modelDefault);
           doSetModels(ms => ms.map(m => m.id === id ? { ...m, terms, preset: p } : m));
         };
@@ -1909,6 +1938,10 @@ function PlanFactorielInner() {
           const m = editModels.find(x => x.id === id);
           if (!m) return;
           const has = m.terms.includes(t);
+          // Si on ajoute un terme quadratique pur sans point central : bloquer
+          if (!has && isQuadPure(t, factors) && !(matrix && matrix.some(r => r.center))) {
+            setShowNoCenterFor("quadratic"); return;
+          }
           // Si on ajoute : vérifier contrainte
           if (!has && m.terms.length >= maxTerms) return;
           const terms = has ? m.terms.filter(x => x !== t) : [...m.terms, t];
@@ -1936,6 +1969,30 @@ function PlanFactorielInner() {
                   <DialogTitle className="text-base font-semibold text-gray-900 mb-2">Modèle impossible</DialogTitle>
                   <p className="text-sm text-gray-500 mb-6">Le modèle cubique (ordre 3) nécessite au moins 3 facteurs.</p>
                   <button onClick={() => setShowCubicDialog(false)} className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">Fermer</button>
+                </DialogPanel>
+              </div>
+            </Dialog>
+
+            {/* Dialog : quadratique / cubique sans points centraux */}
+            <Dialog open={showNoCenterFor !== null} onClose={() => setShowNoCenterFor(null)} className="relative z-50">
+              <DialogBackdrop transition className="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0" />
+              <div className="fixed inset-0 z-10 flex items-center justify-center p-4">
+                <DialogPanel transition className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl text-center transition-all data-closed:opacity-0 data-closed:scale-95">
+                  <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-amber-100">
+                    <ExclamationTriangleIcon className="size-6 text-amber-600" />
+                  </div>
+                  <DialogTitle className="text-base font-semibold text-gray-900 mb-2">
+                    Modèle {showNoCenterFor === "quadratic" ? "quadratique" : "cubique"} impossible
+                  </DialogTitle>
+                  <p className="text-sm text-gray-500 mb-2">
+                    Sans point central dans la matrice d'expérience, les facteurs ne prennent que 2 niveaux (−1 / +1).
+                  </p>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Les termes d'ordre supérieur (Xi², …) deviennent constants et ne peuvent pas être estimés. Ajoute au moins un point central à l'étape <strong>Matrice des essais</strong> pour activer ce modèle.
+                  </p>
+                  <button onClick={() => setShowNoCenterFor(null)} className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
+                    Fermer
+                  </button>
                 </DialogPanel>
               </div>
             </Dialog>
@@ -2027,7 +2084,6 @@ function PlanFactorielInner() {
                       { id: "linear", label: "Linéaire" },
                       { id: "synergie", label: "Synergie" },
                       { id: "quadratic", label: "Quadratique" },
-                      { id: "cubic", label: "Cubique" },
                     ].map(p => (
                       <button key={p.id} onClick={() => applyPresetTo(activeModel.id, p.id)}
                         className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
@@ -2089,10 +2145,9 @@ function PlanFactorielInner() {
                     <span className="text-xs text-gray-400">Termes actifs :</span>
                     <strong className="text-sm text-gray-700">{activeModel.terms.length + 1}</strong>
                     <span className="text-xs text-gray-400">/ {nRuns} essais</span>
-                    {!isDefault
-                      ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Modifié</span>
-                      : <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Défaut JSON</span>
-                    }
+                    {!isDefault && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Modifié</span>
+                    )}
                   </div>
                 </div>
               );

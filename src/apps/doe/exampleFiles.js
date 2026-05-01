@@ -8,6 +8,7 @@ import exExtraction from "./examples/ex_extraction.json";
 import exRevetement from "./examples/ex_revetement.json";
 import exOptimisationReaction from "./examples/ex_optimisation_reaction.json";
 import exOptimisationAvance from "./examples/ex_optimisation_avance.json";
+import exEster from "./examples/ex_ester.json";
 import modele4facteurslineaire from "./examples/modele_4facteurs_lineaire.json";
 
 export const EXAMPLE_FILES = [
@@ -40,6 +41,14 @@ export const EXAMPLE_FILES = [
     _data: exExtraction,
     title: "Extraction d'un principe actif",
     context: "3 facteurs · Rendement & Pureté",
+    difficulty: "débutant",
+    real_data: false,
+  },
+  {
+    file: "ex_ester.json",
+    _data: exEster,
+    title: "Synthèse d'un ester",
+    context: "2 facteurs · Plan 2² · Taux de conversion · Surface 3D non-plane",
     difficulty: "débutant",
     real_data: false,
   },
